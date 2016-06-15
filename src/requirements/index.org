@@ -1,0 +1,21 @@
+#+TITLE: Requirements for Outreach Portal 3.0
+#+AUTHOR: VLEAD
+#+DATE: [2016-06-15 Wed]
+#+PROPERTY: results output
+#+PROPERTY: exports code
+#+SETUPFILE: ../org-templates/level-1.org
+#+options: ^:nil
+#+LATEX: Literal LaTeX code for export
+
+* Application:  A portal to help conduct workshop on Virtual Labs.
+
+* Users
+
+* Roles
+
+* Sessions
+
+* Interaction with the system and privileges
+
+* Questions/scenarios
+
