@@ -75,14 +75,7 @@ Encodes the following items of information:
 
 * Abstract Entity Types
 #+BEGIN_SRC spec :tangle spec.txt
-
-;;; Entity Types
-
-TYPE User
-TYPE Email
-TYPE Name
-TYPE Role = {admin + guest + reviewer + OCC(OC) + NCC(NC)}
-TYPE NodalCentre ( abbreviation- NC )
+abbreviation- NC )
 TYPE OutreachCentre ( abbreviation- OC )
 TYPE Institution
 TYPE Session
@@ -234,7 +227,6 @@ the  actors:  =session=.
 *** Actor credentials
     s.role==admin or s.role==OCC(OC)
 *** Referential Integrity
-
     s: session-set
 
 *** Remarks
@@ -245,8 +237,6 @@ the  actors:  =session=.
     u: User, r: Role, s: Session
 *** Actor credentials
     s.role == admin or s.role == OCC(oc)
-    #   
-    #   
 *** Referential Integrity
     s:session-set
     s.role == admin => r:role-set
@@ -306,12 +296,14 @@ the  actors:  =session=.
 *** Referential-Integrity
     s:session-set
 
+*** Result
+    s is removed from the session-set
         
 ** create audit
 
 *** Parameters
-    s:Session, old-data:String, time-stamp:String, pk-old:Integer,
-    pk-current:Integer, entity:String 
+    s:Session, old-data:String, time-stamp:String, primary-key-old:Integer,
+    primary-key-current-session:Integer, entity:String 
 
 *** Referential Integrity
     s:session-set
@@ -319,9 +311,11 @@ the  actors:  =session=.
 *** Remarks
     This function logs an Audit to the database. 
     old-data is a string containing the values of the object before it is changed.
-    pk-old contains the id of the object being changed
-    pk-current contains the id of the session of the user who is changing the object
+    primary-key-old contains the id of the object being changed
+    primary-key-current-session contains the id of the session of the user who is changing the object
        
+*** Result
+    An Audit record is created and saved in the database.
  
 
 ** delete User
@@ -329,7 +323,7 @@ the  actors:  =session=.
     u: User, s:  Session
 *** Actor credentials
     
-    s.role==admin  or s.role==OCC(OC) 
+    s.role==admin  or s.role==OCC(oc) where oc:oc-set 
 
 *** Referential Integrity
     
@@ -338,16 +332,18 @@ the  actors:  =session=.
     u:~logged-in-user-set
     
 
+
 *** Remarks
    
    An admin can delete any user
    A user with role OCC can delete a user with role NCC only if he belongs to an NC which is a spoke of the OC.
 
-
+*** Result
+    u is removed from the user-set
 
 ** update User
 *** Parameters
-    u: User, s:  Session
+    n: Name,e:Email, u: User, s:  Session
 *** Actor credentials
     
     s.role==admin  or s.role==OCC(OC) or s.role == NCC(NC)
