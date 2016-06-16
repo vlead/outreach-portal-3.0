@@ -152,6 +152,7 @@ Relations
  user   [Session,User]
  role   [Session,Role]
 
+
  
 
  #+END_SRC
@@ -225,7 +226,7 @@ the  actors:  =session=.
 *** Parameters
     u: User, s: Session
 *** Actor credentials
-    s.role==admin or s.role==OCC(OC)
+    s.role==admin or s.role==OCC(oc) where oc:oc-set
 *** Referential Integrity
     s: session-set
 
@@ -258,7 +259,7 @@ the  actors:  =session=.
     i:institute-set
     i:~ oc-institute-set 
     i:~ nc-institute-set
-*** Result
+*** Effect
     role-set' =role-set U OCC(oc)
 
 ** Create NC
@@ -271,8 +272,8 @@ the  actors:  =session=.
     i:institute-set  
     i:~ nc-institute-set
     if i : oc-institute-set
-        i.oc == oc
-*** Result
+        i.oc == oc      #Note : i.oc represtsents the oc associated with i
+*** Effect
     role-set' =role-set U NCC(nc)
     
 
@@ -295,7 +296,7 @@ the  actors:  =session=.
 
 *** Referential-Integrity
     s:session-set
-
+    
 *** Effect
     s is removed from the session-set
         
