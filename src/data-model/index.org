@@ -139,14 +139,14 @@ state variables.
 
 ;;; Primary state variables
 
- user-set                : set[User]               ; set of users in the system
- name-set                : set[Name]               ; set of names in the system
- nc-set                  : set[NC]                 ; set of nodal centres
- email-set               : set[Email]              ; set of emails in the system
- session-set             : set[Session]            ; set of sessions in the system
- oc-set                  : set[OC]                 ; set of outreach centres in the system
- institution-set         : set[Institution]        ; set of institutions in the system
- role-set                : set[Role]               ; set of roles in the system
+ user-set  : set[User]       ; set of users in the system
+ name-set  : set[Name]       ; set of names in the system
+ nc-set    : set[NC]         ; set of nodal centres
+ email-set : set[Email]      ; set of emails in the system
+ session-set : set[Session]  ; set of sessions in the system
+ oc-set    :  set[OC]        ; set of outreach centres in the system
+ institute-set : set[Institute] ; set of institutes in the system
+ role-set : set[Role]           ; set of roles in the system
 
  
 
@@ -199,6 +199,7 @@ These specifications also capture referential integrity.
 #+END_SRC
 
 * Operations 
+
 CRUD operations.  
 
 Each operation is performed on an entity instance or an
