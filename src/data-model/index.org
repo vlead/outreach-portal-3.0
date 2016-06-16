@@ -346,17 +346,24 @@ the  actors:  =session=.
     n: Name,e:Email, u: User, s:  Session
 *** Actor credentials
     
-    s.role==admin  or s.role==OCC(OC) or s.role == NCC(NC)
+    s.role==admin  or s.role==OCC(oc) where oc:oc-set
 
 *** Referential Integrity
     
     u: user-set
     s: session-set
+    u:~logged-in-user-set
       
- 
-*** Effect
+*** Effect 
+    The user details are updated.
+
+*** Note
+    Not sure if user should be logged-in.    
+   
+*** Remarks
    
    An admin can update any user.
    A user with role OCC can update a user with role NCC and himself.
    A user with role NCC can update only himself.
+   
    
