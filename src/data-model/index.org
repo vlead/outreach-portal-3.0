@@ -229,7 +229,7 @@ the  actors:  =session=.
 *** Referential Integrity
     s: session-set
 
-*** Remarks
+*** Effect
     This operation creates a new user with default role being guest.
 
 ** Add Role
@@ -245,7 +245,7 @@ the  actors:  =session=.
          r==NCC(nc)
          hub(nc) == oc
     u:user-set
-*** Remark
+*** Effect
     r is added to u.roles
 
 ** Create OC
@@ -285,7 +285,7 @@ the  actors:  =session=.
     u:user-set
     r:role-set
     r:user.roles   
-*** Result
+*** Effect
     A session for that user is added to the session-set
 
 ** logout 
@@ -296,7 +296,7 @@ the  actors:  =session=.
 *** Referential-Integrity
     s:session-set
 
-*** Result
+*** Effect
     s is removed from the session-set
         
 ** create audit
@@ -314,7 +314,7 @@ the  actors:  =session=.
     primary-key-old contains the id of the object being changed
     primary-key-current-session contains the id of the session of the user who is changing the object
        
-*** Result
+*** Effect
     An Audit record is created and saved in the database.
  
 
@@ -338,7 +338,7 @@ the  actors:  =session=.
    An admin can delete any user
    A user with role OCC can delete a user with role NCC only if he belongs to an NC which is a spoke of the OC.
 
-*** Result
+*** Effect
     u is removed from the user-set
 
 ** update User
@@ -353,7 +353,7 @@ the  actors:  =session=.
     u: user-set
     s: session-set
        
-*** Remarks
+*** Effect
    
    An admin can update any user.
    A user with role OCC can update a user with role NCC and himself.
