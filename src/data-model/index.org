@@ -404,6 +404,7 @@ the  actors:  =session=.
     u: user-set
     s: session-set
     u:~logged-in-user-set
+    e:~email-set
 #+END_SRC         
 *** Effect 
 #+BEGIN_SRC spec :tangle spec.txt
@@ -411,12 +412,16 @@ the  actors:  =session=.
 #+END_SRC   
 *** Note
 #+BEGIN_SRC spec :tangle spec.txt
-    Not sure if user should be logged-in.    
+    Not sure if user should be logged-in. 
+    If the constraint of user not being logged in is implemented, 
+    then there should be a way to include session time-outs.
+    
 #+END_SRC      
 *** Remarks
 #+BEGIN_SRC spec :tangle spec.txt   
    An admin can update any user.
-   A user with role OCC can update a user with role NCC and himself.
-   A user with role NCC can update only himself.
+   A user with role OCC(oc) can update a user with role NCC(nc) such that
+   hub of nc == oc (oc:oc-set and nc:nc-set) .
+   
 #+END_SRC   
    
