@@ -75,7 +75,12 @@ Encodes the following items of information:
 
 * Abstract Entity Types
 #+BEGIN_SRC spec :tangle spec.txt
-abbreviation- NC )
+
+TYPE User
+TYPE Name
+TYPE Email
+TYPE Role (admin + reviewer + guest + OCC(OC) + NCC(NC))
+TYPE NodalCentre (abbreviation- NC )
 TYPE OutreachCentre ( abbreviation- OC )
 TYPE Institution
 TYPE Session
