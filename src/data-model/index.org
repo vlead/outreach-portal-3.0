@@ -6,6 +6,10 @@
 #+SETUPFILE: ./org-templates/level-0.org
 #+options: ^:nil
 #+LATEX: Literal LaTeX code for export
+* Introduction
+  The purpose of this document is to describe the expected behaviour of the new
+  outreach portal. It is a specification for the new requirements of this portal.
+
 * Notation
 ** Sets, cardinality and relations
 
