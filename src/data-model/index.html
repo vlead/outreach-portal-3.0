@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2016-06-17 Fri 09:39 -->
+<!-- 2016-06-17 Fri 10:17 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="viewport" content="width=device-width, initial-scale=1" />
 <title>Outreach Portal 3.0 Data Model</title>
@@ -148,105 +148,106 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgheadline4">1. Notation</a>
+<li><a href="#orgheadline1">1. Introduction</a></li>
+<li><a href="#orgheadline5">2. Notation</a>
 <ul>
-<li><a href="#orgheadline1">1.1. Sets, cardinality and relations</a></li>
-<li><a href="#orgheadline2">1.2. Relations and their cardinality type</a></li>
-<li><a href="#orgheadline3">1.3. Example of Entity Relationship notation</a></li>
+<li><a href="#orgheadline2">2.1. Sets, cardinality and relations</a></li>
+<li><a href="#orgheadline3">2.2. Relations and their cardinality type</a></li>
+<li><a href="#orgheadline4">2.3. Example of Entity Relationship notation</a></li>
 </ul>
 </li>
-<li><a href="#orgheadline5">2. Abstract Entity Types</a></li>
-<li><a href="#orgheadline7">3. Relations and cardinality constraints over entity types</a>
+<li><a href="#orgheadline6">3. Abstract Entity Types</a></li>
+<li><a href="#orgheadline8">4. Relations and cardinality constraints over entity types</a>
 <ul>
-<li><a href="#orgheadline6">3.1. Keys</a></li>
+<li><a href="#orgheadline7">4.1. Keys</a></li>
 </ul>
 </li>
-<li><a href="#orgheadline12">4. System state</a>
+<li><a href="#orgheadline13">5. System state</a>
 <ul>
-<li><a href="#orgheadline8">4.1. Primary Entity sets</a></li>
-<li><a href="#orgheadline9">4.2. Derived Entity sets</a></li>
-<li><a href="#orgheadline11">4.3. Referential Integrity Constraints over entity-sets</a>
+<li><a href="#orgheadline9">5.1. Primary Entity sets</a></li>
+<li><a href="#orgheadline10">5.2. Derived Entity sets</a></li>
+<li><a href="#orgheadline12">5.3. Referential Integrity Constraints over entity-sets</a>
 <ul>
-<li><a href="#orgheadline10">4.3.1. <code>user-set</code></a></li>
+<li><a href="#orgheadline11">5.3.1. <code>user-set</code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgheadline61">5. Operations</a>
+<li><a href="#orgheadline62">6. Operations</a>
 <ul>
-<li><a href="#orgheadline13">5.1. Actor</a></li>
-<li><a href="#orgheadline18">5.2. Add User</a>
+<li><a href="#orgheadline14">6.1. Actor</a></li>
+<li><a href="#orgheadline19">6.2. Add User</a>
 <ul>
-<li><a href="#orgheadline14">5.2.1. Parameters</a></li>
-<li><a href="#orgheadline15">5.2.2. Actor credentials</a></li>
-<li><a href="#orgheadline16">5.2.3. Referential Integrity</a></li>
-<li><a href="#orgheadline17">5.2.4. Effect</a></li>
+<li><a href="#orgheadline15">6.2.1. Parameters</a></li>
+<li><a href="#orgheadline16">6.2.2. Actor credentials</a></li>
+<li><a href="#orgheadline17">6.2.3. Referential Integrity</a></li>
+<li><a href="#orgheadline18">6.2.4. Effect</a></li>
 </ul>
 </li>
-<li><a href="#orgheadline23">5.3. Add Role</a>
+<li><a href="#orgheadline24">6.3. Add Role</a>
 <ul>
-<li><a href="#orgheadline19">5.3.1. Parameters</a></li>
-<li><a href="#orgheadline20">5.3.2. Actor credentials</a></li>
-<li><a href="#orgheadline21">5.3.3. Referential Integrity</a></li>
-<li><a href="#orgheadline22">5.3.4. Effect</a></li>
+<li><a href="#orgheadline20">6.3.1. Parameters</a></li>
+<li><a href="#orgheadline21">6.3.2. Actor credentials</a></li>
+<li><a href="#orgheadline22">6.3.3. Referential Integrity</a></li>
+<li><a href="#orgheadline23">6.3.4. Effect</a></li>
 </ul>
 </li>
-<li><a href="#orgheadline28">5.4. Create OC</a>
+<li><a href="#orgheadline29">6.4. Create OC</a>
 <ul>
-<li><a href="#orgheadline24">5.4.1. Parameters</a></li>
-<li><a href="#orgheadline25">5.4.2. Actor Credentials</a></li>
-<li><a href="#orgheadline26">5.4.3. Referential Integrity</a></li>
-<li><a href="#orgheadline27">5.4.4. Effect</a></li>
+<li><a href="#orgheadline25">6.4.1. Parameters</a></li>
+<li><a href="#orgheadline26">6.4.2. Actor Credentials</a></li>
+<li><a href="#orgheadline27">6.4.3. Referential Integrity</a></li>
+<li><a href="#orgheadline28">6.4.4. Effect</a></li>
 </ul>
 </li>
-<li><a href="#orgheadline33">5.5. Create NC</a>
+<li><a href="#orgheadline34">6.5. Create NC</a>
 <ul>
-<li><a href="#orgheadline29">5.5.1. Parameters</a></li>
-<li><a href="#orgheadline30">5.5.2. Actor Credentials</a></li>
-<li><a href="#orgheadline31">5.5.3. Referential Integrity</a></li>
-<li><a href="#orgheadline32">5.5.4. Effect</a></li>
+<li><a href="#orgheadline30">6.5.1. Parameters</a></li>
+<li><a href="#orgheadline31">6.5.2. Actor Credentials</a></li>
+<li><a href="#orgheadline32">6.5.3. Referential Integrity</a></li>
+<li><a href="#orgheadline33">6.5.4. Effect</a></li>
 </ul>
 </li>
-<li><a href="#orgheadline38">5.6. login</a>
+<li><a href="#orgheadline39">6.6. login</a>
 <ul>
-<li><a href="#orgheadline34">5.6.1. Parameters</a></li>
-<li><a href="#orgheadline35">5.6.2. Actor Credentials</a></li>
-<li><a href="#orgheadline36">5.6.3. Referential-Integrity</a></li>
-<li><a href="#orgheadline37">5.6.4. Effect</a></li>
+<li><a href="#orgheadline35">6.6.1. Parameters</a></li>
+<li><a href="#orgheadline36">6.6.2. Actor Credentials</a></li>
+<li><a href="#orgheadline37">6.6.3. Referential-Integrity</a></li>
+<li><a href="#orgheadline38">6.6.4. Effect</a></li>
 </ul>
 </li>
-<li><a href="#orgheadline42">5.7. logout</a>
+<li><a href="#orgheadline43">6.7. logout</a>
 <ul>
-<li><a href="#orgheadline39">5.7.1. Parameters</a></li>
-<li><a href="#orgheadline40">5.7.2. Referential-Integrity</a></li>
-<li><a href="#orgheadline41">5.7.3. Effect</a></li>
+<li><a href="#orgheadline40">6.7.1. Parameters</a></li>
+<li><a href="#orgheadline41">6.7.2. Referential-Integrity</a></li>
+<li><a href="#orgheadline42">6.7.3. Effect</a></li>
 </ul>
 </li>
-<li><a href="#orgheadline47">5.8. create audit</a>
+<li><a href="#orgheadline48">6.8. create audit</a>
 <ul>
-<li><a href="#orgheadline43">5.8.1. Parameters</a></li>
-<li><a href="#orgheadline44">5.8.2. Referential Integrity</a></li>
-<li><a href="#orgheadline45">5.8.3. Remarks</a></li>
-<li><a href="#orgheadline46">5.8.4. Effect</a></li>
+<li><a href="#orgheadline44">6.8.1. Parameters</a></li>
+<li><a href="#orgheadline45">6.8.2. Referential Integrity</a></li>
+<li><a href="#orgheadline46">6.8.3. Remarks</a></li>
+<li><a href="#orgheadline47">6.8.4. Effect</a></li>
 </ul>
 </li>
-<li><a href="#orgheadline53">5.9. delete User</a>
+<li><a href="#orgheadline54">6.9. delete User</a>
 <ul>
-<li><a href="#orgheadline48">5.9.1. Parameters</a></li>
-<li><a href="#orgheadline49">5.9.2. Actor credentials</a></li>
-<li><a href="#orgheadline50">5.9.3. Referential Integrity</a></li>
-<li><a href="#orgheadline51">5.9.4. Remarks</a></li>
-<li><a href="#orgheadline52">5.9.5. Effect</a></li>
+<li><a href="#orgheadline49">6.9.1. Parameters</a></li>
+<li><a href="#orgheadline50">6.9.2. Actor credentials</a></li>
+<li><a href="#orgheadline51">6.9.3. Referential Integrity</a></li>
+<li><a href="#orgheadline52">6.9.4. Remarks</a></li>
+<li><a href="#orgheadline53">6.9.5. Effect</a></li>
 </ul>
 </li>
-<li><a href="#orgheadline60">5.10. update User</a>
+<li><a href="#orgheadline61">6.10. update User</a>
 <ul>
-<li><a href="#orgheadline54">5.10.1. Parameters</a></li>
-<li><a href="#orgheadline55">5.10.2. Actor credentials</a></li>
-<li><a href="#orgheadline56">5.10.3. Referential Integrity</a></li>
-<li><a href="#orgheadline57">5.10.4. Effect</a></li>
-<li><a href="#orgheadline58">5.10.5. Note</a></li>
-<li><a href="#orgheadline59">5.10.6. Remarks</a></li>
+<li><a href="#orgheadline55">6.10.1. Parameters</a></li>
+<li><a href="#orgheadline56">6.10.2. Actor credentials</a></li>
+<li><a href="#orgheadline57">6.10.3. Referential Integrity</a></li>
+<li><a href="#orgheadline58">6.10.4. Effect</a></li>
+<li><a href="#orgheadline59">6.10.5. Note</a></li>
+<li><a href="#orgheadline60">6.10.6. Remarks</a></li>
 </ul>
 </li>
 </ul>
@@ -254,12 +255,22 @@ for the JavaScript code in this tag.
 </ul>
 </div>
 </div>
-<div id="outline-container-orgheadline4" class="outline-2">
-<h2 id="orgheadline4"><span class="section-number-2">1</span> Notation</h2>
+<div id="outline-container-orgheadline1" class="outline-2">
+<h2 id="orgheadline1"><span class="section-number-2">1</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
-</div><div id="outline-container-orgheadline1" class="outline-3">
-<h3 id="orgheadline1"><span class="section-number-3">1.1</span> Sets, cardinality and relations</h3>
-<div class="outline-text-3" id="text-1-1">
+<p>
+The purpose of this document is to describe the expected behaviour of the new
+outreach portal. It is a specification for the new requirements of this portal.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline5" class="outline-2">
+<h2 id="orgheadline5"><span class="section-number-2">2</span> Notation</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-orgheadline2" class="outline-3">
+<h3 id="orgheadline2"><span class="section-number-3">2.1</span> Sets, cardinality and relations</h3>
+<div class="outline-text-3" id="text-2-1">
 <p>
 If <code>A</code> is a set, then
 </p>
@@ -276,9 +287,9 @@ abbreviated as <code>A</code>.</li>
 </div>
 
 
-<div id="outline-container-orgheadline2" class="outline-3">
-<h3 id="orgheadline2"><span class="section-number-3">1.2</span> Relations and their cardinality type</h3>
-<div class="outline-text-3" id="text-1-2">
+<div id="outline-container-orgheadline3" class="outline-3">
+<h3 id="orgheadline3"><span class="section-number-3">2.2</span> Relations and their cardinality type</h3>
+<div class="outline-text-3" id="text-2-2">
 <p>
 A relation <code>r:A &gt; B</code> could relate each element of <code>A</code> to
 zero, one or more elements of <code>B</code>.
@@ -340,9 +351,9 @@ zero, one or more elements of <code>B</code>.
 </div>
 </div>
 
-<div id="outline-container-orgheadline3" class="outline-3">
-<h3 id="orgheadline3"><span class="section-number-3">1.3</span> Example of Entity Relationship notation</h3>
-<div class="outline-text-3" id="text-1-3">
+<div id="outline-container-orgheadline4" class="outline-3">
+<h3 id="orgheadline4"><span class="section-number-3">2.3</span> Example of Entity Relationship notation</h3>
+<div class="outline-text-3" id="text-2-3">
 <pre class="example">
  [email, user] : User? &gt; Email!
 </pre>
@@ -387,9 +398,9 @@ user: Email &gt; User?
 </div>
 
 
-<div id="outline-container-orgheadline5" class="outline-2">
-<h2 id="orgheadline5"><span class="section-number-2">2</span> Abstract Entity Types</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-orgheadline6" class="outline-2">
+<h2 id="orgheadline6"><span class="section-number-2">3</span> Abstract Entity Types</h2>
+<div class="outline-text-2" id="text-3">
 <div class="org-src-container">
 
 <pre class="src src-spec">TYPE User
@@ -405,9 +416,9 @@ TYPE Session
 </div>
 </div>
 
-<div id="outline-container-orgheadline7" class="outline-2">
-<h2 id="orgheadline7"><span class="section-number-2">3</span> Relations and cardinality constraints over entity types</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-orgheadline8" class="outline-2">
+<h2 id="orgheadline8"><span class="section-number-2">4</span> Relations and cardinality constraints over entity types</h2>
+<div class="outline-text-2" id="text-4">
 <p>
 For each relation, we define its inverse next to it.
 </p>
@@ -429,9 +440,9 @@ Note: A User can have only one session with a particular role
 </div>
 </div>
 
-<div id="outline-container-orgheadline6" class="outline-3">
-<h3 id="orgheadline6"><span class="section-number-3">3.1</span> Keys</h3>
-<div class="outline-text-3" id="text-3-1">
+<div id="outline-container-orgheadline7" class="outline-3">
+<h3 id="orgheadline7"><span class="section-number-3">4.1</span> Keys</h3>
+<div class="outline-text-3" id="text-4-1">
 <p>
 An entity <code>K</code> is called a <i>key for</i> an entity <code>A</code> if there
 is a relation <code>r: A? &gt; K!</code>.
@@ -482,17 +493,17 @@ is a relation <code>r: A? &gt; K!</code>.
 </div>
 
 
-<div id="outline-container-orgheadline12" class="outline-2">
-<h2 id="orgheadline12"><span class="section-number-2">4</span> System state</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-orgheadline13" class="outline-2">
+<h2 id="orgheadline13"><span class="section-number-2">5</span> System state</h2>
+<div class="outline-text-2" id="text-5">
 <p>
 The system's state is captured by a set of <i>state
 variables</i>.  
 </p>
 </div>
-<div id="outline-container-orgheadline8" class="outline-3">
-<h3 id="orgheadline8"><span class="section-number-3">4.1</span> Primary Entity sets</h3>
-<div class="outline-text-3" id="text-4-1">
+<div id="outline-container-orgheadline9" class="outline-3">
+<h3 id="orgheadline9"><span class="section-number-3">5.1</span> Primary Entity sets</h3>
+<div class="outline-text-3" id="text-5-1">
 <p>
 For the purpose of <i>the application</i>, we maintain eight primary
 state variables.  
@@ -525,9 +536,9 @@ Relations
 </div>
 
 
-<div id="outline-container-orgheadline9" class="outline-3">
-<h3 id="orgheadline9"><span class="section-number-3">4.2</span> Derived Entity sets</h3>
-<div class="outline-text-3" id="text-4-2">
+<div id="outline-container-orgheadline10" class="outline-3">
+<h3 id="orgheadline10"><span class="section-number-3">5.2</span> Derived Entity sets</h3>
+<div class="outline-text-3" id="text-5-2">
 <div class="org-src-container">
 
 <pre class="src src-spec">  name-set           : user-set.name       ; set of names in the system
@@ -540,12 +551,12 @@ Relations
 </div>
 </div>
 
-<div id="outline-container-orgheadline11" class="outline-3">
-<h3 id="orgheadline11"><span class="section-number-3">4.3</span> Referential Integrity Constraints over entity-sets</h3>
-<div class="outline-text-3" id="text-4-3">
-</div><div id="outline-container-orgheadline10" class="outline-4">
-<h4 id="orgheadline10"><span class="section-number-4">4.3.1</span> <code>user-set</code></h4>
-<div class="outline-text-4" id="text-4-3-1">
+<div id="outline-container-orgheadline12" class="outline-3">
+<h3 id="orgheadline12"><span class="section-number-3">5.3</span> Referential Integrity Constraints over entity-sets</h3>
+<div class="outline-text-3" id="text-5-3">
+</div><div id="outline-container-orgheadline11" class="outline-4">
+<h4 id="orgheadline11"><span class="section-number-4">5.3.1</span> <code>user-set</code></h4>
+<div class="outline-text-4" id="text-5-3-1">
 <p>
 There is atleast one user  whose role is <code>admin</code>.
 </p>
@@ -581,9 +592,9 @@ These specifications also capture referential integrity.
 </div>
 </div>
 
-<div id="outline-container-orgheadline61" class="outline-2">
-<h2 id="orgheadline61"><span class="section-number-2">5</span> Operations</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-orgheadline62" class="outline-2">
+<h2 id="orgheadline62"><span class="section-number-2">6</span> Operations</h2>
+<div class="outline-text-2" id="text-6">
 <p>
 CRUD operations.  
 </p>
@@ -603,9 +614,9 @@ actor performing the operation.
 </ul>
 </div>
 
-<div id="outline-container-orgheadline13" class="outline-3">
-<h3 id="orgheadline13"><span class="section-number-3">5.1</span> Actor</h3>
-<div class="outline-text-3" id="text-5-1">
+<div id="outline-container-orgheadline14" class="outline-3">
+<h3 id="orgheadline14"><span class="section-number-3">6.1</span> Actor</h3>
+<div class="outline-text-3" id="text-6-1">
 <p>
 Operations are performed by Actors.  Our application has 
 the  actors:  <code>session</code>. 
@@ -613,12 +624,12 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 
-<div id="outline-container-orgheadline18" class="outline-3">
-<h3 id="orgheadline18"><span class="section-number-3">5.2</span> Add User</h3>
-<div class="outline-text-3" id="text-5-2">
-</div><div id="outline-container-orgheadline14" class="outline-4">
-<h4 id="orgheadline14"><span class="section-number-4">5.2.1</span> Parameters</h4>
-<div class="outline-text-4" id="text-5-2-1">
+<div id="outline-container-orgheadline19" class="outline-3">
+<h3 id="orgheadline19"><span class="section-number-3">6.2</span> Add User</h3>
+<div class="outline-text-3" id="text-6-2">
+</div><div id="outline-container-orgheadline15" class="outline-4">
+<h4 id="orgheadline15"><span class="section-number-4">6.2.1</span> Parameters</h4>
+<div class="outline-text-4" id="text-6-2-1">
 <div class="org-src-container">
 
 <pre class="src src-spec">    u: User, s: Session
@@ -626,9 +637,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline15" class="outline-4">
-<h4 id="orgheadline15"><span class="section-number-4">5.2.2</span> Actor credentials</h4>
-<div class="outline-text-4" id="text-5-2-2">
+<div id="outline-container-orgheadline16" class="outline-4">
+<h4 id="orgheadline16"><span class="section-number-4">6.2.2</span> Actor credentials</h4>
+<div class="outline-text-4" id="text-6-2-2">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s.role==admin or s.role==OCC(oc) where oc:oc-set
@@ -636,9 +647,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline16" class="outline-4">
-<h4 id="orgheadline16"><span class="section-number-4">5.2.3</span> Referential Integrity</h4>
-<div class="outline-text-4" id="text-5-2-3">
+<div id="outline-container-orgheadline17" class="outline-4">
+<h4 id="orgheadline17"><span class="section-number-4">6.2.3</span> Referential Integrity</h4>
+<div class="outline-text-4" id="text-6-2-3">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s: session-set
@@ -646,9 +657,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline17" class="outline-4">
-<h4 id="orgheadline17"><span class="section-number-4">5.2.4</span> Effect</h4>
-<div class="outline-text-4" id="text-5-2-4">
+<div id="outline-container-orgheadline18" class="outline-4">
+<h4 id="orgheadline18"><span class="section-number-4">6.2.4</span> Effect</h4>
+<div class="outline-text-4" id="text-6-2-4">
 <div class="org-src-container">
 
 <pre class="src src-spec">    This operation creates a new user with default role being guest.
@@ -657,12 +668,12 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline23" class="outline-3">
-<h3 id="orgheadline23"><span class="section-number-3">5.3</span> Add Role</h3>
-<div class="outline-text-3" id="text-5-3">
-</div><div id="outline-container-orgheadline19" class="outline-4">
-<h4 id="orgheadline19"><span class="section-number-4">5.3.1</span> Parameters</h4>
-<div class="outline-text-4" id="text-5-3-1">
+<div id="outline-container-orgheadline24" class="outline-3">
+<h3 id="orgheadline24"><span class="section-number-3">6.3</span> Add Role</h3>
+<div class="outline-text-3" id="text-6-3">
+</div><div id="outline-container-orgheadline20" class="outline-4">
+<h4 id="orgheadline20"><span class="section-number-4">6.3.1</span> Parameters</h4>
+<div class="outline-text-4" id="text-6-3-1">
 <div class="org-src-container">
 
 <pre class="src src-spec">    u: User, r: Role, s: Session
@@ -670,9 +681,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline20" class="outline-4">
-<h4 id="orgheadline20"><span class="section-number-4">5.3.2</span> Actor credentials</h4>
-<div class="outline-text-4" id="text-5-3-2">
+<div id="outline-container-orgheadline21" class="outline-4">
+<h4 id="orgheadline21"><span class="section-number-4">6.3.2</span> Actor credentials</h4>
+<div class="outline-text-4" id="text-6-3-2">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s.role == admin or s.role == OCC(oc)
@@ -680,9 +691,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline21" class="outline-4">
-<h4 id="orgheadline21"><span class="section-number-4">5.3.3</span> Referential Integrity</h4>
-<div class="outline-text-4" id="text-5-3-3">
+<div id="outline-container-orgheadline22" class="outline-4">
+<h4 id="orgheadline22"><span class="section-number-4">6.3.3</span> Referential Integrity</h4>
+<div class="outline-text-4" id="text-6-3-3">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s:session-set
@@ -696,9 +707,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline22" class="outline-4">
-<h4 id="orgheadline22"><span class="section-number-4">5.3.4</span> Effect</h4>
-<div class="outline-text-4" id="text-5-3-4">
+<div id="outline-container-orgheadline23" class="outline-4">
+<h4 id="orgheadline23"><span class="section-number-4">6.3.4</span> Effect</h4>
+<div class="outline-text-4" id="text-6-3-4">
 <div class="org-src-container">
 
 <pre class="src src-spec">    r is added to u.roles
@@ -707,12 +718,12 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline28" class="outline-3">
-<h3 id="orgheadline28"><span class="section-number-3">5.4</span> Create OC</h3>
-<div class="outline-text-3" id="text-5-4">
-</div><div id="outline-container-orgheadline24" class="outline-4">
-<h4 id="orgheadline24"><span class="section-number-4">5.4.1</span> Parameters</h4>
-<div class="outline-text-4" id="text-5-4-1">
+<div id="outline-container-orgheadline29" class="outline-3">
+<h3 id="orgheadline29"><span class="section-number-3">6.4</span> Create OC</h3>
+<div class="outline-text-3" id="text-6-4">
+</div><div id="outline-container-orgheadline25" class="outline-4">
+<h4 id="orgheadline25"><span class="section-number-4">6.4.1</span> Parameters</h4>
+<div class="outline-text-4" id="text-6-4-1">
 <div class="org-src-container">
 
 <pre class="src src-spec">    i:Institute, s:Session
@@ -720,9 +731,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline25" class="outline-4">
-<h4 id="orgheadline25"><span class="section-number-4">5.4.2</span> Actor Credentials</h4>
-<div class="outline-text-4" id="text-5-4-2">
+<div id="outline-container-orgheadline26" class="outline-4">
+<h4 id="orgheadline26"><span class="section-number-4">6.4.2</span> Actor Credentials</h4>
+<div class="outline-text-4" id="text-6-4-2">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s.role==admin
@@ -730,9 +741,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline26" class="outline-4">
-<h4 id="orgheadline26"><span class="section-number-4">5.4.3</span> Referential Integrity</h4>
-<div class="outline-text-4" id="text-5-4-3">
+<div id="outline-container-orgheadline27" class="outline-4">
+<h4 id="orgheadline27"><span class="section-number-4">6.4.3</span> Referential Integrity</h4>
+<div class="outline-text-4" id="text-6-4-3">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s:session-set
@@ -743,9 +754,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline27" class="outline-4">
-<h4 id="orgheadline27"><span class="section-number-4">5.4.4</span> Effect</h4>
-<div class="outline-text-4" id="text-5-4-4">
+<div id="outline-container-orgheadline28" class="outline-4">
+<h4 id="orgheadline28"><span class="section-number-4">6.4.4</span> Effect</h4>
+<div class="outline-text-4" id="text-6-4-4">
 <div class="org-src-container">
 
 <pre class="src src-spec">    role-set' =role-set U OCC(oc)
@@ -754,12 +765,12 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline33" class="outline-3">
-<h3 id="orgheadline33"><span class="section-number-3">5.5</span> Create NC</h3>
-<div class="outline-text-3" id="text-5-5">
-</div><div id="outline-container-orgheadline29" class="outline-4">
-<h4 id="orgheadline29"><span class="section-number-4">5.5.1</span> Parameters</h4>
-<div class="outline-text-4" id="text-5-5-1">
+<div id="outline-container-orgheadline34" class="outline-3">
+<h3 id="orgheadline34"><span class="section-number-3">6.5</span> Create NC</h3>
+<div class="outline-text-3" id="text-6-5">
+</div><div id="outline-container-orgheadline30" class="outline-4">
+<h4 id="orgheadline30"><span class="section-number-4">6.5.1</span> Parameters</h4>
+<div class="outline-text-4" id="text-6-5-1">
 <div class="org-src-container">
 
 <pre class="src src-spec">    i:Institute, oc:OC, s:Session
@@ -767,9 +778,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline30" class="outline-4">
-<h4 id="orgheadline30"><span class="section-number-4">5.5.2</span> Actor Credentials</h4>
-<div class="outline-text-4" id="text-5-5-2">
+<div id="outline-container-orgheadline31" class="outline-4">
+<h4 id="orgheadline31"><span class="section-number-4">6.5.2</span> Actor Credentials</h4>
+<div class="outline-text-4" id="text-6-5-2">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s.role==admin or s.role==OCC(oc) and oc:oc-set
@@ -777,9 +788,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline31" class="outline-4">
-<h4 id="orgheadline31"><span class="section-number-4">5.5.3</span> Referential Integrity</h4>
-<div class="outline-text-4" id="text-5-5-3">
+<div id="outline-container-orgheadline32" class="outline-4">
+<h4 id="orgheadline32"><span class="section-number-4">6.5.3</span> Referential Integrity</h4>
+<div class="outline-text-4" id="text-6-5-3">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s:session-set
@@ -791,9 +802,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline32" class="outline-4">
-<h4 id="orgheadline32"><span class="section-number-4">5.5.4</span> Effect</h4>
-<div class="outline-text-4" id="text-5-5-4">
+<div id="outline-container-orgheadline33" class="outline-4">
+<h4 id="orgheadline33"><span class="section-number-4">6.5.4</span> Effect</h4>
+<div class="outline-text-4" id="text-6-5-4">
 <div class="org-src-container">
 
 <pre class="src src-spec">    role-set' =role-set U NCC(nc)
@@ -803,12 +814,12 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 
-<div id="outline-container-orgheadline38" class="outline-3">
-<h3 id="orgheadline38"><span class="section-number-3">5.6</span> login</h3>
-<div class="outline-text-3" id="text-5-6">
-</div><div id="outline-container-orgheadline34" class="outline-4">
-<h4 id="orgheadline34"><span class="section-number-4">5.6.1</span> Parameters</h4>
-<div class="outline-text-4" id="text-5-6-1">
+<div id="outline-container-orgheadline39" class="outline-3">
+<h3 id="orgheadline39"><span class="section-number-3">6.6</span> login</h3>
+<div class="outline-text-3" id="text-6-6">
+</div><div id="outline-container-orgheadline35" class="outline-4">
+<h4 id="orgheadline35"><span class="section-number-4">6.6.1</span> Parameters</h4>
+<div class="outline-text-4" id="text-6-6-1">
 <div class="org-src-container">
 
 <pre class="src src-spec">    u: User, r:Role
@@ -816,18 +827,18 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline35" class="outline-4">
-<h4 id="orgheadline35"><span class="section-number-4">5.6.2</span> Actor Credentials</h4>
-<div class="outline-text-4" id="text-5-6-2">
+<div id="outline-container-orgheadline36" class="outline-4">
+<h4 id="orgheadline36"><span class="section-number-4">6.6.2</span> Actor Credentials</h4>
+<div class="outline-text-4" id="text-6-6-2">
 <div class="org-src-container">
 
 <pre class="src src-spec"></pre>
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline36" class="outline-4">
-<h4 id="orgheadline36"><span class="section-number-4">5.6.3</span> Referential-Integrity</h4>
-<div class="outline-text-4" id="text-5-6-3">
+<div id="outline-container-orgheadline37" class="outline-4">
+<h4 id="orgheadline37"><span class="section-number-4">6.6.3</span> Referential-Integrity</h4>
+<div class="outline-text-4" id="text-6-6-3">
 <div class="org-src-container">
 
 <pre class="src src-spec">    u:user-set
@@ -837,9 +848,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline37" class="outline-4">
-<h4 id="orgheadline37"><span class="section-number-4">5.6.4</span> Effect</h4>
-<div class="outline-text-4" id="text-5-6-4">
+<div id="outline-container-orgheadline38" class="outline-4">
+<h4 id="orgheadline38"><span class="section-number-4">6.6.4</span> Effect</h4>
+<div class="outline-text-4" id="text-6-6-4">
 <div class="org-src-container">
 
 <pre class="src src-spec">    A session for that user is added to the session-set
@@ -848,12 +859,12 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline42" class="outline-3">
-<h3 id="orgheadline42"><span class="section-number-3">5.7</span> logout</h3>
-<div class="outline-text-3" id="text-5-7">
-</div><div id="outline-container-orgheadline39" class="outline-4">
-<h4 id="orgheadline39"><span class="section-number-4">5.7.1</span> Parameters</h4>
-<div class="outline-text-4" id="text-5-7-1">
+<div id="outline-container-orgheadline43" class="outline-3">
+<h3 id="orgheadline43"><span class="section-number-3">6.7</span> logout</h3>
+<div class="outline-text-3" id="text-6-7">
+</div><div id="outline-container-orgheadline40" class="outline-4">
+<h4 id="orgheadline40"><span class="section-number-4">6.7.1</span> Parameters</h4>
+<div class="outline-text-4" id="text-6-7-1">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s:Session
@@ -861,9 +872,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline40" class="outline-4">
-<h4 id="orgheadline40"><span class="section-number-4">5.7.2</span> Referential-Integrity</h4>
-<div class="outline-text-4" id="text-5-7-2">
+<div id="outline-container-orgheadline41" class="outline-4">
+<h4 id="orgheadline41"><span class="section-number-4">6.7.2</span> Referential-Integrity</h4>
+<div class="outline-text-4" id="text-6-7-2">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s:session-set
@@ -871,9 +882,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline41" class="outline-4">
-<h4 id="orgheadline41"><span class="section-number-4">5.7.3</span> Effect</h4>
-<div class="outline-text-4" id="text-5-7-3">
+<div id="outline-container-orgheadline42" class="outline-4">
+<h4 id="orgheadline42"><span class="section-number-4">6.7.3</span> Effect</h4>
+<div class="outline-text-4" id="text-6-7-3">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s is removed from the session-set
@@ -882,12 +893,12 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline47" class="outline-3">
-<h3 id="orgheadline47"><span class="section-number-3">5.8</span> create audit</h3>
-<div class="outline-text-3" id="text-5-8">
-</div><div id="outline-container-orgheadline43" class="outline-4">
-<h4 id="orgheadline43"><span class="section-number-4">5.8.1</span> Parameters</h4>
-<div class="outline-text-4" id="text-5-8-1">
+<div id="outline-container-orgheadline48" class="outline-3">
+<h3 id="orgheadline48"><span class="section-number-3">6.8</span> create audit</h3>
+<div class="outline-text-3" id="text-6-8">
+</div><div id="outline-container-orgheadline44" class="outline-4">
+<h4 id="orgheadline44"><span class="section-number-4">6.8.1</span> Parameters</h4>
+<div class="outline-text-4" id="text-6-8-1">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s:Session, old-data:String, time-stamp:String, primary-key-old:Integer,
@@ -896,9 +907,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline44" class="outline-4">
-<h4 id="orgheadline44"><span class="section-number-4">5.8.2</span> Referential Integrity</h4>
-<div class="outline-text-4" id="text-5-8-2">
+<div id="outline-container-orgheadline45" class="outline-4">
+<h4 id="orgheadline45"><span class="section-number-4">6.8.2</span> Referential Integrity</h4>
+<div class="outline-text-4" id="text-6-8-2">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s:session-set
@@ -906,9 +917,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline45" class="outline-4">
-<h4 id="orgheadline45"><span class="section-number-4">5.8.3</span> Remarks</h4>
-<div class="outline-text-4" id="text-5-8-3">
+<div id="outline-container-orgheadline46" class="outline-4">
+<h4 id="orgheadline46"><span class="section-number-4">6.8.3</span> Remarks</h4>
+<div class="outline-text-4" id="text-6-8-3">
 <div class="org-src-container">
 
 <pre class="src src-spec">    This function logs an Audit to the database. 
@@ -919,9 +930,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline46" class="outline-4">
-<h4 id="orgheadline46"><span class="section-number-4">5.8.4</span> Effect</h4>
-<div class="outline-text-4" id="text-5-8-4">
+<div id="outline-container-orgheadline47" class="outline-4">
+<h4 id="orgheadline47"><span class="section-number-4">6.8.4</span> Effect</h4>
+<div class="outline-text-4" id="text-6-8-4">
 <div class="org-src-container">
 
 <pre class="src src-spec">    An Audit record is created and saved in the database.
@@ -931,12 +942,12 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 
-<div id="outline-container-orgheadline53" class="outline-3">
-<h3 id="orgheadline53"><span class="section-number-3">5.9</span> delete User</h3>
-<div class="outline-text-3" id="text-5-9">
-</div><div id="outline-container-orgheadline48" class="outline-4">
-<h4 id="orgheadline48"><span class="section-number-4">5.9.1</span> Parameters</h4>
-<div class="outline-text-4" id="text-5-9-1">
+<div id="outline-container-orgheadline54" class="outline-3">
+<h3 id="orgheadline54"><span class="section-number-3">6.9</span> delete User</h3>
+<div class="outline-text-3" id="text-6-9">
+</div><div id="outline-container-orgheadline49" class="outline-4">
+<h4 id="orgheadline49"><span class="section-number-4">6.9.1</span> Parameters</h4>
+<div class="outline-text-4" id="text-6-9-1">
 <div class="org-src-container">
 
 <pre class="src src-spec">    u: User, s:  Session
@@ -944,9 +955,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline49" class="outline-4">
-<h4 id="orgheadline49"><span class="section-number-4">5.9.2</span> Actor credentials</h4>
-<div class="outline-text-4" id="text-5-9-2">
+<div id="outline-container-orgheadline50" class="outline-4">
+<h4 id="orgheadline50"><span class="section-number-4">6.9.2</span> Actor credentials</h4>
+<div class="outline-text-4" id="text-6-9-2">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s.role==admin  or s.role==OCC(oc) where oc:oc-set
@@ -954,9 +965,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline50" class="outline-4">
-<h4 id="orgheadline50"><span class="section-number-4">5.9.3</span> Referential Integrity</h4>
-<div class="outline-text-4" id="text-5-9-3">
+<div id="outline-container-orgheadline51" class="outline-4">
+<h4 id="orgheadline51"><span class="section-number-4">6.9.3</span> Referential Integrity</h4>
+<div class="outline-text-4" id="text-6-9-3">
 <div class="org-src-container">
 
 <pre class="src src-spec">    u: user-set
@@ -968,9 +979,9 @@ the  actors:  <code>session</code>.
 </div>
 
 
-<div id="outline-container-orgheadline51" class="outline-4">
-<h4 id="orgheadline51"><span class="section-number-4">5.9.4</span> Remarks</h4>
-<div class="outline-text-4" id="text-5-9-4">
+<div id="outline-container-orgheadline52" class="outline-4">
+<h4 id="orgheadline52"><span class="section-number-4">6.9.4</span> Remarks</h4>
+<div class="outline-text-4" id="text-6-9-4">
 <div class="org-src-container">
 
 <pre class="src src-spec">   An admin can delete any user
@@ -979,9 +990,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline52" class="outline-4">
-<h4 id="orgheadline52"><span class="section-number-4">5.9.5</span> Effect</h4>
-<div class="outline-text-4" id="text-5-9-5">
+<div id="outline-container-orgheadline53" class="outline-4">
+<h4 id="orgheadline53"><span class="section-number-4">6.9.5</span> Effect</h4>
+<div class="outline-text-4" id="text-6-9-5">
 <div class="org-src-container">
 
 <pre class="src src-spec">    u is removed from the user-set
@@ -990,12 +1001,12 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline60" class="outline-3">
-<h3 id="orgheadline60"><span class="section-number-3">5.10</span> update User</h3>
-<div class="outline-text-3" id="text-5-10">
-</div><div id="outline-container-orgheadline54" class="outline-4">
-<h4 id="orgheadline54"><span class="section-number-4">5.10.1</span> Parameters</h4>
-<div class="outline-text-4" id="text-5-10-1">
+<div id="outline-container-orgheadline61" class="outline-3">
+<h3 id="orgheadline61"><span class="section-number-3">6.10</span> update User</h3>
+<div class="outline-text-3" id="text-6-10">
+</div><div id="outline-container-orgheadline55" class="outline-4">
+<h4 id="orgheadline55"><span class="section-number-4">6.10.1</span> Parameters</h4>
+<div class="outline-text-4" id="text-6-10-1">
 <div class="org-src-container">
 
 <pre class="src src-spec">    n: Name,e:Email, u: User, s:  Session
@@ -1003,9 +1014,9 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline55" class="outline-4">
-<h4 id="orgheadline55"><span class="section-number-4">5.10.2</span> Actor credentials</h4>
-<div class="outline-text-4" id="text-5-10-2">
+<div id="outline-container-orgheadline56" class="outline-4">
+<h4 id="orgheadline56"><span class="section-number-4">6.10.2</span> Actor credentials</h4>
+<div class="outline-text-4" id="text-6-10-2">
 <div class="org-src-container">
 
 <pre class="src src-spec">    s.role==admin  or s.role==OCC(oc) where oc:oc-set
@@ -1013,21 +1024,22 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline56" class="outline-4">
-<h4 id="orgheadline56"><span class="section-number-4">5.10.3</span> Referential Integrity</h4>
-<div class="outline-text-4" id="text-5-10-3">
+<div id="outline-container-orgheadline57" class="outline-4">
+<h4 id="orgheadline57"><span class="section-number-4">6.10.3</span> Referential Integrity</h4>
+<div class="outline-text-4" id="text-6-10-3">
 <div class="org-src-container">
 
 <pre class="src src-spec">    u: user-set
     s: session-set
     u:~logged-in-user-set
+    e:~email-set
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline57" class="outline-4">
-<h4 id="orgheadline57"><span class="section-number-4">5.10.4</span> Effect</h4>
-<div class="outline-text-4" id="text-5-10-4">
+<div id="outline-container-orgheadline58" class="outline-4">
+<h4 id="orgheadline58"><span class="section-number-4">6.10.4</span> Effect</h4>
+<div class="outline-text-4" id="text-6-10-4">
 <div class="org-src-container">
 
 <pre class="src src-spec">    The user details are updated.
@@ -1035,24 +1047,26 @@ the  actors:  <code>session</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline58" class="outline-4">
-<h4 id="orgheadline58"><span class="section-number-4">5.10.5</span> Note</h4>
-<div class="outline-text-4" id="text-5-10-5">
+<div id="outline-container-orgheadline59" class="outline-4">
+<h4 id="orgheadline59"><span class="section-number-4">6.10.5</span> Note</h4>
+<div class="outline-text-4" id="text-6-10-5">
 <div class="org-src-container">
 
-<pre class="src src-spec">    Not sure if user should be logged-in.
+<pre class="src src-spec">    Not sure if user should be logged-in. 
+    If the constraint of user not being logged in is implemented, 
+    then there should be a way to include session time-outs.
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline59" class="outline-4">
-<h4 id="orgheadline59"><span class="section-number-4">5.10.6</span> Remarks</h4>
-<div class="outline-text-4" id="text-5-10-6">
+<div id="outline-container-orgheadline60" class="outline-4">
+<h4 id="orgheadline60"><span class="section-number-4">6.10.6</span> Remarks</h4>
+<div class="outline-text-4" id="text-6-10-6">
 <div class="org-src-container">
 
 <pre class="src src-spec">   An admin can update any user.
-   A user with role OCC can update a user with role NCC and himself.
-   A user with role NCC can update only himself.
+   A user with role OCC(oc) can update a user with role NCC(nc) such that
+   hub of nc == oc (oc:oc-set and nc:nc-set) .
 </pre>
 </div>
 </div>
@@ -1063,7 +1077,7 @@ the  actors:  <code>session</code>.
 <div id="postamble" class="status">
 <p class="date">Date: <span class="timestamp-wrapper"><span class="timestamp">[2016-06-03 Fri]</span></span></p>
 <p class="author">Author: VLEAD</p>
-<p class="date">Created: 2016-06-17 Fri 09:39</p>
+<p class="date">Created: 2016-06-17 Fri 10:17</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
