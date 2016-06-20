@@ -1,0 +1,298 @@
+#+TITLE: Entities
+#+AUTHOR: VLEAD
+#+DATE: [2016-06-07 Tue]
+#+SETUPFILE: ../../org-templates/level-2.org
+#+TAGS: boilerplate(b)
+#+EXCLUDE_TAGS: boilerplate
+#+OPTIONS: ^:nil
+
+* Introduction
+
+In the object implementation of the mini version of the User
+Directory Application, all entities are Objects.  In
+addition, there is an object called =System= that holds the
+state of the application (=user-set=, =session-set=, etc.).
+
+Each of the entities of the data model are implemented as
+objects.  Each entity is defined via a class definition, a
+constructor and getter and setter methods that access and
+mutate the fields of the entity. 
+
+The main idea in the object model is that certain relations
+of the data model (those that are total functions) are
+implemented as /fields/.  For example the =User= object has
+a field called =email= that holds an object of type =Email=.
+
+As a start, we do not implement all relations of the data
+model.  For example, the relation =user: Email > User?= is
+not implemented.  It should be, if we desire to have an
+implementation that is /complete/ with respect to the data
+model.  Which elements of the data model are implemented and
+which are not are decisions based on the end user
+requirements of the application.
+
+
+* Name
+
+=Name= is a value class with type =is_alphabetic_str=.
+
+#+NAME: class_Name
+#+begin_src python
+Name = ClassTemplate.mk_class("Name", name=check_alphabetic_str)
+is_name = is_inst(Name)
+check_name = check_pred(is_name)
+
+#+end_src
+
+*** Test Name
+#+NAME: class_TestName
+#+BEGIN_SRC python
+class TestName(TestCase):
+    TESTING = True
+
+    def test_instantiate_name(self):
+        print "test_instantiate_name"
+        self.assertEqual(is_name(Name(name="Jimi Hendrix")), True)
+        self.assertEqual(Name(name="Jimi Hendrix").get("name"), "Jimi Hendrix")
+        self.assertRaises(TypeError, Name, name="Jimi 123 Hendrix")
+
+#+END_SRC
+
+
+* Email
+=Name= is a value class with type =is_email_str=.
+#+NAME: class_Email
+#+begin_src python
+Email = ClassTemplate.mk_class("Email", email=check_email_str)
+
+Email.__eq__ = lambda self, other: \
+                  isinstance(other, self.__class__) and \
+                  self.get("email") == other.get("email")
+
+is_email = is_inst(Email)
+check_email = check_pred(is_email)
+
+#+end_src
+
+** Test Email
+#+NAME: class_testEmail
+#+BEGIN_SRC python
+class TestEmail(TestCase):
+    TESTING = True
+
+    def test_instantiate_email(self):
+        print "test_instantiate_email"
+        self.assertEqual(is_email(Email(email="jimi@gnu.org")), True)
+        self.assertEqual(Email(email="jimi@gnu.org").get("email"),
+                         "jimi@gnu.org")
+        self.assertRaises(TypeError, Name, name="jimi@@gnu.org")
+
+
+    def test_equality_of_email(self):
+        print "test_equality_of_email"
+        em1 = Email(email="jimi@gnu.org")
+        self.assertEqual(em1 == em1, True)
+
+        em2 = Email(email="didley@gnu.org")
+        self.assertEqual(em1 == em2, False)
+
+#+END_SRC
+
+
+* Role
+   =Role= is an entity that has a field =name= which is an alphabetic string
+
+#+NAME: class_Role
+#+BEGIN_SRC python
+Role = ClassTemplate.mk_class("Role", name=check_alphabetic_str)
+is_role = is_inst(Role)
+check_role = check_pred(is_role)
+Role.is_admin = lambda role: role.name == 'admin'
+
+#+END_SRC
+
+** Test Role
+#+NAME: class_TestRole
+#+BEGIN_SRC python
+class TestRole(TestCase):
+    TESTING = True
+
+    def test_instantiate_role(self):
+        print "test_instantiate_role"
+        self.assertEqual(is_role(Role(name="admin")), True)
+        a_role = Role(name="admin")
+        self.assertEqual(check_role(a_role), a_role)
+        self.assertEqual(Role(name="admin").get("name"), "admin")
+        self.assertRaises(TypeError, Role, name="admin123")
+
+    def test_sets_on_role(self):
+        print "test_sets_on_role"
+        u_role = Role(name="user")
+        self.assertEqual(u_role.get("name"), "user")
+        u_role.set(name="admin")
+        self.assertEqual(u_role.get("name"), "admin")
+#+END_SRC
+
+
+* User
+  A =User= entity has fields =name= of type =Name=, =email= of type =Email= and
+  role of type =Role=.
+
+#+NAME: class_User
+#+BEGIN_SRC python
+User = ClassTemplate.mk_class("User", 
+                              name=check_name, 
+                              email=check_email, 
+                              role=check_role)
+
+User.__eq__ = lambda self, other: \
+                  isinstance(other, self.__class__) and \
+                  self.get("email") == other.get("email")
+
+is_user = is_inst(User)
+check_user = check_pred(is_user)
+
+#+END_SRC
+
+** Test User
+#+NAME: class_TestUser
+#+BEGIN_SRC python
+class TestUser(TestCase):
+    TESTING = True
+
+    def test_instantiate_user(self):
+        print "test_instantiate_user"
+        user = User(name=Name(name="Jimi Hendrix"),
+                    email=Email(email="jimi@gnu.org"),
+                    role=Role(name="admin"))
+        self.assertEqual(is_user(user), True)
+
+    def test_sets_on_user(self):
+        print "test_sets_on_user"
+        user = User(name=Name(name="Jimi Hendrix"),
+                    email=Email(email="jimi@gnu.org"),
+                    role=Role(name="admin"))
+
+        user.set(name=Name(name="Bo Didley"),
+                 email=Email(email="didley@gnu.org"),
+                 role=Role(name="user"))
+
+        self.assertEqual(user.get("name").get("name"), "Bo Didley")
+        self.assertEqual(user.get("email").get("email"), "didley@gnu.org")
+        self.assertEqual(user.get("role").get("name"), "user")
+
+        
+    def test_equality_on_user(self):
+        print "test_equality_on_user"
+        user1 = User(name=Name(name="Jimi Hendrix"),
+                    email=Email(email="jimi@gnu.org"),
+                    role=Role(name="admin"))
+        self.assertEqual(user1 == user1, True)
+
+#+END_SRC
+
+
+* Session
+    A session stores the user information.  The session object defines the set
+    of operations allowed by the system.  
+
+#+NAME: class_Session
+#+BEGIN_SRC python
+Session = ClassTemplate.mk_class("Session", user=check_user)
+
+is_session = is_inst(Session)
+check_session = check_pred(is_session)
+
+#+END_SRC
+
+** Test Session
+
+   Test cases to test Seesion entity
+
+#+NAME: class_TestSession
+#+BEGIN_SRC python
+    TESTING = True
+
+    def test_instantiate_session(self):
+        print "test_instantiate_user"
+        user = User(name=Name(name="Jimi Hendrix"),
+                    email=Email(email="jimi@gnu.org"),
+                    role=Role(name="admin"))
+        session = Session(user=user)
+        self.assertEqual(is_session(session), True)
+
+    def test_sets_on_session(self):
+        print "test_sets_on_session"
+        user = User(name=Name(name="Jimi Hendrix"),
+                    email=Email(email="jimi@gnu.org"),
+                    role=Role(name="admin"))
+
+        session = Session(user=user)
+
+        user = User(name=Name(name="Bo Didley"),
+                    email=Email(email="didley@gnu.org"),
+                    role=Role(name="user"))
+
+        session.set(user=user)
+        self.assertEqual(session.get("user").get("email").get("email"),
+                         "didley@gnu.org")
+
+#+END_SRC
+
+
+* Infra                                                         :boilerplate:
+
+** sources
+*** Imports 
+#+name: imports_for_sources
+#+BEGIN_SRC python
+# -*- coding: utf-8 -*-
+from runtime.utils.type_utils import *
+from runtime.utils.class_templates import *
+#+end_src
+
+
+** Tests
+*** Imports 
+#+name: imports_for_tests
+#+BEGIN_SRC python
+# -*- coding: utf-8 -*-
+import unittest
+from unittest import TestCase
+from runtime.utils.type_utils import *
+from runtime.utils.class_templates import *
+from entities import *
+#+end_src
+
+*** Running tests
+#+NAME: run_test_cases
+#+BEGIN_SRC python
+if __name__ == '__main__':
+    unittest.main()
+
+#+END_SRC
+
+
+* Tangling                                                      :boilerplate:
+
+** sources
+#+BEGIN_SRC python :tangle entities.py :eval no :noweb yes
+<<imports_for_sources>>
+<<class_Name>>
+<<class_Email>>
+<<class_Role>>
+<<class_User>>
+<<class_Session>>
+#+end_src
+
+
+** tests
+#+BEGIN_SRC python :tangle test_entities.py :eval no :noweb yes
+<<imports_for_tests>>
+<<class_TestName>>
+<<class_TestEmail>>
+<<class_TestRole>>
+<<class_TestUser>>
+<<class_TestSession>>
+<<run_test_cases>>
+#+end_src
