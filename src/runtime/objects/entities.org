@@ -8,13 +8,13 @@
 
 * Introduction
 
-In the object implementation of the mini version of the User
-Directory Application, all entities are Objects.  In
-addition, there is an object called =System= that holds the
-state of the application (=user-set=, =session-set=, etc.).
+In the object implementation of the Outreach Portal, 
+all entities are Objects.  In addition, there is an object 
+called =System= that holds the state of the application 
+(=user-set=, =session-set=, etc.).
 
-Each of the entities of the data model are implemented as
-objects.  Each entity is defined via a class definition, a
+Each of the entities of the data model is implemented as
+an object.  Each entity is defined via a class definition, a
 constructor and getter and setter methods that access and
 mutate the fields of the entity. 
 
