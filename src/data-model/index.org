@@ -88,6 +88,10 @@ TYPE NodalCentre (abbreviation- NC )
 TYPE OutreachCentre ( abbreviation- OC )
 TYPE Institution
 TYPE Session
+TYPE Workshop
+TYPE Status
+TYPE Target
+TYPE Artefact 
 
 
 #+END_SRC
@@ -98,14 +102,14 @@ For each relation, we define its inverse next to it.
 
 ;;; Relations with cardinality constraints
 
-[email, user]          : User?    > Email!
-[name, user]           : User     > Name!
-[roles, users]         : User     > Role+
-[host, oc]             : OC?      > Institution!
-[spokes, hub]          : OC!      > NC
-[host, nc]             : NC?      > Institution!
-[user, session]        : Session  > User!
-[role, session]        : Session  > Role!
+[email, user]          : User?    >    Email!
+[name, user]           : User     >    Name!
+[roles, users]         : User     >    Role+
+[host, oc]             : OC?      >    Institution!
+[spokes, hub]          : OC!      >    NC
+[host, nc]             : NC?      >    Institution!
+[user, session]        : Session  >    User!
+[role, session]        : Session  >    Role!
 
 Note: A User can have only one session with a particular role
 
@@ -150,20 +154,28 @@ Sets
  nc-set        : set[NC]        ; set of nodal centres
  oc-set        : set[OC]       ; set of outreach centres in the system
  institute-set : set[Institute] ; set of institutes in the system
- 
+ workshop-set  : set[Workshop]  ; set of all workshops 
+ status-set    : set[Status]    ; set of all statuses
+
 Relations
- email [User,Email]
- name  [User,Name]
- roles [User,Role]
- host  [OC,Institute] and [NC,Institute]
- spokes [OC,NC]
- hub    [NC,OC]
- user   [Session,User]
- role   [Session,Role]
+ email      [User,Email]
+ name       [User,Name]
+ roles      [User,Role]
+ host       [OC,Institute] and [NC,Institute]
+ spokes     [OC,NC]
+ hub        [NC,OC]
+ user       [Session,User]
+ role       [Session,Role]
 
-
+ photos     [Workshop, Artefact]
+ report     [Workshop, Artefact]
+ feedback   [Workshop, Artefact]
+ attendance [Workshop, Artefact]
+ owner      [Workshop, NCC(nc)]
+ target     [Workshop, Target]
+ location   [Workshop, Institute]
+ status     [Workshop, Status]
  
-
  #+END_SRC
 
 
