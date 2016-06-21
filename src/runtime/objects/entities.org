@@ -216,8 +216,8 @@ class TestInstitute(TestCase):
         print "test_instantiate_institute"
         self.assertEqual(is_institute(Institute(name="IIIT",address="Hyderabad")), True)
         institute_ex = Institute(name="IIIT",address="Hyderabad")
-        self.assertEqual(check_role(institute_ex), institute_ex)
-        self.assertEqual(check_role(institute_ex).name, "IIIT")
+        self.assertEqual(check_institute(institute_ex), institute_ex)
+        self.assertEqual(check_institute(institute_ex).get("name"), "IIIT")
         self.assertRaises(TypeError, Institute, name="IIIT123")
 #+END_SRC
   
@@ -269,6 +269,8 @@ class TestSession(TestCase):
                          "didley@gnu.org")
 
 #+END_SRC
+
+
 
 
 * Infra                                                         :boilerplate:
