@@ -177,7 +177,12 @@ Relations
  status     [Workshop, Status]
  
  #+END_SRC
-
+*** User relations
+    [[https://drive.google.com/open?id=1pehN8AwI8Om4hYwjM4CPP7nyWEhwCNkSazXrKnXhbMw]]
+*** Institute, NC and OC relations
+    [[https://drive.google.com/open?id=1WEnEb5L6_3NjUje-JWPvyHnYAFsaKRbn3_-PRRccs28]]
+*** Workshop relations
+    [[https://drive.google.com/open?id=1VQQRDTdGrAT1_sUL9WlV5PCFS-D1PNvNsMg9NQOo8pg]]
 
 ** Derived Entity sets
 #+BEGIN_SRC spec :tangle spec.txt
