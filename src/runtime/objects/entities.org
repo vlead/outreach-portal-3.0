@@ -99,14 +99,97 @@ class TestEmail(TestCase):
 #+END_SRC
 
 
+* OC
+  A =OC= entity has fields =name= of type =Name=,
+ institute of type =Institute=.
+#+NAME: class_OC
+#+BEGIN_SRC python
+
+OC= ClassTemplate.mk_class("OC",
+institute=check_institute)
+
+OC.__eq__ = lambda self,other: \
+            isinstance(other, self.__class__) and \
+            self.get("institute") == other.get("institute")
+
+
+is_oc = is_inst(OC)
+check_oc = check_pred(is_oc)
+
+#+END_SRC
+
+** Test OC
+
+#+NAME: class_TestOC
+#+BEGIN_SRC python
+class TestOC(TestCase):
+    TESTING = True
+
+    def test_instatiate_OC(self):
+        print "test_instantiate_user"
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"))        
+                  
+        self.assertEqual(is_oc(oc), True)
+#+END_SRC
+
+#+NAME: class_TestOC
+#+BEGIN_SRC python
+class TestOC(TestCase):
+    TESTING = True
+
+    def test_instatiate_OC(self):
+        print "test_instantiate_user"
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"))        
+                  
+        self.assertEqual(is_oc(oc), True)
+#+END_SRC
+
+* NC
+  A =NC= entity has fields =name= of type =Name=,
+ institute of type =Institute=.
+#+NAME: class_NC
+#+BEGIN_SRC python
+
+NC= ClassTemplate.mk_class("NC", institute=check_institute, hub=is_oc)
+
+is_nc = is_inst(NC)
+check_nc = check_pred(is_nc)
+
+#+END_SRC
+
+** Test NC
+
+#+NAME: class_TestOC
+#+BEGIN_SRC python
+class TestNC(TestCase):
+    TESTING = True
+
+    def test_instatiate_NC(self):
+        print "test_instantiate_user"
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad")))        
+                  
+        self.assertEqual(is_nc(nc), True)
+#+END_SRC
+
 * Role
    =Role= is an entity that has a field =name= which is an alphabetic string
 
 #+NAME: class_Role
 #+BEGIN_SRC python
-Role = ClassTemplate.mk_class("Role", name=is_alphabetic_str,centre=is_alphabetic_str)
+def is_centre(value):
+    if isinstance(value, OC) or isinstance(value,NC) or isinstance(value,None):
+        return value
+    else:
+        raise TypeError("Invalid centre type")
+Role = ClassTemplate.mk_class("Role", name=is_alphabetic_str,centre=is_centre)
 is_role = is_inst(Role)
 check_role = check_pred(is_role)
+Role.getcentre = lambda self: \
+                  return self.centre
+Role.setcentre = lambda self, centre: \
+                  if is_centre(centre): \
+                  self.centre = centre
+
 Role.admin = Role(name="admin")
 Role.reviewer = Role(name="reviewer")
 Role.guest = Role(name="guest")
@@ -138,6 +221,9 @@ class TestRole(TestCase):
         self.assertEqual(u_role.get("name"), "user")
         u_role.set(name="admin")
         self.assertEqual(u_role.get("name"), "admin")
+      
+    
+    
 #+END_SRC
 
 
@@ -228,64 +314,6 @@ class TestInstitute(TestCase):
         self.assertRaises(TypeError, Institute, name="IIIT123")
 #+END_SRC
   
-* OC
-  A =OC= entity has fields =name= of type =Name=,
- institute of type =Institute=.
-#+NAME: class_OC
-#+BEGIN_SRC python
-
-OC= ClassTemplate.mk_class("OC",
-institute=check_institute)
-
-OC.__eq__ = lambda self,other: \
-            isinstance(other, self.__class__) and \
-            self.get("institute") == other.get("institute")
-
-
-is_oc = is_inst(OC)
-check_oc = check_pred(is_oc)
-
-#+END_SRC
-
-** Test OC
-
-#+NAME: class_TestOC
-#+BEGIN_SRC python
-class TestOC(TestCase):
-    TESTING = True
-
-    def test_instatiate_OC(self):
-        print "test_instantiate_user"
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"))        
-                  
-        self.assertEqual(is_oc(oc), True)
-#+END_SRC
-* NC
-  A =NC= entity has fields =name= of type =Name=,
- institute of type =Institute=.
-#+NAME: class_NC
-#+BEGIN_SRC python
-
-NC= ClassTemplate.mk_class("NC", institute=check_institute, hub=is_oc)
-
-is_nc = is_inst(NC)
-check_nc = check_pred(is_nc)
-
-#+END_SRC
-
-** Test NC
-
-#+NAME: class_TestOC
-#+BEGIN_SRC python
-class TestNC(TestCase):
-    TESTING = True
-
-    def test_instatiate_NC(self):
-        print "test_instantiate_user"
-        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad")))        
-                  
-        self.assertEqual(is_nc(nc), True)
-#+END_SRC
 
 * Session
     A session stores the user information.  The session object defines the set
@@ -399,4 +427,4 @@ if __name__ == '__main__':
 <<class_TestNC>>
 <<class_TestSession>>
 <<run_test_cases>>
-#+end_src
+#+end_sr
