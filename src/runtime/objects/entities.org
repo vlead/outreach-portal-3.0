@@ -240,7 +240,7 @@ check_oc = check_pred(is_oc)
 
 #+END_SRC
 
-* Test OC
+** Test OC
 
 #+NAME: class_TestOC
 #+BEGIN_SRC python
@@ -253,6 +253,33 @@ class TestOC(TestCase):
                   
         self.assertEqual(is_oc(oc), True)
 #+END_SRC
+* NC
+  A =NC= entity has fields =name= of type =Name=,
+ institute of type =Institute=.
+#+NAME: class_NC
+#+BEGIN_SRC python
+
+NC= ClassTemplate.mk_class("NC", institute=check_institute, hub=is_oc)
+
+is_nc = is_inst(NC)
+check_nc = check_pred(is_nc)
+
+#+END_SRC
+
+** Test NC
+
+#+NAME: class_TestOC
+#+BEGIN_SRC python
+class TestNC(TestCase):
+    TESTING = True
+
+    def test_instatiate_NC(self):
+        print "test_instantiate_user"
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad")))        
+                  
+        self.assertEqual(is_nc(nc), True)
+#+END_SRC
+
 * Session
     A session stores the user information.  The session object defines the set
     of operations allowed by the system.  
@@ -348,6 +375,7 @@ if __name__ == '__main__':
 <<class_User>>
 <<class_Institute>>
 <<class_OC>>
+<<class_NC>>
 <<class_Session>>
 #+end_src
 
@@ -361,6 +389,7 @@ if __name__ == '__main__':
 <<class_TestUser>>
 <<class_TestInstitute>>
 <<class_TestOC>>
+<<class_TestNC>>
 <<class_TestSession>>
 <<run_test_cases>>
 #+end_src
