@@ -192,6 +192,36 @@ class TestUser(TestCase):
 #+END_SRC
 
 
+* Institute
+
+=Institute= is an entity that has two fields =name= which is an alphabetic
+string and =address= which is a string
+
+#+NAME: class_Institute
+#+BEGIN_SRC python
+
+Institute = ClassTemplate.mk_class("Institute", name=check_alphabetic_str, address=check_str)
+is_institute = is_inst(Institute)
+check_institute = check_pred(is_institute)
+
+#+END_SRC
+
+** Test Institute
+#+NAME: class_TestInstitute
+#+BEGIN_SRC python
+class TestInstitute(TestCase):
+    TESTING = True
+
+    def test_instantiate_institute(self):
+        print "test_instantiate_institute"
+        self.assertEqual(is_institute(Institute(name="IIIT",address="Hyderabad")), True)
+        institute_ex = Institute(name="IIIT",address="Hyderabad")
+        self.assertEqual(check_role(institute_ex), institute_ex)
+        self.assertEqual(check_role(institute_ex).name, "IIIT")
+        self.assertRaises(TypeError, Institute, name="IIIT123")
+#+END_SRC
+  
+
 * Session
     A session stores the user information.  The session object defines the set
     of operations allowed by the system.  
@@ -211,6 +241,7 @@ check_session = check_pred(is_session)
 
 #+NAME: class_TestSession
 #+BEGIN_SRC python
+class TestSession(TestCase):
     TESTING = True
 
     def test_instantiate_session(self):
@@ -282,6 +313,7 @@ if __name__ == '__main__':
 <<class_Email>>
 <<class_Role>>
 <<class_User>>
+<<class_Institute>>
 <<class_Session>>
 #+end_src
 
@@ -293,6 +325,7 @@ if __name__ == '__main__':
 <<class_TestEmail>>
 <<class_TestRole>>
 <<class_TestUser>>
+<<class_TestInstitute>>
 <<class_TestSession>>
 <<run_test_cases>>
 #+end_src
