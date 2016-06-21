@@ -102,7 +102,7 @@ For each relation, we define its inverse next to it.
 [name, user]           : User                     > Name!
 [roles, users]         : User                     > Role+
 [host, oc]             : OC?                      > Institution!
-[hub, spokes]          : OC!                      > NC
+[spokes, hub]          : OC!                      > NC
 [host, nc]             : NC?                      > Institution!
 [user, session]        : Session                  > User!
 [role, session]        : Session                  > Role!
@@ -148,7 +148,7 @@ Sets
  role-set      : set[Role]      ; set of roles in the system
  session-set   : set[Session]   ; set of sessions in the system
  nc-set        : set[NC]        ; set of nodal centres
- oc-set        :  set[OC]       ; set of outreach centres in the system
+ oc-set        : set[OC]       ; set of outreach centres in the system
  institute-set : set[Institute] ; set of institutes in the system
  
 Relations
@@ -174,11 +174,11 @@ Relations
   oc-institute-set   : oc-set.host         ; set of institutes in the system associated with an oc
   nc-institute-set   : nc-set.host         ; set of institutes in the system associated with a nc
   logged-in-user-set : session-set.user    ; set of logged in users
-    
+  admin-user-set     : user-set.role==admin; set of admin users
 #+END_SRC
 
 ** Referential Integrity Constraints over entity-sets
-
+   
 *** =user-set=
 
 
@@ -204,7 +204,7 @@ These specifications also capture referential integrity.
 [role, user]     :  user-set     > role-set+   
 [session, user]  :  user-set!    > session-set?
 [host, oc]       :  oc-set?      > institution-set!
-[hub, spokes]    :  oc-set!      > nc-set
+[spokes, hub]    :  oc-set!      > nc-set
 [host, nc]       :  oc-set?      > institution-set!
 
 
