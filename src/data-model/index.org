@@ -98,14 +98,14 @@ For each relation, we define its inverse next to it.
 
 ;;; Relations with cardinality constraints
 
-[email, user]          : User?                    > Email!
-[name, user]           : User                     > Name!
-[roles, users]         : User                     > Role+
-[host, oc]             : OC?                      > Institution!
-[spokes, hub]          : OC!                      > NC
-[host, nc]             : NC?                      > Institution!
-[user, session]        : Session                  > User!
-[role, session]        : Session                  > Role!
+[email, user]          : User?    > Email!
+[name, user]           : User     > Name!
+[roles, users]         : User     > Role+
+[host, oc]             : OC?      > Institution!
+[spokes, hub]          : OC!      > NC
+[host, nc]             : NC?      > Institution!
+[user, session]        : Session  > User!
+[role, session]        : Session  > Role!
 
 Note: A User can have only one session with a particular role
 
