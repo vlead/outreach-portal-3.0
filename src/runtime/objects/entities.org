@@ -221,7 +221,38 @@ class TestInstitute(TestCase):
         self.assertRaises(TypeError, Institute, name="IIIT123")
 #+END_SRC
   
+* OC
+  A =OC= entity has fields =name= of type =Name=,
+ institute of type =Institute=.
+#+NAME: class_OC
+#+BEGIN_SRC python
 
+OC= ClassTemplate.mk_class("OC",
+institute=check_institute)
+
+OC.__eq__ = lambda self,other: \
+            isinstance(other, self.__class__) and \
+            self.get("institute") == other.get("institute")
+
+
+is_oc = is_inst(OC)
+check_oc = check_pred(is_oc)
+
+#+END_SRC
+
+* Test OC
+
+#+NAME: class_TestOC
+#+BEGIN_SRC python
+class TestOC(TestCase):
+    TESTING = True
+
+    def test_instatiate_OC(self):
+        print "test_instantiate_user"
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"))        
+                  
+        self.assertEqual(is_oc(oc), True)
+#+END_SRC
 * Session
     A session stores the user information.  The session object defines the set
     of operations allowed by the system.  
@@ -316,6 +347,7 @@ if __name__ == '__main__':
 <<class_Role>>
 <<class_User>>
 <<class_Institute>>
+<<class_OC>>
 <<class_Session>>
 #+end_src
 
@@ -328,6 +360,7 @@ if __name__ == '__main__':
 <<class_TestRole>>
 <<class_TestUser>>
 <<class_TestInstitute>>
+<<class_TestOC>>
 <<class_TestSession>>
 <<run_test_cases>>
 #+end_src
