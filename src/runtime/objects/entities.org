@@ -115,6 +115,26 @@ OC.__eq__ = lambda self,other: \
 is_oc = is_inst(OC)
 check_oc = check_pred(is_oc)
 
+OC.spokes = []
+
+def set_spokes(self, centre):
+    if is_nc(centre):
+        self.spokes.append(centre)
+
+
+OC.setspokes = set_spokes
+def get_spokes(self):
+    return self.spokes
+OC.getspokes= get_spokes
+OC.__eq__ = lambda self,other: \
+            isinstance(other, self.__class__) and \
+            self.get("institute") == other.get("institute")
+
+
+is_oc = is_inst(OC)
+check_oc = check_pred(is_oc)
+
+
 #+END_SRC
 
 ** Test OC
@@ -141,6 +161,18 @@ class TestOC(TestCase):
         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"))        
                   
         self.assertEqual(is_oc(oc), True)
+
+    
+    def test_sets_spokes_on_OC(self):
+        print "test_sets_spokes_on_oc"
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"))       
+
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=oc)       
+        self.assertEqual((nc.get("institute")).get("name"), "HCU")
+    
+        oc.setspokes(nc)
+        
+        self.assertEqual(oc.getspokes()[0].get("institute").get("name"), "HCU")    
 #+END_SRC
 
 
