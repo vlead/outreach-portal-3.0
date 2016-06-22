@@ -173,7 +173,7 @@ Relations
  target     [Workshop, Target]
  location   [Workshop, Institute]
  status     [Workshop, Status]
- 
+ name       [Workshop, Name]
  #+END_SRC
 *** User relations
     [[https://drive.google.com/open?id=1pehN8AwI8Om4hYwjM4CPP7nyWEhwCNkSazXrKnXhbMw]]
@@ -227,6 +227,9 @@ These specifications also capture referential integrity.
 
 #+END_SRC
 
+* Assumptions
+** We did not explicitly pass a User object in some methods, since the Session object passed holds both a User object and a Role object.
+** Artefact may be photos, reports, attendance or feedback.
 * Operations 
 
 CRUD operations.  
@@ -444,3 +447,118 @@ the  actors:  =session=.
    
 #+END_SRC   
    
+
+
+
+
+
+** add workshop
+*** Parameters
+#+BEGIN_SRC spec :tangle spec.txt
+    i: Institute, t: Target, s:  Session
+#+END_SRC   
+*** Actor credentials
+#+BEGIN_SRC spec :tangle spec.txt    
+    s.role==NCC(nc) where nc:nc-set
+#+END_SRC   
+*** Referential Integrity
+#+BEGIN_SRC spec :tangle spec.txt    
+    s: session-set
+    i: institute-set
+#+END_SRC         
+*** Effect 
+#+BEGIN_SRC spec :tangle spec.txt
+    A workshop with the given details is created and added to workshop-set
+#+END_SRC   
+*** Remarks
+#+BEGIN_SRC spec :tangle spec.txt   
+    Only a user with the role of NCC(nc) can create a workshop.   
+#+END_SRC   
+** edit workshop
+*** Parameters
+#+BEGIN_SRC spec :tangle spec.txt
+    w: Workshop, t: Target, st: Status, i: Institute, s:  Session
+#+END_SRC   
+*** Actor credentials
+#+BEGIN_SRC spec :tangle spec.txt    
+    s.role==NCC(nc) where nc:nc-set
+    or s.role==OCC(oc) where oc:oc-set
+#+END_SRC   
+*** Referential Integrity
+#+BEGIN_SRC spec :tangle spec.txt    
+    s: session-set
+    w: workshop-set
+    i: institute-set
+#+END_SRC         
+*** Effect 
+#+BEGIN_SRC spec :tangle spec.txt
+    A workshop is updated with the given details.
+    w.location = i
+    w.target = t
+    w.status = st
+#+END_SRC   
+*** Remarks
+#+BEGIN_SRC spec :tangle spec.txt   
+    A user with the role of OCC(oc) or NCC(nc) can update a workshop.
+    A user need not pass all three parameters to update the details of a workshop.
+    We did not feel the necessity for a method to delete a workshop.
+#+END_SRC   
+
+
+** add artefact
+*** Parameters
+#+BEGIN_SRC spec :tangle spec.txt
+    w: Workshop, a: Artefact, s:  Session
+#+END_SRC   
+*** Actor credentials
+#+BEGIN_SRC spec :tangle spec.txt    
+    s.role==NCC(nc) where nc:nc-set
+#+END_SRC   
+*** Referential Integrity
+#+BEGIN_SRC spec :tangle spec.txt    
+    s: session-set
+    w: workshop-set
+#+END_SRC         
+*** Effect 
+#+BEGIN_SRC spec :tangle spec.txt
+    The artefact is added to the workshop's artefact set.
+#+END_SRC   
+*** Remarks
+#+BEGIN_SRC spec :tangle spec.txt   
+    Artefacts may consist of photos, report, attendance or feedback.
+#+END_SRC   
+
+
+
+
+** delete artefact
+*** Parameters
+#+BEGIN_SRC spec :tangle spec.txt
+    w: Workshop, a: Artefact, s:  Session
+#+END_SRC   
+*** Actor credentials
+#+BEGIN_SRC spec :tangle spec.txt    
+    s.role==NCC(nc) where nc:nc-set
+#+END_SRC   
+*** Referential Integrity
+#+BEGIN_SRC spec :tangle spec.txt    
+    s: session-set
+    w: workshop-set
+    a: w.artefact-set
+#+END_SRC         
+*** Effect 
+#+BEGIN_SRC spec :tangle spec.txt
+    The artefact is deleted from the workshop's artefact set.
+#+END_SRC   
+*** Remarks
+#+BEGIN_SRC spec :tangle spec.txt   
+    Artefacts may consist of photos, report, attendance or feedback.
+#+END_SRC   
+
+
+
+
+
+
+** Workshop workflow diagram
+   [[https://docs.google.com/drawings/d/1av_XMueESqLkUdYRGZuJskeTzr9yl8_agsGq1JedMMg/edit?usp=sharing]]
