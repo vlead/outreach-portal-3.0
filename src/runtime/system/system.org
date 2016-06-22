@@ -90,8 +90,8 @@ class System ():
     user_set = [admin_user]
     session_set = []
 
-#    ops_table = {'add_user' : AddUser} 
-    #             'del_user' : DelUser}
+   
+            #     'del_user' : DelUser}
 
     def __init__(self):
         raise Error('Can not instantiate')
@@ -182,23 +182,25 @@ class TestSystemArityAndType(TestCase):
 
 
 ** =do= method 
+#+NAME: do_function
 #+begin_src python
     @staticmethod   
     def do(op, **args):
-        cls = System.ops_table[op]
+        cls = ops_table[op]
         arg_types  = cls.arg_types
         auth_check = cls.auth_check
         state_check = cls.state_check
 
         try:
-            System.arity_check(args.keys(), len(arg_types.keys())
+            System.arity_check(args.keys(), len(arg_types.keys()))
             System.type_check(args, arg_types)
-            auth_check(args[1])
+            auth_check(args['session'])
             state_check(args)
+            cls.action(args)
         except (ArityError, TypeError, AuthError, StateError) as err:
             print str(err)
-        else: 
-            cls.action(args)
+  
+
 
 #+end_src
 
@@ -207,12 +209,15 @@ class TestSystemArityAndType(TestCase):
 #+NAME: class_adduser
 #+begin_src python
 class AddUser():
-    arg_types = [user=is_User, session=is_Session]
-    auth_check = System.is_session_admin(args["session"])
+    arg_types = {"user":is_user, "session":is_session}
+  
+    @staticmethod
+    def auth_check(session):
+        System.is_session_admin(session)
 
     @staticmethod
     def state_check(args):
-        u = args["name"]
+        u = args["user"]
         s = args["session"]
         if not (s in System.session_set):
             raise StateError("user not in session %s" % s.user.name)
@@ -221,12 +226,36 @@ class AddUser():
 
             
     @staticmethod
-    def action(**args):
+    def action(args):
         u = args["user"]
         s = args["session"]
+        print System.user_set
         System.user_set.append(u)
+        print System.user_set
+        u.set_role(role=Role(name="guest",centre=None))
+        
         return u
+ops_table = {'add_user' : AddUser}
 #+end_src
+*** Test AddUser
+#+NAME: test_adduser
+#+BEGIN_SRC python
+class TestAddUser(TestCase):
+    TESTING = True
+    def test_add_user(self):
+        print "test_add_user"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role(name=Config.admin_name,centre=None))
+        System.session_set.append(session)
+ 
+        user=User(name=Name(name="me"),email=Email(email="abc@gmail.com"))
+
+        System.do("add_user",user=user,session=session)
+        
+        u=System.user_set[1]
+        self.assertEqual(u.get("name").get("name"),"me")
+
+#+END_SRC
 
 ** =del_user=
 ** =show_users=
@@ -288,8 +317,11 @@ if __name__ == '__main__':
 #+BEGIN_SRC python :tangle system.py :eval no :noweb yes
 <<imports_for_sources>>
 <<class_system>>
-#<<class_adduser>>
+<<do_function>>
+
 <<arity_type_checks>>
+
+<<class_adduser>>
 #+end_src
 
 
@@ -298,6 +330,8 @@ if __name__ == '__main__':
 <<imports_for_tests>>
 <<test_system_constructor>>
 <<test_arity_and_types>>
+<<test_adduser>>
 <<run_test_cases>>
+
 #+end_src
 
