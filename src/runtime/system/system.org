@@ -90,7 +90,7 @@ class System ():
     user_set = [admin_user]
     session_set = []
 
-    #ops_table = {'add_user' : AddUser, 
+#    ops_table = {'add_user' : AddUser} 
     #             'del_user' : DelUser}
 
     def __init__(self):
@@ -141,15 +141,15 @@ class TestSystemConstructor(TestCase):
     @staticmethod
     def arity_check(args, n):
        if  (len(args) != n) :
-          raise ArityError("arity mismatch: size of args %s does not " + 
-                           "match operation arity %d" % (args, n))
+          raise ArityError("arity mismatch: size of args  does not " + 
+                           "match operation arity " )
 
     @staticmethod
     def type_check(args, arg_types):
-        for key, value in args:
+        for key, value in args.iteritems():
             if not arg_types[key](value):
-                raise TypeError("type mismatch: argument %s is not of " + 
-                                "type %s" % (value, arg_types[key]))
+                raise TypeError("type mismatch: argument  is not of " + 
+                                "type " )
        
    
 #+end_src
@@ -157,20 +157,8 @@ class TestSystemConstructor(TestCase):
 *** Test Arity and Type Checks
 #+NAME: test_arity_and_types
 #+BEGIN_SRC python
-'''
 class TestSystemArityAndType(TestCase):
     TESTING = True
-
-    def create_app(self):
-        app = create_app(config)
-        return app
-
-    def setUp(self):
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
 
     def test_arity(self):
         print "test_arity"
@@ -180,7 +168,7 @@ class TestSystemArityAndType(TestCase):
     def test_type_checks(self):
         print "test_type_checks"
         args = {"name": Name(name="Jimi Hendrix"),
-                "email": Email(email="jimi@gnu.org")
+                "email": Name(name="Jimi Hendrix")
                 }
 
         arg_types = {"name": is_name,
@@ -189,7 +177,7 @@ class TestSystemArityAndType(TestCase):
 
         with self.assertRaises(TypeError):
             System.type_check(args, arg_types)
-'''
+
 #+END_SRC
 
 
@@ -216,7 +204,7 @@ class TestSystemArityAndType(TestCase):
 
 
 * =AddUser=
-
+#+NAME: class_adduser
 #+begin_src python
 class AddUser():
     arg_types = [user=is_User, session=is_Session]
@@ -262,7 +250,7 @@ class AddUser():
 # -*- coding: utf-8 -*-
 from runtime.objects.entities import *
 from runtime.config.config import Config
-from runtime.exceptions import *
+from runtime.exceptions.custom_exceptions import *
 
 #+end_src
 
@@ -300,6 +288,7 @@ if __name__ == '__main__':
 #+BEGIN_SRC python :tangle system.py :eval no :noweb yes
 <<imports_for_sources>>
 <<class_system>>
+#<<class_adduser>>
 <<arity_type_checks>>
 #+end_src
 
