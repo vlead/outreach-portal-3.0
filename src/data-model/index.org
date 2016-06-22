@@ -561,3 +561,6 @@ the  actors:  =session=.
 
 
 
+
+** Workshop workflow diagram
+   [[https://docs.google.com/drawings/d/1av_XMueESqLkUdYRGZuJskeTzr9yl8_agsGq1JedMMg/edit?usp=sharing]]
