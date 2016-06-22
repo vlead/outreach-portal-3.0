@@ -398,7 +398,7 @@ class TestInstitute(TestCase):
 
 #+NAME: class_Session
 #+BEGIN_SRC python
-Session = ClassTemplate.mk_class("Session", user=is_user)
+Session = ClassTemplate.mk_class("Session", user=is_user, role=is_role)
 
 is_session = is_inst(Session)
 check_session = check_pred(is_session)
@@ -419,7 +419,8 @@ class TestSession(TestCase):
         user = User(name=Name(name="Jimi Hendrix"),
                     email=Email(email="jimi@gnu.org")
                    )
-        session = Session(user=user)
+        role = Role(name=("admin"), centre=None)
+        session = Session(user=user, role=role)
         self.assertEqual(is_session(session), True)
 
     def test_sets_on_session(self):
@@ -427,8 +428,8 @@ class TestSession(TestCase):
         user = User(name=Name(name="Jimi Hendrix"),
                     email=Email(email="jimi@gnu.org")
                    )
-
-        session = Session(user=user)
+        role = Role(name=("admin"), centre=None)
+        session = Session(user=user, role=role)
 
         user = User(name=Name(name="Bo Didley"),
                     email=Email(email="didley@gnu.org")
