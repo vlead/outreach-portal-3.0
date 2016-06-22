@@ -229,9 +229,7 @@ class AddUser():
     def action(args):
         u = args["user"]
         s = args["session"]
-        print System.user_set
         System.user_set.append(u)
-        print System.user_set
         u.set_role(role=Role(name="guest",centre=None))
         
         return u
