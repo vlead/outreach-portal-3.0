@@ -210,14 +210,13 @@ class TestNC(TestCase):
 #+NAME: class_Role
 #+BEGIN_SRC python
 def is_centre(value):
-    def fun(value):
-        if value == None:
-            return None
-        elif is_oc(value) or is_nc(value):
-            return value
-        else:
-            raise TypeError("Invalid centre type")
-    return fun
+    if value == None:
+        return None
+    elif is_oc(value) or is_nc(value):
+        return value
+    else:
+        raise TypeError("Invalid centre type")
+   
 check_centre=is_centre
 class Role:
     name = None
