@@ -76,6 +76,7 @@ Encodes the following items of information:
  user: Email > User?
  #+end_example
 
+
 * Abstract Entity Types
 #+BEGIN_SRC spec :tangle spec.txt
 
@@ -104,14 +105,14 @@ For each relation, we define its inverse next to it.
 [email, user]          : User?    >    Email!
 [name, user]           : User     >    Name!
 [roles, users]         : User     >    Role+
-[host, oc]             : OC?      >    Institution!
+[host, oc]             : OC?      >    Institute!
 [spokes, hub]          : OC!      >    NC
-[host, nc]             : NC?      >    Institution!
+[host, nc]             : NC?      >    Institute!
 [user, session]        : Session  >    User!
 [role, session]        : Session  >    Role!
 
 Note: A User can have only one session with a particular role
-
+Note: We weren't sure if we should list the workshop relations here, so we listed them in the next section.
 
 #+END_SRC
 
@@ -133,6 +134,7 @@ is a relation =r: A? > K!=.
 | Session | User and Role |
 |---------+---------------|
 
+
 * System state
   The system's state is captured by a set of /state
   variables/.  
@@ -150,7 +152,7 @@ Sets
  role-set      : set[Role]      ; set of roles in the system
  session-set   : set[Session]   ; set of sessions in the system
  nc-set        : set[NC]        ; set of nodal centres
- oc-set        : set[OC]       ; set of outreach centres in the system
+ oc-set        : set[OC]        ; set of outreach centres in the system
  institute-set : set[Institute] ; set of institutes in the system
  workshop-set  : set[Workshop]  ; set of all workshops 
  status-set    : set[Status]    ; set of all statuses
@@ -218,9 +220,9 @@ These specifications also capture referential integrity.
 [name, user]     :  user-set+    > name-set!    
 [role, user]     :  user-set     > role-set+   
 [session, user]  :  user-set!    > session-set?
-[host, oc]       :  oc-set?      > institution-set!
+[host, oc]       :  oc-set?      > institute-set!
 [spokes, hub]    :  oc-set!      > nc-set
-[host, nc]       :  oc-set?      > institution-set!
+[host, nc]       :  oc-set?      > institute-set!
 
 
 
@@ -452,7 +454,7 @@ the  actors:  =session=.
 
 
 
-** add workshop
+** create workshop
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
     i: Institute, t: Target, s:  Session
