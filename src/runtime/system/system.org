@@ -1,4 +1,4 @@
-#+TITLE: Mini Version of User Directory Application: System
+#+TITLE: System implementation for OutReach Portal 3.0
 #+AUTHOR: VLEAD
 #+DATE: [2016-06-07 Tue]
 #+SETUPFILE: ../../org-templates/level-2.org
@@ -83,20 +83,27 @@ The class corresponding to each operation has five fields:
 #+begin_src python
 class System ():
     admin_user = User(name=Name(name=Config.admin_name), 
-                      email=Email(email=Config.admin_email), 
-                      role=Role(name=Config.admin_role))
+                      email=Email(email=Config.admin_email) 
+                      )
+    admin_user.set_role(role=Role(name="admin",centre=None))
+    admin_user.set_role(role=Role(name="guest",centre=None))
     user_set = [admin_user]
     session_set = []
 
-#    ops_table = {'add_user' : AddUser, 
-#                 'del_user' : DelUser}
+    #ops_table = {'add_user' : AddUser, 
+    #             'del_user' : DelUser}
 
     def __init__(self):
         raise Error('Can not instantiate')
 
     @staticmethod
     def is_session_admin(session):
-        return session.get("user").get("role").get("name") == "admin"
+        return session.get("role").get_name() == "admin"
+    
+    @staticmethod    
+    def is_session_OCC(session):
+        return session.get("role").get_name()== "OCC"
+
 #+end_src
 
 *** Test Constructor
@@ -105,28 +112,20 @@ class System ():
 class TestSystemConstructor(TestCase):
     TESTING = True
 
-    def create_app(self):
-        app = create_app(config)
-        return app
-
-    def setUp(self):
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-
+   
     def test_system_constructor(self):
         print "test_system_constructor"
+        self.assertEqual(System.user_set[0].get("name").get("name"), 
+                         Config.admin_name)
         self.assertEqual(System.user_set[0].get("email").get("email"), 
                          Config.admin_email)
+        self.assertEqual(System.user_set[0].get_role()[0].get_name(), 
+                         "admin")
 
     def test_is_session_admin(self):
         print "test_is_session_admin"
-        admin_user = User(name=Name(name=Config.admin_name), 
-                      email=Email(email=Config.admin_email), 
-                      role=Role(name=Config.admin_role))
-        session = Session(user=admin_user)
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role(name=Config.admin_name,centre=None))
         System.session_set.append(session)
         self.assertEqual(System.is_session_admin(session), True)
 
@@ -138,6 +137,7 @@ class TestSystemConstructor(TestCase):
    The =do= method is the main work-horse of =Controller=.  
 #+NAME: arity_type_checks
 #+BEGIN_SRC python
+   
     @staticmethod
     def arity_check(args, n):
        if  (len(args) != n) :
@@ -145,17 +145,19 @@ class TestSystemConstructor(TestCase):
                            "match operation arity %d" % (args, n))
 
     @staticmethod
-    def type_check(***args, **arg_types):
+    def type_check(args, arg_types):
         for key, value in args:
             if not arg_types[key](value):
                 raise TypeError("type mismatch: argument %s is not of " + 
                                 "type %s" % (value, arg_types[key]))
-               
+       
+   
 #+end_src
 
 *** Test Arity and Type Checks
 #+NAME: test_arity_and_types
 #+BEGIN_SRC python
+'''
 class TestSystemArityAndType(TestCase):
     TESTING = True
 
@@ -187,7 +189,7 @@ class TestSystemArityAndType(TestCase):
 
         with self.assertRaises(TypeError):
             System.type_check(args, arg_types)
-
+'''
 #+END_SRC
 
 
@@ -260,7 +262,7 @@ class AddUser():
 # -*- coding: utf-8 -*-
 from runtime.objects.entities import *
 from runtime.config.config import Config
-from runtime.exceptions.custom_exceptions import *
+from runtime.exceptions import *
 
 #+end_src
 
@@ -271,15 +273,15 @@ from runtime.exceptions.custom_exceptions import *
 #+BEGIN_SRC python
 # -*- coding: utf-8 -*-
 import unittest
-from flask.ext.testing import TestCase
-from runtime.utils.class_persistence_template import *
-from runtime.rest.app import create_app
+from unittest import TestCase
+#from runtime.utils.class_persistence_template import *
+#from runtime.rest.app import create_app
 
 from system import *
 
-config = {
-    'SQLALCHEMY_DATABASE_URI': ''
-}
+#config = {
+#   'SQLALCHEMY_DATABASE_URI': ''
+#}
 
 #+end_src
 
