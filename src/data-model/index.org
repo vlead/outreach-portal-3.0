@@ -231,9 +231,7 @@ These specifications also capture referential integrity.
 
 * Assumptions
 ** We did not explicitly pass a User object in some methods, since the Session object passed holds both a User object and a Role object.
-
 ** Artefact may be photos, reports, attendance or feedback.
-
 * Operations 
 
 CRUD operations.  
