@@ -89,6 +89,7 @@ class System ():
     admin_user.set_role(role=Role(name="guest",centre=None))
     user_set = [admin_user]
     session_set = []
+    role_set = [Role.admin,Role.reviewer,Role.guest]
 
    
             #     'del_user' : DelUser}
@@ -236,7 +237,7 @@ class TestSystemArityAndType(TestCase):
             System.type_check(args, arg_types)
             auth_check(args)
             state_check(args)
-            cls.action(args)
+            return cls.action(args)
         except (ArityError, TypeError, AuthError, StateError) as err:
             print str(err)
   
@@ -254,9 +255,7 @@ class AddUser():
     @staticmethod
     def auth_check(args):
         session = args['session']
-        if System.is_session_admin(session) or System.is_session_OCC(session):
-            return True
-        else:
+        if not (System.is_session_admin(session) or System.is_session_OCC(session)):
             raise AuthError("Role not Authorized to perform this action")
 
     @staticmethod
@@ -264,9 +263,9 @@ class AddUser():
         user = args["user"]
         session = args["session"]
         if not (session in System.session_set):
-            raise StateError("user not in session %s" % s.user.name)
+            raise StateError("user not in session %s" % session.user.name.name)
         if (user in System.user_set):
-            raise StateError("user %s already in System" % u.name)
+            raise StateError("user %s already in System" % user.name.name)
 
             
     @staticmethod
@@ -276,7 +275,7 @@ class AddUser():
         System.user_set.append(user)
         user.set_role(role=Role(name="guest",centre=None))
         return user
-ops_table = {'add_user' : AddUser}
+
 #+end_src
 *** Test AddUser
 #+NAME: test_adduser
@@ -298,17 +297,66 @@ class TestAddUser(TestCase):
 
 #+END_SRC
 
-** =del_user=
-** =show_users=
+* =del_user=
+* =show_users=
 
-** =get_user_by_email=
-** =make_user=
-** =get_email_of_user=
-** =get_name_of_user=
-** =get_role_of_user=
-** =login=
-** =del_session=
-** =show_sessions=
+* =get_user_by_email=
+* =make_user=
+* =get_email_of_user=
+* =get_name_of_user=
+* =get_role_of_user=
+* =login=
+#+NAME: class_login
+#+begin_src python
+class login():
+    arg_types = {"user":is_user, "role":is_role}
+  
+    @staticmethod
+    def auth_check(args):
+        user = args['user']
+        role = args['role']
+        for rol in user.roles:
+            if role.name == rol.name:
+                return
+        raise AuthError("User not Authorized to take this role")
+        
+    @staticmethod
+    def state_check(args):
+        user = args["user"]
+        role = args["role"]
+        if role not in System.role_set:
+            raise StateError("role %s not in System " % role.name)
+        if (user not in System.user_set):
+            raise StateError("user %s not in System" % user.name.name)
+
+    @staticmethod        
+    def action(args):
+        user = args["user"]
+        role = args["role"]
+        new_session = Session(user=user,role=role)
+        System.session_set.append(new_session)
+        return new_session
+ops_table = {'add_user' : AddUser,'login':login}
+#+end_src
+** Test login
+#+NAME: test_login
+#+BEGIN_SRC python
+class Testlogin(TestCase):
+    TESTING = True
+    def test_login(self):
+        print "test_login"
+        login_user=System.user_set[0]
+        login_role = System.role_set[0]
+
+        System.do("login",user=login_user,role=login_role)
+
+        session=System.session_set[0]
+        self.assertEqual(session.get("user").get("name").get("name"),"admin")
+        self.assertEqual(session.get("user").get_role()[0].get_name(),"admin")
+#+END_SRC
+
+* =del_session=
+* =show_sessions=
 
 
 * Infra                                                         :boilerplate:
@@ -363,6 +411,7 @@ if __name__ == '__main__':
 <<arity_type_checks>>
 
 <<class_adduser>>
+<<class_login>>
 #+end_src
 
 
@@ -372,6 +421,7 @@ if __name__ == '__main__':
 <<test_system_constructor>>
 <<test_arity_and_types>>
 <<test_adduser>>
+<<test_login>>
 <<run_test_cases>>
 
 #+end_src
