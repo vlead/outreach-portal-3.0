@@ -83,12 +83,14 @@ The class corresponding to each operation has five fields:
 #+begin_src python
 class System ():
     admin_user = User(name=Name(name=Config.admin_name), 
-                      email=Email(email=Config.admin_email) 
+                      email=Email(email="app-admin@vlabs.ac.in") 
                       )
     admin_user.set_role(role=Role(name="admin",centre=None))
     admin_user.set_role(role=Role(name="guest",centre=None))
     user_set = [admin_user]
     session_set = []
+    role_set = [Role.admin,Role.reviewer,Role.guest]
+    institute_set = []
 
    
             #     'del_user' : DelUser}
@@ -104,6 +106,18 @@ class System ():
     def is_session_OCC(session):
         return session.get("role").get_name()== "OCC"
 
+    @staticmethod    
+    def is_session_NCC(session):
+        return session.get("role").get_name()== "NCC"
+    
+    @staticmethod    
+    def is_session_reviewer(session):
+        return session.get("role").get_name()== "reviewer"
+    
+    @staticmethod    
+    def is_session_guest(session):
+        return session.get("role").get_name()== "guest"
+
 #+end_src
 
 *** Test Constructor
@@ -118,7 +132,7 @@ class TestSystemConstructor(TestCase):
         self.assertEqual(System.user_set[0].get("name").get("name"), 
                          Config.admin_name)
         self.assertEqual(System.user_set[0].get("email").get("email"), 
-                         Config.admin_email)
+                         "app-admin@vlabs.ac.in")
         self.assertEqual(System.user_set[0].get_role()[0].get_name(), 
                          "admin")
 
@@ -128,6 +142,34 @@ class TestSystemConstructor(TestCase):
         session = Session(user=admin_user,role=Role(name=Config.admin_name,centre=None))
         System.session_set.append(session)
         self.assertEqual(System.is_session_admin(session), True)
+    
+    def test_is_session_OCC(self):
+        print "test_is_session_OCC"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role(name="OCC",centre=None))
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_OCC(session), True)
+    
+    def test_is_session_NCC(self):
+        print "test_is_session_NCC"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role(name="NCC",centre=None))
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_NCC(session), True)
+
+    def test_is_session_reviewer(self):
+        print "test_is_session_reviewer"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role(name="reviewer",centre=None))
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_reviewer(session), True)
+    
+    def test_is_session_guest(self):
+        print "test_is_session_guest"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role(name="guest",centre=None))
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_guest(session), True)
 
 #+END_SRC
 
@@ -194,16 +236,15 @@ class TestSystemArityAndType(TestCase):
         try:
             System.arity_check(args.keys(), len(arg_types.keys()))
             System.type_check(args, arg_types)
-            auth_check(args['session'])
+            auth_check(args)
             state_check(args)
-            cls.action(args)
+            return cls.action(args)
         except (ArityError, TypeError, AuthError, StateError) as err:
             print str(err)
   
 
 
 #+end_src
-
 
 * =AddUser=
 #+NAME: class_adduser
@@ -212,37 +253,41 @@ class AddUser():
     arg_types = {"user":is_user, "session":is_session}
   
     @staticmethod
-    def auth_check(session):
-        if System.is_session_admin(session) or System.is_session_OCC(session):
-            return True
-        else:
+    def auth_check(args):
+        session = args['session']
+        if not (System.is_session_admin(session) or System.is_session_OCC(session)):
             raise AuthError("Role not Authorized to perform this action")
 
     @staticmethod
     def state_check(args):
-        u = args["user"]
-        s = args["session"]
-        if not (s in System.session_set):
-            raise StateError("user not in session %s" % s.user.name)
-        if (u in System.user_set):
-            raise StateError("user %s already in System" % u.name)
+        user = args["user"]
+        session = args["session"]
+        if not (session in System.session_set):
+            raise StateError("user not in session %s" % session.get("user").get("name").get("name"))
+        if (user in System.user_set):
+            raise StateError("user %s already in System" % user.get("name").get("name"))
 
             
     @staticmethod
     def action(args):
-        u = args["user"]
-        s = args["session"]
-        System.user_set.append(u)
-        u.set_role(role=Role(name="guest",centre=None))
-        
-        return u
-ops_table = {'add_user' : AddUser}
+        user = args["user"]
+        session = args["session"]
+        System.user_set.append(user)
+        user.set_role(role=Role(name="guest",centre=None))
+        return user
 #+end_src
 *** Test AddUser
 #+NAME: test_adduser
 #+BEGIN_SRC python
 class TestAddUser(TestCase):
     TESTING = True
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in", System.user_set)
+        System.user_set = admin
+
     def test_add_user(self):
         print "test_add_user"
         admin_user=System.user_set[0]
@@ -258,6 +303,77 @@ class TestAddUser(TestCase):
 
 #+END_SRC
 
+* =DeleteUser=
+#+NAME: class_adduser
+#+begin_src python
+class DeleteUser():
+    arg_types = {"user":is_user, "session":is_session}
+  
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        user = args['user']
+        if System.is_session_admin(session):
+            return True
+        elif System.is_session_OCC(session):
+            role = filter (lambda x: x.get_name() == NCC and x.centre.hub == session.get("role").centre, user.roles)
+            if role:
+                return True
+        else:
+            raise AuthError("Role not Authorized to perform this action")
+
+    @staticmethod
+    def state_check(args):
+        user = args["user"]
+        session = args["session"]
+        for s in System.session_set:
+            if(s.get("user")==user):
+              raise StateError("cannot delete user, user is in session %s" % s.get("user").get("name"))
+
+        if not (session in System.session_set):
+            raise StateError("user not in session %s" % session.get("user").get("name"))
+        if not (user in System.user_set):
+            raise StateError("user %s not in System" % user.get("name").get("name"))
+
+            
+    @staticmethod
+    def action(args):
+        user = args["user"]
+        session = args["session"]
+        new_users = filter(lambda x: x.get("email").get("email") != user.get("email").get("email"), System.user_set)
+        System.user_set= new_users 
+
+
+#+end_src
+*** Test DeleteUser
+#+NAME: test_adduser
+#+BEGIN_SRC python
+class TestDeleteUser(TestCase):
+    TESTING = True
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in", System.user_set)
+        System.user_set = admin
+
+    def test_delete_admin_user(self):
+        print "test_delete_user"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role(name=Config.admin_name,centre=None))
+        System.session_set.append(session)
+ 
+        other_admin_user=User(name=Name(name="me"),email=Email(email="abc@gmail.com"))
+        System.do("add_user", user=other_admin_user, session=session)
+        other_admin_user.set_role(role=Role(name="admin",centre=None))
+        length = len(System.user_set)
+        System.do("delete_user",user=other_admin_user,session=session)
+        new_length = len(System.user_set)
+        
+        self.assertEqual(new_length+1, length)
+
+#+END_SRC
+
 ** =del_user=
 ** =show_users=
 
@@ -269,6 +385,153 @@ class TestAddUser(TestCase):
 ** =login=
 ** =del_session=
 ** =show_sessions=
+
+* =show_users=
+
+* =get_user_by_email=
+* =make_user=
+* =get_email_of_user=
+* =get_name_of_user=
+* =get_role_of_user=
+* =login=
+#+NAME: class_login
+#+begin_src python
+class login():
+    arg_types = {"user":is_user, "role":is_role}
+  
+    @staticmethod
+    def auth_check(args):
+        user = args['user']
+        role = args['role']
+        for rol in user.roles:
+            if role.name == rol.name:
+                return
+        raise AuthError("User not Authorized to take this role")
+        
+    @staticmethod
+    def state_check(args):
+        user = args["user"]
+        role = args["role"]
+        if role not in System.role_set:
+            raise StateError("role %s not in System " % role.name)
+        if (user not in System.user_set):
+            raise StateError("user %s not in System" % user.name.name)
+
+    @staticmethod        
+    def action(args):
+        user = args["user"]
+        role = args["role"]
+        new_session = Session(user=user,role=role)
+        System.session_set.append(new_session)
+        return new_session
+
+
+
+#+end_src
+** Test login
+#+NAME: test_login
+#+BEGIN_SRC python
+class Testlogin(TestCase):
+    TESTING = True
+    def test_login(self):
+        print "test_login"
+        login_user=System.user_set[0]
+        login_role = System.role_set[0]
+
+        System.do("login",user=login_user,role=login_role)
+
+        session=System.session_set[0]
+        self.assertEqual(session.get("user").get("name").get("name"),"admin")
+        self.assertEqual(session.get("user").get_role()[0].get_name(),"admin")
+#+END_SRC
+
+* =logout=
+#+NAME: class_logout
+#+begin_src python
+class logout():
+    arg_types = {"session":is_session}
+
+    @staticmethod
+    def auth_check(args):
+        return
+
+    @staticmethod
+    def state_check(args):
+        session = args["session"]
+        if not (session in System.session_set):
+            raise StateError("user not in session %s" % session.user.name.name)
+
+    @staticmethod
+    def action(args):
+        session = args["session"] 
+        System.session_set.remove(session)
+        return True
+
+#+end_src
+** Test logout
+#+NAME: test_logout
+#+BEGIN_SRC python
+class Testlogout(TestCase):
+    TESTING = True
+    def test_logout(self):
+        print "test_logout"
+        login_user=System.user_set[0]
+        login_role = System.role_set[0]
+        System.session_set = []
+        sess = System.do("login",user=login_user,role=login_role)
+        self.assertEqual(len(System.session_set),1)
+        System.do("logout",session=sess)
+        self.assertEqual(System.session_set,[])
+#+END_SRC
+* =create institute=
+#+NAME: class_CreateInstitute
+#+begin_src python
+class CreateInstitute():
+    arg_types = {"name":is_alphabetic_str, "address":is_str,"session":is_session}
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        if not (System.is_session_admin(session) or System.is_session_OCC(session)):
+            raise AuthError("Role not Authorized to perform this action")
+    
+    @staticmethod
+    def state_check(args):
+        session = args["session"]
+        name = args['name']
+        address = args['address']
+        if not (session in System.session_set):
+            raise StateError("user not in session %s" % session.user.name.name)
+        for inst in System.institute_set:
+            if inst.name == name and inst.address == address:
+                raise StateError("institute %s already in System" % institute.name)
+
+    @staticmethod        
+    def action(args):
+        name = args["name"]
+        address = args["address"]
+        new_institute = Institute(name=name,address=address)
+        System.institute_set.append(new_institute)
+        return new_institute
+              
+
+ops_table = {'add_user' : AddUser,'login':login,'logout':logout,'create_institute':CreateInstitute, 'delete_user' : DeleteUser}
+#+end_src
+** Test create_institute
+#+NAME: test_CreateInstitute
+#+BEGIN_SRC python
+class TestCreateInstitute(TestCase):
+    TESTING = True
+    def test_create_institute(self):
+        print "test_create_institute"
+        login_user=System.user_set[0]
+        login_role = System.role_set[0]
+        System.session_set = []
+        sess = System.do("login",user=login_user,role=login_role)
+        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
+        self.assertEqual(institute,System.institute_set[0])
+
+#+END_SRC
+* =show_sessions=
 
 
 * Infra                                                         :boilerplate:
@@ -311,7 +574,6 @@ if __name__ == '__main__':
 
 #+END_SRC
 
-
 * Tangling                                                      :boilerplate:
 
 ** sources
@@ -323,6 +585,9 @@ if __name__ == '__main__':
 <<arity_type_checks>>
 
 <<class_adduser>>
+<<class_login>>
+<<class_logout>>
+<<class_CreateInstitute>>
 #+end_src
 
 
@@ -332,6 +597,9 @@ if __name__ == '__main__':
 <<test_system_constructor>>
 <<test_arity_and_types>>
 <<test_adduser>>
+<<test_login>>
+<<test_logout>>
+<<test_CreateInstitute>>
 <<run_test_cases>>
 
 #+end_src
