@@ -213,7 +213,10 @@ class AddUser():
   
     @staticmethod
     def auth_check(session):
-        System.is_session_admin(session)
+        if System.is_session_admin(session) or System.is_session_OCC(session):
+            return True
+        else:
+            raise AuthError("Role not Authorized to perform this action")
 
     @staticmethod
     def state_check(args):
