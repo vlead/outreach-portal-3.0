@@ -355,7 +355,44 @@ class Testlogin(TestCase):
         self.assertEqual(session.get("user").get_role()[0].get_name(),"admin")
 #+END_SRC
 
-* =del_session=
+* =logout=
+#+NAME: class_logout
+#+begin_src python
+class logout():
+    arg_types = {"session":is_session}
+
+    @staticmethod
+    def auth_check(args):
+        return
+
+    @staticmethod
+    def state_check(args):
+        session = args["session"]
+        if not (session in System.session_set):
+            raise StateError("user not in session %s" % session.user.name.name)
+
+    @staticmethod
+    def action(args):
+        session = args["session"] 
+        System.session_set.remove(session)
+        return True
+ops_table = {'add_user' : AddUser,'login':login,'logout':logout}
+#+end_src
+** Test logout
+#+NAME: test_logout
+#+BEGIN_SRC python
+class Testlogout(TestCase):
+    TESTING = True
+    def test_logout(self):
+        print "test_logout"
+        login_user=System.user_set[0]
+        login_role = System.role_set[0]
+        System.session_set = []
+        sess = System.do("login",user=login_user,role=login_role)
+        self.assertEqual(len(System.session_set),1)
+        System.do("logout",session=sess)
+        self.assertEqual(System.session_set,[])
+#+END_SRC
 * =show_sessions=
 
 
@@ -412,6 +449,7 @@ if __name__ == '__main__':
 
 <<class_adduser>>
 <<class_login>>
+<<class_logout>>
 #+end_src
 
 
@@ -422,6 +460,7 @@ if __name__ == '__main__':
 <<test_arity_and_types>>
 <<test_adduser>>
 <<test_login>>
+<<test_logout>>
 <<run_test_cases>>
 
 #+end_src
