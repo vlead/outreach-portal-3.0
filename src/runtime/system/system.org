@@ -83,7 +83,7 @@ The class corresponding to each operation has five fields:
 #+begin_src python
 class System ():
     admin_user = User(name=Name(name=Config.admin_name), 
-                      email=Email(email=Config.admin_email) 
+                      email=Email(email="app-admin@vlabs.ac.in") 
                       )
     admin_user.set_role(role=Role(name="admin",centre=None))
     admin_user.set_role(role=Role(name="guest",centre=None))
@@ -131,7 +131,7 @@ class TestSystemConstructor(TestCase):
         self.assertEqual(System.user_set[0].get("name").get("name"), 
                          Config.admin_name)
         self.assertEqual(System.user_set[0].get("email").get("email"), 
-                         Config.admin_email)
+                         "app-admin@vlabs.ac.in")
         self.assertEqual(System.user_set[0].get_role()[0].get_name(), 
                          "admin")
 
@@ -245,7 +245,6 @@ class TestSystemArityAndType(TestCase):
 
 #+end_src
 
-
 * =AddUser=
 #+NAME: class_adduser
 #+begin_src python
@@ -263,9 +262,9 @@ class AddUser():
         user = args["user"]
         session = args["session"]
         if not (session in System.session_set):
-            raise StateError("user not in session %s" % session.user.name.name)
+            raise StateError("user not in session %s" % session.get("user").get("name").get("name"))
         if (user in System.user_set):
-            raise StateError("user %s already in System" % user.name.name)
+            raise StateError("user %s already in System" % user.get("name").get("name"))
 
             
     @staticmethod
@@ -275,13 +274,19 @@ class AddUser():
         System.user_set.append(user)
         user.set_role(role=Role(name="guest",centre=None))
         return user
-
 #+end_src
 *** Test AddUser
 #+NAME: test_adduser
 #+BEGIN_SRC python
 class TestAddUser(TestCase):
     TESTING = True
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in", System.user_set)
+        System.user_set = admin
+
     def test_add_user(self):
         print "test_add_user"
         admin_user=System.user_set[0]
@@ -297,7 +302,89 @@ class TestAddUser(TestCase):
 
 #+END_SRC
 
-* =del_user=
+* =DeleteUser=
+#+NAME: class_adduser
+#+begin_src python
+class DeleteUser():
+    arg_types = {"user":is_user, "session":is_session}
+  
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        user = args['user']
+        if System.is_session_admin(session):
+            return True
+        elif System.is_session_OCC(session):
+            role = filter (lambda x: x.get_name() == NCC and x.centre.hub == session.get("role").centre, user.roles)
+            if role:
+                return True
+        else:
+            raise AuthError("Role not Authorized to perform this action")
+
+    @staticmethod
+    def state_check(args):
+        user = args["user"]
+        session = args["session"]
+        for s in System.session_set:
+            if(s.get("user")==user):
+              raise StateError("cannot delete user, user is in session %s" % s.get("user").get("name"))
+
+        if not (session in System.session_set):
+            raise StateError("user not in session %s" % session.get("user").get("name"))
+        if not (user in System.user_set):
+            raise StateError("user %s not in System" % user.get("name").get("name"))
+
+            
+    @staticmethod
+    def action(args):
+        user = args["user"]
+        session = args["session"]
+        new_users = filter(lambda x: x.get("email").get("email") != user.get("email").get("email"), System.user_set)
+        System.user_set= new_users 
+
+
+#+end_src
+*** Test DeleteUser
+#+NAME: test_adduser
+#+BEGIN_SRC python
+class TestDeleteUser(TestCase):
+    TESTING = True
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in", System.user_set)
+        System.user_set = admin
+
+    def test_delete_admin_user(self):
+        print "test_delete_user"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role(name=Config.admin_name,centre=None))
+        System.session_set.append(session)
+ 
+        other_admin_user=User(name=Name(name="me"),email=Email(email="abc@gmail.com"))
+        System.do("add_user", user=other_admin_user, session=session)
+        other_admin_user.set_role(role=Role(name="admin",centre=None))
+        length = len(System.user_set)
+        System.do("delete_user",user=other_admin_user,session=session)
+        new_length = len(System.user_set)
+        
+        self.assertEqual(new_length+1, length)
+
+#+END_SRC
+
+** =del_user=
+** =show_users=
+
+** =get_user_by_email=
+** =make_user=
+** =get_email_of_user=
+** =get_name_of_user=
+** =get_role_of_user=
+** =login=
+** =del_session=
+** =show_sessions=
+
 * =show_users=
 
 * =get_user_by_email=
@@ -336,7 +423,7 @@ class login():
         new_session = Session(user=user,role=role)
         System.session_set.append(new_session)
         return new_session
-ops_table = {'add_user' : AddUser,'login':login}
+ops_table = {'add_user' : AddUser,'login':login, 'delete_user' : DeleteUser}
 #+end_src
 ** Test login
 #+NAME: test_login
@@ -398,7 +485,6 @@ if __name__ == '__main__':
     unittest.main()
 
 #+END_SRC
-
 
 * Tangling                                                      :boilerplate:
 
