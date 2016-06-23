@@ -104,6 +104,18 @@ class System ():
     def is_session_OCC(session):
         return session.get("role").get_name()== "OCC"
 
+    @staticmethod    
+    def is_session_NCC(session):
+        return session.get("role").get_name()== "NCC"
+    
+    @staticmethod    
+    def is_session_reviewer(session):
+        return session.get("role").get_name()== "reviewer"
+    
+    @staticmethod    
+    def is_session_guest(session):
+        return session.get("role").get_name()== "guest"
+
 #+end_src
 
 *** Test Constructor
@@ -128,6 +140,34 @@ class TestSystemConstructor(TestCase):
         session = Session(user=admin_user,role=Role(name=Config.admin_name,centre=None))
         System.session_set.append(session)
         self.assertEqual(System.is_session_admin(session), True)
+    
+    def test_is_session_OCC(self):
+        print "test_is_session_OCC"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role(name="OCC",centre=None))
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_OCC(session), True)
+    
+    def test_is_session_NCC(self):
+        print "test_is_session_NCC"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role(name="NCC",centre=None))
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_NCC(session), True)
+
+    def test_is_session_reviewer(self):
+        print "test_is_session_reviewer"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role(name="reviewer",centre=None))
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_reviewer(session), True)
+    
+    def test_is_session_guest(self):
+        print "test_is_session_guest"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role(name="guest",centre=None))
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_guest(session), True)
 
 #+END_SRC
 
