@@ -178,11 +178,26 @@ Relations
  name       [Workshop, Name]
  #+END_SRC
 *** User relations
-    [[https://drive.google.com/open?id=1pehN8AwI8Om4hYwjM4CPP7nyWEhwCNkSazXrKnXhbMw]]
+
+#+BEGIN_HTML
+<img src="https://docs.google.com/drawings/d/1pehN8AwI8Om4hYwjM4CPP7nyWEhwCNkSazXrKnXhbMw/pub?w=960&h=720">
+#+END_HTML
+
+    [[https://docs.google.com/drawings/d/1pehN8AwI8Om4hYwjM4CPP7nyWEhwCNkSazXrKnXhbMw/edit?usp=sharing][edit image]]
 *** Institute, NC and OC relations
-    [[https://drive.google.com/open?id=1WEnEb5L6_3NjUje-JWPvyHnYAFsaKRbn3_-PRRccs28]]
+
+#+BEGIN_HTML
+<img src="https://docs.google.com/drawings/d/1WEnEb5L6_3NjUje-JWPvyHnYAFsaKRbn3_-PRRccs28/pub?w=960&h=720">
+#+END_HTML
+
+    [[https://docs.google.com/drawings/d/1WEnEb5L6_3NjUje-JWPvyHnYAFsaKRbn3_-PRRccs28/edit?usp=sharing][edit image]]
 *** Workshop relations
-    [[https://drive.google.com/open?id=1VQQRDTdGrAT1_sUL9WlV5PCFS-D1PNvNsMg9NQOo8pg]]
+
+#+BEGIN_HTML
+<img src="https://docs.google.com/drawings/d/1VQQRDTdGrAT1_sUL9WlV5PCFS-D1PNvNsMg9NQOo8pg/pub?w=960&h=720">
+#+END_HTML
+
+    [[https://drive.google.com/open?id=1VQQRDTdGrAT1_sUL9WlV5PCFS-D1PNvNsMg9NQOo8pg][edit image]]
 
 ** Derived Entity sets
 #+BEGIN_SRC spec :tangle spec.txt
@@ -230,8 +245,8 @@ These specifications also capture referential integrity.
 #+END_SRC
 
 * Assumptions
-** We did not explicitly pass a User object in some methods, since the Session object passed holds both a User object and a Role object.
-** Artefact may be photos, reports, attendance or feedback.
+- We did not explicitly pass a User object in some methods, since the Session object passed holds both a User object and a Role object.
+- Artefact may be photos, reports, attendance or feedback.
 * Operations 
 
 CRUD operations.  
@@ -563,4 +578,9 @@ the  actors:  =session=.
 
 
 ** Workshop workflow diagram
-   [[https://docs.google.com/drawings/d/1av_XMueESqLkUdYRGZuJskeTzr9yl8_agsGq1JedMMg/edit?usp=sharing]]
+
+#+BEGIN_HTML
+<img src="https://docs.google.com/drawings/d/1av_XMueESqLkUdYRGZuJskeTzr9yl8_agsGq1JedMMg/pub?w=960&h=720">
+#+END_HTML
+
+   [[https://docs.google.com/drawings/d/1av_XMueESqLkUdYRGZuJskeTzr9yl8_agsGq1JedMMg/edit?usp=sharing][edit image]]
