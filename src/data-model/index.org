@@ -134,7 +134,12 @@ is a relation =r: A? > K!=.
 | Session | User and Role |
 |---------+---------------|
 
-
+* Assumptions
+- We did not explicitly pass a User object in some methods, since the Session object passed holds both a User object and a Role object.
+- Artefact may be photos, reports, attendance or feedback.
+- The Session object also contains a 'last-active' Time object, which may be
+  used to delete a user if he remains inactive past a specified time and hasn't
+  logged out.
 * System state
   The system's state is captured by a set of /state
   variables/.  
@@ -244,9 +249,6 @@ These specifications also capture referential integrity.
 
 #+END_SRC
 
-* Assumptions
-- We did not explicitly pass a User object in some methods, since the Session object passed holds both a User object and a Role object.
-- Artefact may be photos, reports, attendance or feedback.
 * Operations 
 
 CRUD operations.  
@@ -348,6 +350,44 @@ the  actors:  =session=.
     role-set' =role-set U NCC(nc)
 #+END_SRC       
 
+** Edit OC
+*** Parameters
+#+BEGIN_SRC spec :tangle spec.txt
+    oc: OC, name: Name, s:Session
+#+END_SRC   
+*** Actor Credentials
+#+BEGIN_SRC spec :tangle spec.txt
+    s.role==admin
+#+END_SRC   
+*** Referential Integrity
+#+BEGIN_SRC spec :tangle spec.txt
+    s:session-set
+    oc:oc-set
+#+END_SRC   
+*** Effect
+#+BEGIN_SRC spec :tangle spec.txt
+    oc.name = name
+    role-set' =role-set U OCC(oc)
+#+END_SRC   
+** Edit NC
+*** Parameters
+#+BEGIN_SRC spec :tangle spec.txt
+    nc: NC, name: Name, s:Session
+#+END_SRC   
+*** Actor Credentials
+#+BEGIN_SRC spec :tangle spec.txt
+    s.role==admin or s.role==OCC(oc) where hub(nc)==oc
+#+END_SRC   
+*** Referential Integrity
+#+BEGIN_SRC spec :tangle spec.txt
+    s:session-set
+    nc:nc-set
+#+END_SRC   
+*** Effect
+#+BEGIN_SRC spec :tangle spec.txt
+    nc.name = name
+    role-set' =role-set U NCC(nc)
+#+END_SRC   
 ** login
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
