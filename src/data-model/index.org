@@ -134,7 +134,12 @@ is a relation =r: A? > K!=.
 | Session | User and Role |
 |---------+---------------|
 
-
+* Assumptions
+- We did not explicitly pass a User object in some methods, since the Session object passed holds both a User object and a Role object.
+- Artefact may be photos, reports, attendance or feedback.
+- The Session object also contains a 'last-active' Time object, which may be
+  used to delete a user if he remains inactive past a specified time and hasn't
+  logged out.
 * System state
   The system's state is captured by a set of /state
   variables/.  
@@ -244,9 +249,6 @@ These specifications also capture referential integrity.
 
 #+END_SRC
 
-* Assumptions
-- We did not explicitly pass a User object in some methods, since the Session object passed holds both a User object and a Role object.
-- Artefact may be photos, reports, attendance or feedback.
 * Operations 
 
 CRUD operations.  
