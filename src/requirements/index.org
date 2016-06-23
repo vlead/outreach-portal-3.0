@@ -10,12 +10,135 @@
 * Application:  A portal to help conduct workshop on Virtual Labs.
 
 * Users
+** Req 1
+   The system has users.
+** Req 2
+   Each user has an email address (string that corresponds to a
+   valid email addr).  
+** Req 3
+   Email identifies a user.  Two users with the same email
+   are the same users. 
+** Req 4
+   Each user has a Name (string).
+** Req 5
+   Each user has atleast one role, and by default when a user is created, the
+   role that is associated with the newly created user is guest.
 
+   
 * Roles
+** Req 1 
+   There are 5 kinds of roles: =admin=, =guest=, =reviewer=, =OCC(oc)=,
+   =NCC(nc)=.  Each role determines what data access privileges are available
+   to the user.
+
+** Req 2
+   Each user is mapped to at least one role meaning a user can have one or more
+   roles.  In any given session, a user is mapped to a single role.
+
+** Req 3
+   1. A user with role admin has the ability to:
+
+      1. Create a new user, Read and Update information of other users, and
+         delete other users.
+
+   2. A user with role guest has the ability to:
+
+      1. View certain information of the Outreach Portal. (to be defined)
+      
+   3. A user with role =reviewer= has the ability to:
+
+      1. View all the information of the Outreach Portal.
+
+   4. A user with the role =OCC(oc)= has the ability to:
+
+      1. Manage the outreach center =oc=.
+
+      2. Create, Read, Update and delete nodal centers.
+
+      3. Assign role =NCC(nc)= to other users where =nc= is nodal center
+         belonging to the outreach center =oc=.
+
+   5. A user with the role =NCC(nc)= has the ability to:
+
+      1. Manage the nodal center =nc=.
+
+
+* Outreach Center
+** Req 1
+   An outreach center (=OC=) is housed in an institute. 
+** Req 2
+   The target usage for an =OC= is set by user while donning the role =admin=
+** Req 2
+   =OC= monitors and coordinates outreach activity for a region.  This is
+   achieved by creating one or more nodal centers that are associated with an
+   =OC= to carry out outreach activity to meet the targets for an =OC=.
+** Req 4
+   Each =OC= has zero or more coordinators associated with it.
+** Req 5
+   =OCC= of an =OC= reviews activities of all the nodal centers associated with
+   it and upon review, either approves or rejects the activities.
+** Req 6
+   An =OC= is created by user while donning the role =admin=
+
+
+* Nodal Center
+** Req 1
+   An nodal center (=NC=) is housed in an institute.
+** Req 2
+   Each =NC= is associated with a unique outreach center.
+** Req 3
+   The target for a =NC= is set by the Outreach Center Coordinator (=OCC=) of
+   the =OC= with which this =NC= is associated with.
+** Req 4
+   Each =NC= has zero or more coordinators associated with it.
+** Req 5
+   A Nodal Center Coordinator (=NCC=) conducts activities to meet the target of
+   =NC=.
+** Req 6
+   A =NCC= submits all the artifacts associated with an activity for approval
+   by an =OCC=.
+
+
+* Activities
+** Req 1
+   A Workshop is an activity and a workshop is conducted at an Institute.
+** Req 3
+   A workshop has participants - students and a coordinator. 
+** Req 3
+   Each workshop has a target and actual usage of Virtual Labs measured in
+   terms of experiments performed by the participants. 
+** Req 4
+   There are different types of artifacts associated with each workshop -
+   attendance sheet, photos, feedback and report. 
 
 * Sessions
+** Req 1
+   Users are required to login into the system.
 
-* Interaction with the system and privileges
+** Req 2
+   Each user once logged in is associated with a session.
 
+** Req 3
+   Operations are permitted only if the user is logged in into the system.
+
+** Req 4
+   Users can have more than one session at a given time but no two sessions of
+   a user can have the same role.
+
+* COMMENT Views
+** Admin
+   
 * Questions/scenarios
+  1. What is the information that a user when logged in with role =guest= is
+     presented with?
+     
+     The information could be related to the total usage, upcoming workshops
+     etc.
+
+  2. When a user is logged in with role =reviewer=, most of the information
+     available with the portal should be presented.  The information is targets
+     and actual usage, outreach centers, nodal centers, workshops conducted,
+     workshops planned. 
+
+
 

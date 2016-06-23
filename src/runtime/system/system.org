@@ -234,10 +234,11 @@ class TestSystemArityAndType(TestCase):
         arg_types  = cls.arg_types
         auth_check = cls.auth_check
         state_check = cls.state_check
-
+        arity_and_type_checks_needed = cls.arity_and_type_checks_needed
         try:
-            System.arity_check(args.keys(), len(arg_types.keys()))
-            System.type_check(args, arg_types)
+            if arity_and_type_checks_needed:
+               System.arity_check(args.keys(), len(arg_types.keys()))
+               System.type_check(args, arg_types)
             auth_check(args)
             state_check(args)
             return cls.action(args)
@@ -253,6 +254,7 @@ class TestSystemArityAndType(TestCase):
 #+begin_src python
 class AddUser():
     arg_types = {"user":is_user, "session":is_session}
+    arity_and_type_checks_needed = True 
   
     @staticmethod
     def auth_check(args):
@@ -269,7 +271,7 @@ class AddUser():
         if (user in System.user_set):
             raise StateError("user %s already in System" % user.get("name").get("name"))
 
-            
+    
     @staticmethod
     def action(args):
         user = args["user"]
@@ -306,11 +308,11 @@ class TestAddUser(TestCase):
 #+END_SRC
 
 * =DeleteUser=
-#+NAME: class_adduser
+#+NAME: class_deleteuser
 #+begin_src python
 class DeleteUser():
     arg_types = {"user":is_user, "session":is_session}
-  
+    arity_and_type_checks_needed = True   
     @staticmethod
     def auth_check(args):
         session = args['session']
@@ -375,20 +377,89 @@ class TestDeleteUser(TestCase):
         self.assertEqual(new_length+1, length)
 
 #+END_SRC
+* =UpdateUser=
+#+NAME: class_updateuser
+#+begin_src python
+class UpdateUser():
+    arg_types = {"name": is_name, "email": is_email, "user":is_user, "session":is_session}
+    arity_and_type_checks_needed = False
 
-* =show_users=
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        user = args['user']
+        if System.is_session_admin(session):
+            return True
+        elif System.is_session_OCC(session):
+            role = filter (lambda x: x.get_name() == NCC and x.centre.hub == session.get("role").centre, user.roles)
+            if role:
+                return True
+        else:
+            raise AuthError("Role not Authorized to perform this action")
 
-* =get_user_by_email=
-* =make_user=
-* =get_email_of_user=
-* =get_name_of_user=
-* =get_role_of_user=
+    @staticmethod
+    def state_check(args):
+        user = args["user"]
+        session = args["session"]
+        for s in System.session_set:
+            if(s.get("user")==user):
+              raise StateError("cannot update user, user is in session %s" % s.get("user").get("name"))
+
+        if not (session in System.session_set):
+            raise StateError("You are not in session set %s" % session.get("user").get("name"))
+        if not (user in System.user_set):
+            raise StateError("user %s not in System" % user.get("name").get("name"))
+
+    @staticmethod
+    def action(args):
+        user = args["user"]
+        session = args["session"]
+        
+        if not "name" in args:
+           name=user.get("name")
+        else:
+           name=args["name"]      
+
+        if not "email" in args:
+           email=user.get("email")
+        else:
+           email=args["email"]
+
+        user.set(name=name)
+        user.set(email=email)
+#+end_src
+*** Test UpdateUser
+#+NAME: test_adduser
+#+BEGIN_SRC python
+class TestUpdateUser(TestCase):
+    TESTING = True
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in", System.user_set)
+        System.user_set = admin
+
+    def test_delete_admin_user(self):
+        print "test_delete_user"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role(name=Config.admin_name,centre=None))
+        System.session_set.append(session)
+ 
+        other_user=User(name=Name(name="me"),email=Email(email="abc@gmail.com"))
+        System.do("add_user", user=other_user, session=session)
+
+        System.do("update_user",name=Name(name="john"), user=other_user,session=session)
+        
+        self.assertEqual(other_user.get("name").get("name"), "john")
+
+#+END_SRC
 * =login=
 #+NAME: class_login
 #+begin_src python
 class login():
     arg_types = {"user":is_user, "role":is_role}
-  
+    arity_and_type_checks_needed = True  
     @staticmethod
     def auth_check(args):
         user = args['user']
@@ -450,7 +521,7 @@ class Testlogin(TestCase):
 #+begin_src python
 class logout():
     arg_types = {"session":is_session}
-
+    arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):
         return
@@ -495,6 +566,7 @@ class Testlogout(TestCase):
 #+begin_src python
 class CreateInstitute():
     arg_types = {"name":is_alphabetic_str, "address":is_str,"session":is_session}
+    arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):
         session = args['session']
@@ -519,7 +591,6 @@ class CreateInstitute():
         new_institute = Institute(name=name,address=address)
         System.institute_set.append(new_institute)
         return new_institute
-              
 #+end_src
 ** Test create_institute
 #+NAME: test_CreateInstitute
@@ -548,7 +619,7 @@ class TestCreateInstitute(TestCase):
 #+begin_src python
 class CreateOC():
     arg_types = {"institute":is_institute, "session":is_session}
-  
+    arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):
         session = args['session']
@@ -579,7 +650,7 @@ class CreateOC():
         new_role = Role(name="OCC",centre=new_oc)
         System.role_set.append(new_role)
         return new_oc
-ops_table = {'add_user' : AddUser,'login':login,'delete_user':DeleteUser,'logout':logout,'create_institute':CreateInstitute,'create_oc':CreateOC}
+ops_table = {'add_user' : AddUser,'login':login,'delete_user':DeleteUser,'logout':logout,'create_institute':CreateInstitute,'create_oc':CreateOC,'update_user':UpdateUser}
 
 #+end_src
 ** Test create_oc
@@ -606,9 +677,6 @@ class TestCreateOC(TestCase):
         #self.assertRaises(StateError,System.do,"create_oc",institute=institute,session=sess)
 #+END_SRC
 
-
-
-* =show_sessions=
 
 
 * Infra                                                         :boilerplate:
@@ -662,6 +730,8 @@ if __name__ == '__main__':
 <<arity_type_checks>>
 
 <<class_adduser>>
+<<class_updateuser>>
+<<class_deleteuser>>
 <<class_login>>
 <<class_logout>>
 <<class_CreateInstitute>>
