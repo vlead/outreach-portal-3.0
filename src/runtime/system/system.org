@@ -91,6 +91,8 @@ class System ():
     session_set = []
     role_set = [Role.admin,Role.reviewer,Role.guest]
     institute_set = []
+    oc_set = []
+    nc_set = []
 
    
             #     'del_user' : DelUser}
@@ -403,6 +405,9 @@ class login():
     def auth_check(args):
         user = args['user']
         role = args['role']
+        for sess in System.session_set:
+            if sess.get('user') == user and sess.get('role') == role:
+                raise AuthError("User already logged in with this role")
         for rol in user.roles:
             if role.name == rol.name:
                 return
@@ -437,12 +442,12 @@ class Testlogin(TestCase):
         print "test_login"
         login_user=System.user_set[0]
         login_role = System.role_set[0]
-
+        System.session_set = []
         System.do("login",user=login_user,role=login_role)
-
         session=System.session_set[0]
         self.assertEqual(session.get("user").get("name").get("name"),"admin")
         self.assertEqual(session.get("user").get_role()[0].get_name(),"admin")
+        #self.assertRaises(AuthError,System.do,"login",user=login_user,role=login_role)
 #+END_SRC
 
 * =logout=
@@ -502,7 +507,7 @@ class CreateInstitute():
         if not (session in System.session_set):
             raise StateError("user not in session %s" % session.user.name.name)
         for inst in System.institute_set:
-            if inst.name == name and inst.address == address:
+            if inst.get('name') == name and inst.get('address') == address:
                 raise StateError("institute %s already in System" % institute.name)
 
     @staticmethod        
@@ -513,8 +518,6 @@ class CreateInstitute():
         System.institute_set.append(new_institute)
         return new_institute
               
-
-ops_table = {'add_user' : AddUser,'login':login,'logout':logout,'create_institute':CreateInstitute, 'delete_user' : DeleteUser}
 #+end_src
 ** Test create_institute
 #+NAME: test_CreateInstitute
@@ -531,6 +534,67 @@ class TestCreateInstitute(TestCase):
         self.assertEqual(institute,System.institute_set[0])
 
 #+END_SRC
+* =create_oc=
+#+NAME: class_CreateOC
+#+begin_src python
+class CreateOC():
+    arg_types = {"institute":is_institute, "session":is_session}
+  
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        institute = args['institute']
+        if not System.is_session_admin(session):
+            raise AuthError("Role not Authorized to perform this action")
+
+    @staticmethod
+    def state_check(args):
+        session = args["session"]
+        institute = args['institute']
+        if not (session in System.session_set):
+            raise StateError("user not in session %s" % session.user.name.name)
+        if institute not in System.institute_set:
+            raise StateError("institute %s not in System" % institute.name)
+        for oc in System.oc_set:
+            if oc.get('institute') == institute:
+                raise StateError("institute %s already has an oc associated with it" %oc)
+        for nc in System.nc_set:
+            if nc.get('institute') == institute:
+                raise StateError("institute %s already has an oc associated with it" %nc)
+
+    @staticmethod        
+    def action(args):
+        institute = args["institute"]
+        new_oc = OC(institute=institute)
+        System.oc_set.append(new_oc)
+        new_role = Role(name="OCC",centre=new_oc)
+        System.role_set.append(new_role)
+        return new_oc
+ops_table = {'add_user' : AddUser,'login':login,'logout':logout,'create_institute':CreateInstitute,'create_oc':CreateOC}
+
+#+end_src
+** Test create_oc
+#+NAME: test_CreateOC
+#+BEGIN_SRC python
+class TestCreateOC(TestCase):
+    TESTING = True
+    def test_create_oc(self):
+        print "test_create_oc"
+        login_user=System.user_set[0]
+        login_role = System.role_set[0]
+        System.session_set = []
+        System.institute_set = []
+        System.oc_set = []
+  
+        sess = System.do("login",user=login_user,role=login_role)
+        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
+        oc = System.do("create_oc",institute=institute,session=sess)
+        self.assertEqual(oc.get('institute'),institute)
+        #self.assertRaises(StateError,System.do,"create_oc",institute=institute,session=sess)
+#+END_SRC
+
+
+
 * =show_sessions=
 
 
@@ -588,6 +652,7 @@ if __name__ == '__main__':
 <<class_login>>
 <<class_logout>>
 <<class_CreateInstitute>>
+<<class_CreateOC>>
 #+end_src
 
 
@@ -600,6 +665,7 @@ if __name__ == '__main__':
 <<test_login>>
 <<test_logout>>
 <<test_CreateInstitute>>
+<<test_CreateOC>>
 <<run_test_cases>>
 
 #+end_src
