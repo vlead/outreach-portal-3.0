@@ -308,6 +308,25 @@ the  actors:  =session=.
 #+BEGIN_SRC spec :tangle spec.txt
     r is added to u.roles
 #+END_SRC   
+** Add institute
+*** Parameters
+#+BEGIN_SRC spec :tangle spec.txt
+    name: Name, address: String, i: Institute, s: Session
+#+END_SRC   
+*** Actor credentials
+#+BEGIN_SRC spec :tangle spec.txt
+    s.role == admin or s.role == OCC(oc)
+#+END_SRC   
+*** Referential Integrity
+#+BEGIN_SRC spec :tangle spec.txt
+    s:session-set
+    i:~ institute-set
+#+END_SRC   
+*** Effect
+#+BEGIN_SRC spec :tangle spec.txt
+     Institute is added to i.institute
+#+END_SRC   
+
 ** Create OC
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
