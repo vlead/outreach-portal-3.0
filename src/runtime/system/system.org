@@ -194,7 +194,7 @@ class TestSystemArityAndType(TestCase):
         try:
             System.arity_check(args.keys(), len(arg_types.keys()))
             System.type_check(args, arg_types)
-            auth_check(args['session'])
+            auth_check(args)
             state_check(args)
             cls.action(args)
         except (ArityError, TypeError, AuthError, StateError) as err:
@@ -212,7 +212,8 @@ class AddUser():
     arg_types = {"user":is_user, "session":is_session}
   
     @staticmethod
-    def auth_check(session):
+    def auth_check(args):
+        session = args['session']
         if System.is_session_admin(session) or System.is_session_OCC(session):
             return True
         else:
@@ -220,22 +221,21 @@ class AddUser():
 
     @staticmethod
     def state_check(args):
-        u = args["user"]
-        s = args["session"]
-        if not (s in System.session_set):
+        user = args["user"]
+        session = args["session"]
+        if not (session in System.session_set):
             raise StateError("user not in session %s" % s.user.name)
-        if (u in System.user_set):
+        if (user in System.user_set):
             raise StateError("user %s already in System" % u.name)
 
             
     @staticmethod
     def action(args):
-        u = args["user"]
-        s = args["session"]
-        System.user_set.append(u)
-        u.set_role(role=Role(name="guest",centre=None))
-        
-        return u
+        user = args["user"]
+        session = args["session"]
+        System.user_set.append(user)
+        user.set_role(role=Role(name="guest",centre=None))
+        return user
 ops_table = {'add_user' : AddUser}
 #+end_src
 *** Test AddUser
