@@ -182,7 +182,7 @@ class TestOC(TestCase):
 #+NAME: class_NC
 #+BEGIN_SRC python
 
-NC= ClassTemplate.mk_class("NC", institute=check_institute, hub=is_oc)
+NC= ClassTemplate.mk_class("NC", institute=is_institute, hub=is_oc)
 
 is_nc = is_inst(NC)
 check_nc = check_pred(is_nc)
@@ -210,54 +210,23 @@ class TestNC(TestCase):
 #+NAME: class_Role
 #+BEGIN_SRC python
 def is_centre(value):
-    if value == None:
-        return None
-    elif is_oc(value) or is_nc(value):
-        return value
+    if value == None or is_oc(value) or is_nc(value):
+        return True
     else:
-        raise TypeError("Invalid centre type")
+        raise False
    
-check_centre=is_centre
-class Role:
-    name = None
-    centre = None
-    def __init__(self,**kwargs):
-        if 'name' not in kwargs:
-            raise AttributeRequired("name required")
-        else:
-            self.set_name(kwargs['name'])
-        if 'centre' not in kwargs:
-            raise AttributeRequired("centre required")
-        else:
-            self.set_centre(kwargs['centre'])
-    def get_name(self):
-        return self.name
-    def set_name(self,name):
-        if check_alphabetic_str(name):
-            self.name = name
-    def get_centre(self):
-        return self.centre
-    def set_centre(self,cent):
-        check_centre(cent)
-        self.centre = cent
-            
-"""
-Role = ClassTemplate.mk_class("Role", name=is_alphabetic_str,centre=check_centre)
-"""
+Role = ClassTemplate.mk_class("Role", 
+                              name=is_alphabetic_str,
+                              centre=is_centre)
+
 is_role = is_inst(Role)
 check_role = check_pred(is_role)
-"""Role.get_centre = lambda self: self.centre
-def func(self, centre): 
-    if is_centre(centre): 
-        self.centre = centre
-Role.set_centre = func"""
 Role.admin = Role(name="admin",centre=None)
 Role.reviewer = Role(name="reviewer",centre=None)
 Role.guest = Role(name="guest",centre=None)
 Role.is_admin = lambda role: role.name == 'admin'
 Role.is_reviewer = lambda role: role.name == 'reviewer'
 Role.is_guest = lambda role: role.guest == 'guest'
-
 
 
 #+END_SRC
@@ -270,29 +239,26 @@ class TestRole(TestCase):
 
     def test_instantiate_role(self):
         print "test_instantiate_role"
-        self.assertEqual(is_role(Role(name="admin",centre=None)), True)
-        a_role = Role(name="admin",centre=None)
+        self.assertEqual(is_role(Role(name="admin", centre=None)), True)
+        a_role = Role(name="admin", centre=None)
         self.assertEqual(check_role(a_role), a_role)
-        self.assertEqual(Role(name="admin",centre=None).get_name(), "admin")
-        self.assertRaises(TypeError, Role, name="admin123",centre=None)
+        self.assertEqual(Role(name="admin", centre=None).get("name"), "admin")
+        self.assertRaises(TypeError, Role, name="admin123", centre=None)
 
     def test_sets_on_role(self):
         print "test_sets_on_role"
-        u_role = Role(name="guest",centre=None)
-        self.assertEqual(u_role.get_name(), "guest")
-        u_role.set_name("admin")
-        self.assertEqual(u_role.get_name(), "admin")
-      
+        u_role = Role(name="guest", centre=None)
+        self.assertEqual(u_role.get("name"), "guest")
+        u_role.set(name="admin")
+        self.assertEqual(u_role.get("name"), "admin")
+
     def test_set_and_get_centre(self):
         print "test_set_and_get_centre"
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"))  
-        occ_role = Role(name="OCC",centre=oc)
-        self.assertEqual(occ_role.get_name(), "OCC")
-        self.assertEqual(occ_role.get_centre(), oc)
-        
-        
-        
-    
+        oc = OC(institute=Institute(name="IIITH", address="Hyderabad"))
+        occ_role = Role(name="OCC", centre=oc)
+        self.assertEqual(occ_role.get("name"), "OCC")
+        self.assertEqual(occ_role.get("centre"), oc)
+
 #+END_SRC
 
 
@@ -349,7 +315,7 @@ class TestUser(TestCase):
 
         self.assertEqual(user.get("name").get("name"), "Jimi Hendrix")
         self.assertEqual(user.get("email").get("email"), "jimi@gnu.org")
-        self.assertEqual(user.get_role()[0].get_name(), "user")
+        self.assertEqual(user.get_role()[0].get("name"), "user")
 
         
     def test_equality_on_user(self):
