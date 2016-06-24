@@ -315,7 +315,7 @@ the  actors:  =session=.
 #+END_SRC   
 *** Actor credentials
 #+BEGIN_SRC spec :tangle spec.txt
-    s.role == admin or s.role == OCC(oc)
+    s.role == admin or s.role == OCC(oc) or s.role == NCC(nc)
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
