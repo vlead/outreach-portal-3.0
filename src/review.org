@@ -8,7 +8,7 @@
 
 
 * [2016-06-24 Fri]
-  The review was done on the requirements document.
+  The review was done on the [[./requirements/index.org][requirements]] document.
 
 ** From Thirumal's notes
    1. Requirements, section 1,  with some blurb
