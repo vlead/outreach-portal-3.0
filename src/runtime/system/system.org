@@ -277,7 +277,7 @@ class AddUser():
         user = args["user"]
         session = args["session"]
         System.user_set.append(user)
-        user.set_role(role=Role(name="guest",centre=None))
+        user.set(roles=[Role(name="guest",centre=None)])
         return user
 #+end_src
 *** Test AddUser
@@ -298,7 +298,7 @@ class TestAddUser(TestCase):
         session = Session(user=admin_user,role=Role(name=Config.admin_name,centre=None))
         System.session_set.append(session)
  
-        user=User(name=Name(name="me"),email=Email(email="abc@gmail.com"))
+        user=User(name=Name(name="me"),email=Email(email="abc@gmail.com"),roles=[])
 
         System.do("add_user",user=user,session=session)
         
