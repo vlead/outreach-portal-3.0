@@ -804,7 +804,7 @@ class CreateNC():
         System.role_set.append(new_role)
         return new_nc
 
-ops_table = {'add_user' : AddUser,'login':login,'delete_user':DeleteUser,'logout':logout,'create_institute':CreateInstitute,'create_oc':CreateOC,'create_nc':CreateNC,'update_user':UpdateUser}                
+
 #+end_src
 ** Test CreateNC
 #+NAME: test_CreateNC
@@ -830,6 +830,71 @@ class TestCreateNC(TestCase):
   
 #+END_SRC
 * =show_sessions=
+
+* =update institute=
+#+NAME: class_UpdateInstitute
+#+begin_src python
+class UpdateInstitute():
+    arg_types = {"name":is_alphabetic_str, "address":is_str,"institute":is_institute,"session":is_session}
+    arity_and_type_checks_needed = False
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        if not (System.is_session_admin(session) or System.is_session_OCC(session)):
+            raise AuthError("Role not Authorized to perform this action")
+    
+    @staticmethod
+    def state_check(args):
+        session = args["session"]
+        institute = args["institute"]
+            
+        if not (session in System.session_set):
+            raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
+
+    @staticmethod        
+    def action(args):
+        institute = args["institute"]
+
+        if not "name" in args:
+            name = institute.get("name")
+        else:
+            name = args['name']
+        if not "address" in args:
+            address = institute.get("address")
+        else:
+            address = args["address"]
+
+        institute.set(name=name)
+        institute.set(address=address)
+        
+ops_table = {'add_user' : AddUser,'login':login,'delete_user':DeleteUser,'logout':logout,'create_institute':CreateInstitute,'create_oc':CreateOC,'create_nc':CreateNC,'update_user':UpdateUser,'update_institute':UpdateInstitute}                        
+#+end_src
+** Test update_institute
+#+NAME: test_UpdateInstitute
+#+BEGIN_SRC python
+class TestUpdateInstitute(TestCase):
+    TESTING = True
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        System.session_set = []
+        System.institute_set = []
+        System.oc_set = []
+        System.nc_set = []
+    def test_update_institute(self):
+        print "test_update_institute"
+        login_user = System.user_set[0]
+        login_role = System.role_set[0]
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role.admin)
+        System.session_set.append(session)
+        
+        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=session)
+        System.do("update_institute",name="NITK",institute=institute,session=session)
+        self.assertEqual(institute.get("name"),"NITK")
+
+#+END_SRC
 
 * Infra                                                         :boilerplate:
 
@@ -889,6 +954,7 @@ if __name__ == '__main__':
 <<class_CreateInstitute>>
 <<class_CreateOC>>
 <<class_CreateNC>>
+<<class_UpdateInstitute>>
 #+end_src
 
 
@@ -903,6 +969,7 @@ if __name__ == '__main__':
 <<test_CreateInstitute>>
 <<test_CreateOC>>
 <<test_CreateNC>>
+<<test_UpdateInstitute>>
 <<run_test_cases>>
 
 #+end_src
