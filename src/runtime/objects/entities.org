@@ -213,7 +213,7 @@ def is_centre(value):
     if value == None or is_oc(value) or is_nc(value):
         return True
     else:
-        raise False
+        return False
    
 Role = ClassTemplate.mk_class("Role", 
                               name=is_alphabetic_str,
@@ -230,7 +230,7 @@ def are_roles(rls):
             if not is_role(rl):
                 ret_val = False
     else:
-        ret_val = False
+        ret_val = True
 
     return ret_val
 
