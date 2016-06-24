@@ -311,20 +311,20 @@ the  actors:  =session=.
 ** Add institute
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
-    name: Name, address: String, i: Institute, s: Session
+    name: Name, address: String, s: Session
 #+END_SRC   
 *** Actor credentials
 #+BEGIN_SRC spec :tangle spec.txt
-    s.role == admin or s.role == OCC(oc)
+    s.role == admin or s.role == OCC(oc) or s.role == NCC(nc)
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
     s:session-set
-    i:~ institute-set
 #+END_SRC   
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
      Institute is added to i.institute
+     We also check that the created institute does not exist in the institute set.
 #+END_SRC   
 
 ** Create OC
