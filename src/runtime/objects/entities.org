@@ -123,7 +123,7 @@ OC.__eq__ = lambda self,other: \
 def append_spoke(self,spoke):
     if is_nc(spoke):
         spokes = self.get('spokes')
-        spokes.append(spokes)
+        spokes.append(spoke)
         self.set(spokes=spokes)
 
 OC.append_spoke = append_spoke

@@ -862,6 +862,7 @@ class CreateNC():
         oc = args['hub']
         new_nc = NC(institute=institute,hub=oc)
         System.nc_set.append(new_nc)
+        oc.append_spoke(new_nc)
         new_role = Role(name="NCC",centre=new_nc)
         System.role_set.append(new_role)
         return new_nc
@@ -887,6 +888,7 @@ class TestCreateNC(TestCase):
         oc = System.do("create_oc",institute=institute,spokes=[],session=sess)
         nc = System.do("create_nc",institute=institute,hub=oc,session=sess)
         self.assertEqual(nc.get('institute'),institute)
+        self.assertEqual(oc.get('spokes')[0],nc)
   
 #+END_SRC
 * =show_sessions=
