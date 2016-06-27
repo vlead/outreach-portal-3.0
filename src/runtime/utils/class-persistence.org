@@ -172,7 +172,7 @@ db = SQLAlchemy()
 #+BEGIN_SRC python
 # -*- coding: utf-8 -*-
 import unittest
-from flask.ext.testing import TestCase
+from flask_testing import TestCase
 from datetime import datetime
 from type_utils import *
 from class_templates import *
