@@ -87,7 +87,7 @@ class System ():
                      roles=[Role.admin,Role.guest])
     user_set = [admin_user]
     session_set = []
-    role_set = [Role.admin,Role.reviewer,Role.guest]
+    role_set = [Role.admin,Role.reviewer,Role.guest,Role.noc]
     institute_set = []
     oc_set = []
     nc_set = []
@@ -117,6 +117,10 @@ class System ():
     @staticmethod    
     def is_session_guest(session):
         return session.get("role").get('name')== "guest"
+
+    @staticmethod    
+    def is_session_noc(session):
+        return session.get("role").get('name')== "NOC"
 
 #+end_src
 
@@ -160,16 +164,23 @@ class TestSystemConstructor(TestCase):
     def test_is_session_reviewer(self):
         print "test_is_session_reviewer"
         admin_user=System.user_set[0]
-        session = Session(user=admin_user,role=Role(name="reviewer",centre=None))
+        session = Session(user=admin_user,role=Role.reviewer)
         System.session_set.append(session)
         self.assertEqual(System.is_session_reviewer(session), True)
     
     def test_is_session_guest(self):
         print "test_is_session_guest"
         admin_user=System.user_set[0]
-        session = Session(user=admin_user,role=Role(name="guest",centre=None))
+        session = Session(user=admin_user,role=Role.guest)
         System.session_set.append(session)
         self.assertEqual(System.is_session_guest(session), True)
+
+    def test_is_session_noc(self):
+        print "test_is_session_noc"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role.noc)
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_noc(session), True)
 
 #+END_SRC
 
@@ -257,7 +268,7 @@ class AddUser():
     @staticmethod
     def auth_check(args):
         session = args['session']
-        if not (System.is_session_admin(session) or System.is_session_OCC(session)):
+        if not (System.is_session_admin(session) or System.is_session_OCC(session) or System.is_session_noc(session)):
             raise AuthError("Role not Authorized to perform this action")
 
     @staticmethod
@@ -334,11 +345,6 @@ class DeleteUser():
         for s in System.session_set:
             if(s.get("user")==user):
               raise StateError("cannot delete user, user is in session %s" % s.get("user").get("name"))
-
-        if not (session in System.session_set):
-            raise StateError("user not in session %s" % session.get("user").get("name"))
-        if not (user in System.user_set):
-            raise StateError("user %s not in System" % user.get("name").get("name"))
 
             
     @staticmethod
@@ -546,7 +552,7 @@ class AddRole():
     @staticmethod
     def auth_check(args):
         session = args['session']
-        if not (System.is_session_admin(session) or System.is_session_OCC(session)):
+        if not (System.is_session_admin(session) or System.is_session_OCC(session) or System.is_session_noc(session)):
             raise AuthError("Role not Authorized to perform this action")
 
     @staticmethod
@@ -559,8 +565,11 @@ class AddRole():
         if System.is_session_admin(session):
             if role not in System.role_set:
                 raise StateError("Invalid Role")
+        if System.is_session_noc(session):
+            if role.get('name') != 'OCC':
+                raise StateError('AddRole %s not allowed' %role.get('name'))
         if System.is_session_OCC(session):
-            if not role.get('name') == 'NCC':
+            if role.get('name') != 'NCC':
                 raise StateError("AddRole %s not allowed" %role.get('name'))
             else:
                 if not (session.get('role').get('centre') == role.get('centre').get('hub')):
@@ -715,7 +724,7 @@ class CreateInstitute():
     @staticmethod
     def auth_check(args):
         session = args['session']
-        if not (System.is_session_admin(session) or System.is_session_OCC(session) or System.is_session_NCC(session)):
+        if System.is_session_guest(session) or System.is_session_reviewer(session):
             raise AuthError("Role not Authorized to perform this action")
     
     @staticmethod
@@ -769,7 +778,7 @@ class CreateOC():
     def auth_check(args):
         session = args['session']
         institute = args['institute']
-        if not System.is_session_admin(session):
+        if not (System.is_session_admin(session) or System.is_session_noc(session)):
             raise AuthError("Role not Authorized to perform this action")
 
     @staticmethod
@@ -902,7 +911,7 @@ class UpdateInstitute():
     @staticmethod
     def auth_check(args):
         session = args['session']
-        if not (System.is_session_admin(session) or System.is_session_OCC(session) or System.is_session_NCC(session)):
+        if System.is_session_guest(session) or System.is_session_reviewer(session):
             raise AuthError("Role not Authorized to perform this action")
     
     @staticmethod
