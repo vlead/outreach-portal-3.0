@@ -1,2 +1,2 @@
 # outreach-portal-3.0
-The new outreach portal built froma  specification
+The new outreach portal built fromal  specification

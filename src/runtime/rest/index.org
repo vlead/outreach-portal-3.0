@@ -8,9 +8,10 @@
 
 The REST package hold two modules
 
- - [[./type-utils.org][=app=]]
+ - [[./app.org][=app=]]
 
- - [[./class-templates.org][=api=]]
+ - [[./api.org][=api=]]
+
 
 
 * Tangle                          :boilerplate:
