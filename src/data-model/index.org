@@ -327,6 +327,28 @@ the  actors:  =session=.
      We also check that the created institute does not exist in the institute set.
 #+END_SRC   
 
+** Edit institute
+*** Parameters
+#+BEGIN_SRC spec :tangle spec.txt
+    i: Institute, s: Session
+#+END_SRC   
+*** Actor credentials
+#+BEGIN_SRC spec :tangle spec.txt
+    s.role == admin or s.role == OCC(oc) or s.role == NCC(nc)
+#+END_SRC   
+*** Referential Integrity
+#+BEGIN_SRC spec :tangle spec.txt
+    s:session-set
+    i:~ institute-set
+    i:~ oc-institute-set
+    i:~ nc-institute-set
+#+END_SRC   
+*** Effect
+#+BEGIN_SRC spec :tangle spec.txt
+     Institute is added to i.institute
+     We also check that the edited institute does not exist in the institute set.
+#+END_SRC   
+
 ** Create OC
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
@@ -369,44 +391,6 @@ the  actors:  =session=.
     role-set' =role-set U NCC(nc)
 #+END_SRC       
 
-** Edit OC
-*** Parameters
-#+BEGIN_SRC spec :tangle spec.txt
-    oc: OC, name: Name, s:Session
-#+END_SRC   
-*** Actor Credentials
-#+BEGIN_SRC spec :tangle spec.txt
-    s.role==admin
-#+END_SRC   
-*** Referential Integrity
-#+BEGIN_SRC spec :tangle spec.txt
-    s:session-set
-    oc:oc-set
-#+END_SRC   
-*** Effect
-#+BEGIN_SRC spec :tangle spec.txt
-    oc.name = name
-    role-set' =role-set U OCC(oc)
-#+END_SRC   
-** Edit NC
-*** Parameters
-#+BEGIN_SRC spec :tangle spec.txt
-    nc: NC, name: Name, s:Session
-#+END_SRC   
-*** Actor Credentials
-#+BEGIN_SRC spec :tangle spec.txt
-    s.role==admin or s.role==OCC(oc) where hub(nc)==oc
-#+END_SRC   
-*** Referential Integrity
-#+BEGIN_SRC spec :tangle spec.txt
-    s:session-set
-    nc:nc-set
-#+END_SRC   
-*** Effect
-#+BEGIN_SRC spec :tangle spec.txt
-    nc.name = name
-    role-set' =role-set U NCC(nc)
-#+END_SRC   
 ** login
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
@@ -527,7 +511,7 @@ the  actors:  =session=.
 
 
 
-
+    
 ** create workshop
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
