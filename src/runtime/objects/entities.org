@@ -363,8 +363,37 @@ class TestInstitute(TestCase):
         self.assertEqual(check_institute(institute_ex).get("name"), "IIIT")
         self.assertRaises(TypeError, Institute, name="IIIT123")
 #+END_SRC
-  
+   
 
+* Workshop
+  A workshop is an entity that takes two arguments Institute, and Target.
+
+#+NAME: class_Workshop
+#+BEGIN_SRC python
+Workshop = ClassTemplate.mk_class("Workshop", name=is_name, institute=is_institute)
+is_workshop = is_inst(Workshop)
+check_workshop = check_pred(is_workshop)
+
+#+END_SRC
+
+** Test Workshop
+
+   Test cases to test Seesion entity
+
+#+NAME: class_TestWorkshop
+#+BEGIN_SRC python
+class TestWorkshop(TestCase):
+    TESTING = True
+    print "Test create workshop"
+    def test_instatiate_Workshop(self):
+        print "test_instantiate_user"
+        workshop = Workshop(name=Name(name="Test workshop"),institute=Institute(name="IIITH",address="Hyderabad"))
+        self.assertEqual(is_workshop(workshop), True)
+    
+
+#+END_SRC
+  
+   
 * Session
     A session stores the user information.  The session object defines the set
     of operations allowed by the system.  
@@ -377,7 +406,6 @@ is_session = is_inst(Session)
 check_session = check_pred(is_session)
 
 #+END_SRC
-
 ** Test Session
 
    Test cases to test Seesion entity
@@ -419,9 +447,9 @@ class TestSession(TestCase):
 
 
 
-
+   
 * Infra                                                         :boilerplate:
-
+  
 ** sources
 *** Imports 
 #+name: imports_for_sources
@@ -467,6 +495,7 @@ if __name__ == '__main__':
 <<class_Role>>
 <<class_User>>
 <<class_Session>>
+<<class_Workshop>>
 #+end_src
 
 
@@ -481,5 +510,7 @@ if __name__ == '__main__':
 <<class_TestOC>>
 <<class_TestNC>>
 <<class_TestSession>>
+<<class_TestWorkshop>>
 <<run_test_cases>>
+
 #+end_src
