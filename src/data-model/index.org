@@ -443,8 +443,8 @@ the  actors:  =session=.
 
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
-    s:Session, old-data:String, time-stamp:String, primary-key-old:Integer,
-    primary-key-current-session:Integer, entity:String 
+    s:Session, old-data:String, time-stamp:String, updating-entity-id:Integer,
+    current-session-id:Integer, entity:String , operation:String 
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
@@ -454,8 +454,8 @@ the  actors:  =session=.
 #+BEGIN_SRC spec :tangle spec.txt
     This function logs an Audit to the database. 
     old-data is a string containing the values of the object before it is changed.
-    primary-key-old contains the id of the object being changed
-    primary-key-current-session contains the id of the session of the user who is changing the object
+    updating-entity-id contains the id of the object being changed
+    current-session-id contains the id of the session of the user who is changing the object
 #+END_SRC          
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
