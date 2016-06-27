@@ -315,7 +315,7 @@ the  actors:  =session=.
 #+END_SRC   
 *** Actor credentials
 #+BEGIN_SRC spec :tangle spec.txt
-    s.role == admin or s.role == OCC(oc) or s.role == NCC(nc)
+    s.role == admin or s.role == NOC or s.role == OCC(oc) or s.role == NCC(nc)
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
@@ -334,14 +334,13 @@ the  actors:  =session=.
 #+END_SRC   
 *** Actor credentials
 #+BEGIN_SRC spec :tangle spec.txt
-    s.role == admin or s.role == OCC(oc) or s.role == NCC(nc)
+    s.role == admin or s.role == NOC or s.role == OCC(oc) or s.role == NCC(nc)
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
     s:session-set
-    i:~ institute-set
-    i:~ oc-institute-set
-    i:~ nc-institute-set
+    i: institute-set
+    
 #+END_SRC   
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
