@@ -451,8 +451,6 @@ the  actors:  =session=.
 
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
-    s:Session, old-data:String, time-stamp:String, updated-entity-id:Integer,
-    current-session-user-id:Integer, entity:String , 
     o:Operation 
 #+END_SRC   
 *** Referential Integrity
