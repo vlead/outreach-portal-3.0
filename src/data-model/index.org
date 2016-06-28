@@ -323,11 +323,13 @@ the  actors:  =session=.
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
     s:session-set
+    i: ~institute-set
 #+END_SRC   
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
-     Institute is added to i.institute
+     i= newinstitute   
      We also check that the created institute does not exist in the institute set.
+     institute-set = institute-set U {i}
 #+END_SRC   
 
 ** Create OC
@@ -420,13 +422,15 @@ the  actors:  =session=.
 #+END_SRC       
 *** Referential-Integrity
 #+BEGIN_SRC spec :tangle spec.txt
-    u:user-set
+    u:active-user-set
     r:role-set
     r:user.roles
 #+END_SRC      
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
     A session for that user is added to the session-set
+    s: newsession
+    session-set = session-set U {s}
 #+END_SRC   
 ** logout 
 
@@ -441,6 +445,7 @@ the  actors:  =session=.
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
     s is removed from the session-set
+    session-set = session-set - {s}
 #+END_SRC           
 ** create AuditEntry
 
@@ -478,7 +483,7 @@ the  actors:  =session=.
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt    
-    u: user-set
+    u: active-user-set
     s: session-set
     u:~logged-in-user-set
 #+END_SRC       
@@ -492,7 +497,9 @@ the  actors:  =session=.
  #+END_SRC
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
-    u is removed from the user-set
+    active-user-set= active-user-set - {u}   
+    u.activeStatus=false
+    inactive-user-set = inactive-user-set U {u}
 #+END_SRC   
 ** update User
 *** Parameters
@@ -505,7 +512,7 @@ the  actors:  =session=.
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt    
-    u: user-set
+    u: active-user-set
     s: session-set
     u:~logged-in-user-set
     e:~email-set
