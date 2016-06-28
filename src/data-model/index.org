@@ -92,8 +92,8 @@ TYPE Workshop
 TYPE Status
 TYPE Target
 TYPE Artefact 
-
-
+TYPE AuditEntry
+TYPE Operation
 #+END_SRC
 
 * Relations and cardinality constraints over entity types 
@@ -110,7 +110,7 @@ For each relation, we define its inverse next to it.
 [host, nc]             : NC?      >    Institute!
 [user, session]        : Session  >    User!
 [role, session]        : Session  >    Role!
-
+[operation, audit]     : AuditEntry    >    Operation!
 Note: A User can have only one session with a particular role
 Note: We weren't sure if we should list the workshop relations here, so we listed them in the next section.
 
@@ -422,29 +422,24 @@ the  actors:  =session=.
 #+BEGIN_SRC spec :tangle spec.txt
     s is removed from the session-set
 #+END_SRC           
-** create audit
+** create AuditEntry
 
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
-    s:Session, old-data:String, time-stamp:String, updating-entity-id:Integer,
-    current-session-id:Integer, entity:String , operation:String 
+    o:Operation 
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
-    s:session-set
+    
 #+END_SRC       
 *** Remarks
 #+BEGIN_SRC spec :tangle spec.txt
-    This function logs an Audit to the database. 
-    old-data is a string containing the values of the object before it is changed.
-    updating-entity-id contains the id of the object being changed
-    current-session-id contains the id of the session of the user who is changing the object
+    This function logs an AuditEntry to the database. 
 #+END_SRC          
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
-    An Audit record is created and saved in the database.
+    An AuditEntry record is created and saved in the database.
 #+END_SRC    
-
 ** delete User
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
