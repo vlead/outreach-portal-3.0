@@ -136,7 +136,7 @@ class TestPersistence(TestCase):
                 "id": db.Column(db.Integer, primary_key=True),
                 "name": db.Column(db.String(128), nullable=False)
                 }
-        PName = ClassPersistenceTemplate.mk_persistent(entities.Name, **args)
+        PName = ClassPersistenceTemplate.mk_persistent(Name, **args)
         self.setUp()
         p_name = PName(name="Jimi Hendrix")
         p_name.save()
@@ -172,13 +172,13 @@ db = SQLAlchemy()
 #+BEGIN_SRC python
 # -*- coding: utf-8 -*-
 import unittest
-from flask.ext.testing import TestCase
+from flask_testing import TestCase
 from datetime import datetime
 from type_utils import *
 from class_templates import *
 from class_persistence_template import *
 from runtime.rest.app import create_app
-import runtime.objects.entities as entities
+from runtime.objects.entities import Name
 
 config = {
     'SQLALCHEMY_DATABASE_URI': ''
