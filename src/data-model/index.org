@@ -90,7 +90,7 @@ TYPE OutreachCentre ( abbreviated: OC )
 TYPE Institute
 TYPE Session
 TYPE Workshop
-TYPE Status
+TYPE Status (pending + cancelled + completed + pending approval + approved + rejected)
 TYPE Target
 TYPE Artefact 
 TYPE AuditEntry
