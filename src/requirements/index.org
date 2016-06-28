@@ -11,7 +11,11 @@ Requirements of a Portal whose objective is to help advance the outreach of
 Virtual Labs are captured here. 
 
 * User
-  
+
+  User is an entity in the system.  There are several user(s) in the system
+  whose type is =User=.  The interaction of a user with the system is defined
+  by the requirements below.
+
 ** Req 1
    The system has users.
 ** Req 2
