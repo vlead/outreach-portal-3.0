@@ -181,7 +181,7 @@ class TestPersistenceRole(TestCase):
 
     def test_create_role(self):
         print "test_create_role"
-        ro = Role(name="admin")
+        ro = Role(name="admin",centre=None)
         self.assertEqual(is_role(ro), True)
         ro.save()
         ro = Role.get_by_id(1)
@@ -190,7 +190,7 @@ class TestPersistenceRole(TestCase):
 
     def test_update_role(self):
         print "test update role"
-        ro = Role(name="admin")
+        ro = Role(name="admin",centre=None)
         ro.save()
         ro.update(name="user")
         ro.save()
@@ -199,7 +199,7 @@ class TestPersistenceRole(TestCase):
 
     def test_delete_role(self):
         print "test delete role"
-        ro = Role(name="admin")
+        ro = Role(name="admin",centre=None)
         ro.save()
         self.assertEqual(len(Role.get_all()), 1)
         ro.delete()
@@ -207,9 +207,9 @@ class TestPersistenceRole(TestCase):
 
     def test_duplicate_role(self):
         print "test_duplicate_role"
-        ro1 = Role(name="user")
+        ro1 = Role(name="user",centre=None)
         ro1.save()
-        ro2 = Role(name="user")
+        ro2 = Role(name="user",centre=None)
         with self.assertRaises(IntegrityError):
             ro2.save()
 
@@ -259,9 +259,9 @@ class TestPersistenceUser(TestCase):
         na.save()
         em = Email(email="jimi@gnu.org")
         em.save()
-        ro = Role(name="user")
+        ro = Role(name="user",centre=None)
         ro.save()
-        usr = User(name=na, email=em, role=ro)
+        usr = User(name=na, email=em, roles=[ro])
         usr.save()
         self.assertEqual(is_user(usr), True)
         n_usr = User.get_by_id(1)
@@ -277,14 +277,14 @@ class TestPersistenceUser(TestCase):
         em1.save()
         em2 = Email(email="didley@gnu.org")
         em2.save()
-        ro1 = Role(name="user")
+        ro1 = Role(name="user",centre=None)
         ro1.save()
-        ro2 = Role(name="admin")
+        ro2 = Role(name="admin",centre=None)
         ro2.save()
-        usr = User(name=na1, email=em1, role=ro1)
+        usr = User(name=na1, email=em1, roles=[ro1])
         usr.save()
 
-        usr.update(name=na2, email=em2, role=ro2)
+        usr.update(name=na2, email=em2, roles=[ro2])
         n_usr = User.get_by_id(1)
 
         self.assertEqual(n_usr.get("name").get("name"), "Bo Didley")
@@ -295,14 +295,15 @@ class TestPersistenceUser(TestCase):
         na.save()
         em = Email(email="jimi@gnu.org")
         em.save()
-        ro = Role(name="user")
+        ro = Role(name="user",centre=None)
         ro.save()
-        usr = User(name=na, email=em, role=ro)
+        usr = User(name=na, email=em, roles=[ro])
         usr.save()
 
         self.assertEqual(len(User.get_all()), 1)
         usr.delete()
         self.assertEqual(len(User.get_all()), 0)
+
 
 
 #+END_SRC
