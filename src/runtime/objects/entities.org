@@ -1,3 +1,4 @@
+
 #+TITLE: Entities
 #+AUTHOR: VLEAD
 #+DATE: [2016-06-07 Tue]
@@ -104,36 +105,32 @@ class TestEmail(TestCase):
  institute of type =Institute=.
 #+NAME: class_OC
 #+BEGIN_SRC python
+def is_spokes(spo):
+    if is_list(spo):
+        for nc in spo:
+            if not is_nc(nc):
+                ret_val = False
+    else:
+        ret_val = True
 
-OC= ClassTemplate.mk_class("OC",institute=is_institute)
+    return ret_val
+OC= ClassTemplate.mk_class("OC",institute=is_institute,spokes=is_spokes)
 
 OC.__eq__ = lambda self,other: \
             isinstance(other, self.__class__) and \
             self.get("institute") == other.get("institute")
 
+def append_spoke(self,spoke):
+    if is_nc(spoke):
+        spokes = self.get('spokes')
+        spokes.append(spoke)
+        self.set(spokes=spokes)
 
-is_oc = is_inst(OC)
-check_oc = check_pred(is_oc)
-
-OC.spokes = []
-
-def set_spokes(self, centre):
-    if is_nc(centre):
-        self.spokes.append(centre)
-
-
-OC.setspokes = set_spokes
-def get_spokes(self):
-    return self.spokes
-OC.getspokes= get_spokes
-OC.__eq__ = lambda self,other: \
-            isinstance(other, self.__class__) and \
-            self.get("institute") == other.get("institute")
+OC.append_spoke = append_spoke
 
 
 is_oc = is_inst(OC)
 check_oc = check_pred(is_oc)
-
 
 #+END_SRC
 
@@ -146,34 +143,23 @@ class TestOC(TestCase):
 
     def test_instatiate_OC(self):
         print "test_instantiate_user"
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"))        
-                  
-        self.assertEqual(is_oc(oc), True)
-#+END_SRC
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[])
 
-#+NAME: class_TestOC
-#+BEGIN_SRC python
-class TestOC(TestCase):
-    TESTING = True
-
-    def test_instatiate_OC(self):
-        print "test_instantiate_user"
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"))        
-                  
         self.assertEqual(is_oc(oc), True)
 
-    
+
     def test_sets_spokes_on_OC(self):
         print "test_sets_spokes_on_oc"
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"))       
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[])
 
-        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=oc)       
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=oc)
         self.assertEqual((nc.get("institute")).get("name"), "HCU")
-    
-        oc.setspokes(nc)
-        
-        self.assertEqual(oc.getspokes()[0].get("institute").get("name"), "HCU")    
+
+        oc.set(spokes=[nc])
+
+        self.assertEqual(oc.get('spokes')[0].get("institute").get("name"), "HCU")
 #+END_SRC
+
 
 
 * NC
@@ -182,7 +168,7 @@ class TestOC(TestCase):
 #+NAME: class_NC
 #+BEGIN_SRC python
 
-NC= ClassTemplate.mk_class("NC", institute=check_institute, hub=is_oc)
+NC= ClassTemplate.mk_class("NC", institute=is_institute, hub=is_oc)
 
 is_nc = is_inst(NC)
 check_nc = check_pred(is_nc)
@@ -198,9 +184,10 @@ class TestNC(TestCase):
 
     def test_instatiate_NC(self):
         print "test_instantiate_user"
-        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad")))        
-                  
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[]))
+
         self.assertEqual(is_nc(nc), True)
+
 #+END_SRC
 
 
@@ -210,55 +197,37 @@ class TestNC(TestCase):
 #+NAME: class_Role
 #+BEGIN_SRC python
 def is_centre(value):
-    if value == None:
-        return None
-    elif is_oc(value) or is_nc(value):
-        return value
+    if value == None or is_oc(value) or is_nc(value):
+        return True
     else:
-        raise TypeError("Invalid centre type")
+        return False
    
-check_centre=is_centre
-class Role:
-    name = None
-    centre = None
-    def __init__(self,**kwargs):
-        if 'name' not in kwargs:
-            raise AttributeRequired("name required")
-        else:
-            self.set_name(kwargs['name'])
-        if 'centre' not in kwargs:
-            raise AttributeRequired("centre required")
-        else:
-            self.set_centre(kwargs['centre'])
-    def get_name(self):
-        return self.name
-    def set_name(self,name):
-        if check_alphabetic_str(name):
-            self.name = name
-    def get_centre(self):
-        return self.centre
-    def set_centre(self,cent):
-        check_centre(cent)
-        self.centre = cent
-            
-"""
-Role = ClassTemplate.mk_class("Role", name=is_alphabetic_str,centre=check_centre)
-"""
+Role = ClassTemplate.mk_class("Role", 
+                              name=is_alphabetic_str,
+                              centre=is_centre)
+
 is_role = is_inst(Role)
 check_role = check_pred(is_role)
-"""Role.get_centre = lambda self: self.centre
-def func(self, centre): 
-    if is_centre(centre): 
-        self.centre = centre
-Role.set_centre = func"""
+
+def are_roles(rls):
+    ret_val = True
+
+    if is_list(rls):
+        for rl in rls:
+            if not is_role(rl):
+                ret_val = False
+    else:
+        ret_val = True
+
+    return ret_val 
+
 Role.admin = Role(name="admin",centre=None)
 Role.reviewer = Role(name="reviewer",centre=None)
 Role.guest = Role(name="guest",centre=None)
+Role.noc = Role(name="NOC",centre=None)
 Role.is_admin = lambda role: role.name == 'admin'
 Role.is_reviewer = lambda role: role.name == 'reviewer'
 Role.is_guest = lambda role: role.guest == 'guest'
-
-
 
 #+END_SRC
 
@@ -270,29 +239,25 @@ class TestRole(TestCase):
 
     def test_instantiate_role(self):
         print "test_instantiate_role"
-        self.assertEqual(is_role(Role(name="admin",centre=None)), True)
-        a_role = Role(name="admin",centre=None)
+        self.assertEqual(is_role(Role(name="admin", centre=None)), True)
+        a_role = Role(name="admin", centre=None)
         self.assertEqual(check_role(a_role), a_role)
-        self.assertEqual(Role(name="admin",centre=None).get_name(), "admin")
-        self.assertRaises(TypeError, Role, name="admin123",centre=None)
+        self.assertEqual(Role(name="admin", centre=None).get("name"), "admin")
+        self.assertRaises(TypeError, Role, name="admin123", centre=None)
 
-    def test_sets_on_role(self):
+    def test_set_and_get_role(self):
         print "test_sets_on_role"
-        u_role = Role(name="guest",centre=None)
-        self.assertEqual(u_role.get_name(), "guest")
-        u_role.set_name("admin")
-        self.assertEqual(u_role.get_name(), "admin")
-      
+        u_role = Role(name="guest", centre=None)
+        self.assertEqual(u_role.get("name"), "guest")
+        u_role.set(name="admin")
+        self.assertEqual(u_role.get("name"), "admin")
+
     def test_set_and_get_centre(self):
         print "test_set_and_get_centre"
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"))  
-        occ_role = Role(name="OCC",centre=oc)
-        self.assertEqual(occ_role.get_name(), "OCC")
-        self.assertEqual(occ_role.get_centre(), oc)
-        
-        
-        
-    
+        oc = OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[])
+        occ_role = Role(name="OCC", centre=oc)
+        self.assertEqual(occ_role.get("name"), "OCC")
+        self.assertEqual(occ_role.get("centre"), oc)
 #+END_SRC
 
 
@@ -304,23 +269,22 @@ class TestRole(TestCase):
 #+BEGIN_SRC python
 User = ClassTemplate.mk_class("User", 
                               name=is_name, 
-                              email=is_email
+                              email=is_email,
+                              roles=are_roles
                               )
-User.roles = []
-def set_role(self, role):
-    if is_role(role):
-       self.roles.append(role)
 
-User.set_role = set_role
-
-def get_role(self):
-    return self.roles
-
-User.get_role = get_role
 
 User.__eq__ = lambda self, other: \
                   isinstance(other, self.__class__) and \
                   self.get("email") == other.get("email")
+
+def append_role(self,role):
+    if is_role(role):
+        roles = self.get('roles')
+        roles.append(role)
+        self.set(roles=roles)
+
+User.append_role = append_role
 
 is_user = is_inst(User)
 check_user = check_pred(is_user)
@@ -336,28 +300,37 @@ class TestUser(TestCase):
     def test_instantiate_user(self):
         print "test_instantiate_user"
         user = User(name=Name(name="Jimi Hendrix"),
-                    email=Email(email="jimi@gnu.org"))
+                    email=Email(email="jimi@gnu.org"),
+                    roles=[])
         self.assertEqual(is_user(user), True)
 
     def test_sets_on_user(self):
         print "test_sets_on_user"
         user = User(name=Name(name="Jimi Hendrix"),
-                    email=Email(email="jimi@gnu.org")
+                    email=Email(email="jimi@gnu.org"),
+                    roles=[Role(name="guest", centre=None)]
                    )
-
-        user.set_role(role=Role(name="user",centre=None))
 
         self.assertEqual(user.get("name").get("name"), "Jimi Hendrix")
         self.assertEqual(user.get("email").get("email"), "jimi@gnu.org")
-        self.assertEqual(user.get_role()[0].get_name(), "user")
+        self.assertEqual(user.get("roles")[0].get("name"), "guest")
 
         
     def test_equality_on_user(self):
         print "test_equality_on_user"
         user1 = User(name=Name(name="Jimi Hendrix"),
-                     email=Email(email="jimi@gnu.org")
+                     email=Email(email="jimi@gnu.org"),
+                     roles=[]
                     )
         self.assertEqual(user1 == user1, True)
+        
+    def test_append_role(self):
+        print "test_append_role"
+        user = User(name=Name(name="Jimi Hendrix"),
+                     email=Email(email="jimi@gnu.org"),
+                     roles=[])
+        user.append_role(Role(name="guest",centre=None))
+        self.assertTrue(len(user.get('roles'))==1)
 
 #+END_SRC
 
@@ -390,8 +363,37 @@ class TestInstitute(TestCase):
         self.assertEqual(check_institute(institute_ex).get("name"), "IIIT")
         self.assertRaises(TypeError, Institute, name="IIIT123")
 #+END_SRC
-  
+   
 
+* Workshop
+  A workshop is an entity that takes two arguments Institute, and Target.
+
+#+NAME: class_Workshop
+#+BEGIN_SRC python
+Workshop = ClassTemplate.mk_class("Workshop", name=is_name, institute=is_institute)
+is_workshop = is_inst(Workshop)
+check_workshop = check_pred(is_workshop)
+
+#+END_SRC
+
+** Test Workshop
+
+   Test cases to test workshop entity
+
+#+NAME: class_TestWorkshop
+#+BEGIN_SRC python
+class TestWorkshop(TestCase):
+    TESTING = True
+    print "Test create workshop"
+    def test_instatiate_Workshop(self):
+        print "test_instantiate_user"
+        workshop = Workshop(name=Name(name="Test workshop"),institute=Institute(name="IIITH",address="Hyderabad"))
+        self.assertEqual(is_workshop(workshop), True)
+    
+
+#+END_SRC
+  
+   
 * Session
     A session stores the user information.  The session object defines the set
     of operations allowed by the system.  
@@ -404,7 +406,6 @@ is_session = is_inst(Session)
 check_session = check_pred(is_session)
 
 #+END_SRC
-
 ** Test Session
 
    Test cases to test Seesion entity
@@ -417,22 +418,25 @@ class TestSession(TestCase):
     def test_instantiate_session(self):
         print "test_instantiate_user"
         user = User(name=Name(name="Jimi Hendrix"),
-                    email=Email(email="jimi@gnu.org")
+                    email=Email(email="jimi@gnu.org"),
+                    roles=[]
                    )
-        role = Role(name=("admin"), centre=None)
+        role = Role(name="admin", centre=None)
         session = Session(user=user, role=role)
         self.assertEqual(is_session(session), True)
 
     def test_sets_on_session(self):
         print "test_sets_on_session"
         user = User(name=Name(name="Jimi Hendrix"),
-                    email=Email(email="jimi@gnu.org")
+                    email=Email(email="jimi@gnu.org"),
+                    roles=[]
                    )
-        role = Role(name=("admin"), centre=None)
+        role = Role(name="admin", centre=None)
         session = Session(user=user, role=role)
 
         user = User(name=Name(name="Bo Didley"),
-                    email=Email(email="didley@gnu.org")
+                    email=Email(email="didley@gnu.org"),
+                    roles=[]
                    )
 
         session.set(user=user)
@@ -443,9 +447,9 @@ class TestSession(TestCase):
 
 
 
-
+   
 * Infra                                                         :boilerplate:
-
+  
 ** sources
 *** Imports 
 #+name: imports_for_sources
@@ -491,6 +495,7 @@ if __name__ == '__main__':
 <<class_Role>>
 <<class_User>>
 <<class_Session>>
+<<class_Workshop>>
 #+end_src
 
 
@@ -505,5 +510,7 @@ if __name__ == '__main__':
 <<class_TestOC>>
 <<class_TestNC>>
 <<class_TestSession>>
+<<class_TestWorkshop>>
 <<run_test_cases>>
+
 #+end_src
