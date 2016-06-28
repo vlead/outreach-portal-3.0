@@ -6,6 +6,7 @@
 #+SETUPFILE: ../org-templates/level-1.org
 #+options: ^:nil
 #+LATEX: Literal LaTeX code for export
+
 * Introduction
   The purpose of this document is to describe the expected behaviour of the new
   outreach portal. It is a specification for the new requirements of this portal.
@@ -83,20 +84,23 @@ Encodes the following items of information:
 TYPE User
 TYPE Name
 TYPE Email
-TYPE Role (admin + reviewer + guest + OCC(OC) + NCC(NC))
-TYPE NodalCentre (abbreviation- NC )
-TYPE OutreachCentre ( abbreviation- OC )
+TYPE Role (admin + reviewer + guest + OCC(OC) + NCC(NC) + NOC )
+TYPE NodalCentre (abbreviated: NC )
+TYPE OutreachCentre ( abbreviated: OC )
 TYPE Institute
 TYPE Session
 TYPE Workshop
 TYPE Status
 TYPE Target
 TYPE Artefact
-TYPE Audit 
-
-
+TYPE AuditEntry 
 #+END_SRC
 
+Note: Outreach Centre Coordinator is abrreviated as OCC
+      Nodal Centre Coordinator is abrreviated as NCC
+      National Outreach Coordinator is abrreviated as NOC
+       
+       
 * Relations and cardinality constraints over entity types 
 For each relation, we define its inverse next to it.
 #+BEGIN_SRC spec :tangle spec.txt
@@ -111,8 +115,10 @@ For each relation, we define its inverse next to it.
 [host, nc]             : NC?      >    Institute!
 [user, session]        : Session  >    User!
 [role, session]        : Session  >    Role!
+[activeStatus, user]   : User+    >    activeStatus!
 
-Note: A User can have only one session with a particular role
+Note: if s1.user = s2.user -> 
+         s1.role != s2.role
 Note: We weren't sure if we should list the workshop relations here, so we listed them in the next section.
 
 #+END_SRC
@@ -136,11 +142,11 @@ is a relation =r: A? > K!=.
 |---------+---------------|
 
 * Assumptions
-- We did not explicitly pass a User object in some methods, since the Session object passed holds both a User object and a Role object.
-- Artefact may be photos, reports, attendance or feedback.
-- The Session object also contains a 'last-active' Time object, which may be
-  used to delete a user if he remains inactive past a specified time and hasn't
-  logged out.
+
+1) Artifact may be photos, reports, attendance or feedback.
+2) The Session Entity also contains a 'last-active' time, which may be used to
+   delete a user if he remains inactive past a specified time and hasn't logged
+   out.
 * System state
   The system's state is captured by a set of /state
   variables/.  
@@ -162,20 +168,9 @@ Sets
  institute-set : set[Institute] ; set of institutes in the system
  workshop-set  : set[Workshop]  ; set of all workshops 
  status-set    : set[Status]    ; set of all statuses
-
-Relations
-
- photos     [Workshop, Artefact]
- report     [Workshop, Artefact]
- feedback   [Workshop, Artefact]
- attendance [Workshop, Artefact]
- owner      [Workshop, NCC(nc)]
- target     [Workshop, Target]
- location   [Workshop, Institute]
- status     [Workshop, Status]
- name       [Workshop, Name]
  #+END_SRC
-*** User relations
+
+
 
 #+BEGIN_HTML
 <img src="https://docs.google.com/drawings/d/1pehN8AwI8Om4hYwjM4CPP7nyWEhwCNkSazXrKnXhbMw/pub?w=960&h=720">
@@ -197,6 +192,16 @@ Relations
 
     [[https://drive.google.com/open?id=1VQQRDTdGrAT1_sUL9WlV5PCFS-D1PNvNsMg9NQOo8pg][edit image]]
 
+** Derived Entity sets
+#+BEGIN_SRC spec :tangle spec.txt
+  name-set           : user-set.name       ; set of names in the system
+  email-set          : user-set.email      ; set of emails in the system
+  oc-institute-set   : oc-set.host         ; set of institutes in the system associated with an oc
+  nc-institute-set   : nc-set.host         ; set of institutes in the system associated with a nc
+  logged-in-user-set : session-set.user    ; set of logged in users
+  admin-user-set     : user-set.role==admin; set of admin users
+#+END_SRC
+
 ** Referential Integrity Constraints over entity-sets
    
 *** =user-set=
@@ -208,11 +213,12 @@ There is atleast one user  whose role is =admin=.
 
     ;;; The admin-user
 
+    admin-user-set     : user-set.role==admin; set of admin users
 
-    For all elements u in admin-user-set, u belongs to user-set  ; there is atleast
-                                                                 ; one user with
-                                                                 ; role admin.
-
+    and admin-user-set != NULL
+    
+    
+    
     #+END_SRC
 
 These specifications also capture referential integrity.
@@ -221,15 +227,11 @@ These specifications also capture referential integrity.
 ;;; Relation variables with Referential Integrity
 [email, user]    :  user-set!    > email-set!
 [name, user]     :  user-set+    > name-set!    
-[role, user]     :  user-set     > role-set+   
+[roles, user]    :  user-set     > role-set+   
 [session, user]  :  user-set!    > session-set?
 [host, oc]       :  oc-set?      > institute-set!
 [spokes, hub]    :  oc-set!      > nc-set
 [host, nc]       :  oc-set?      > institute-set!
-
-
-
-
 #+END_SRC
 
 ** Derived Entity sets
@@ -240,9 +242,9 @@ These specifications also capture referential integrity.
   nc-institute-set   : nc-set.host         ; set of institutes in the system associated with a nc
   logged-in-user-set : session-set.user    ; set of logged in users
   admin-user-set     : user-set.role==admin; set of admin users
+  active-user-set    : user-set.activeStatus==True; set of active users
+  inactive-user-set  : user-set.activeStatus==False ; set of inactive users
 #+END_SRC
-
-
 * Operations 
 
 CRUD operations.  
@@ -269,17 +271,18 @@ the  actors:  =session=.
 #+END_SRC   
 *** Actor credentials
 #+BEGIN_SRC spec :tangle spec.txt
-    s.role==admin or s.role==NOC s.role==OCC(oc) where oc:oc-set
+    s.role==admin or s.role==OCC(oc) where oc:oc-set
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
     s: session-set
+    u: ~user-set
 #+END_SRC   
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
     u = new user
-    user-set = (user-set) U (u)
-    'admin' belongs to u.roles
+    active-user-set = (active-user-set) U (u)
+    roles(u)= {guest}
 #+END_SRC   
 ** Add Role
 *** Parameters
@@ -293,16 +296,18 @@ the  actors:  =session=.
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
     s:session-set
+    r: ~ roles(u)
     s.role == admin => r:role-set
     s.role == OCC(oc) =>          
          nc:nc-set
          r==NCC(nc)
          hub(nc) == oc
-    u:user-set
+    u:active-user-set
 #+END_SRC   
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
     r is added to u.roles
+    roles(u)= roles(u) U {r}
 #+END_SRC   
 ** Add institute
 *** Parameters
@@ -311,7 +316,7 @@ the  actors:  =session=.
 #+END_SRC   
 *** Actor credentials
 #+BEGIN_SRC spec :tangle spec.txt
-    s.role == admin or s.role == NOC or s.role == OCC(oc) or s.role == NCC(nc)
+    s.role == admin or s.role == OCC(oc) or s.role == NCC(nc)
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
@@ -323,27 +328,6 @@ the  actors:  =session=.
      We also check that the created institute does not exist in the institute set.
 #+END_SRC   
 
-** Edit institute
-*** Parameters
-#+BEGIN_SRC spec :tangle spec.txt
-    i: Institute, s: Session
-#+END_SRC   
-*** Actor credentials
-#+BEGIN_SRC spec :tangle spec.txt
-    s.role == admin or s.role == NOC or s.role == OCC(oc) or s.role == NCC(nc)
-#+END_SRC   
-*** Referential Integrity
-#+BEGIN_SRC spec :tangle spec.txt
-    s:session-set
-    i: institute-set
-    
-#+END_SRC   
-*** Effect
-#+BEGIN_SRC spec :tangle spec.txt
-     Institute is added to i.institute
-     We also check that the edited institute does not exist in the institute set.
-#+END_SRC   
-
 ** Create OC
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
@@ -351,7 +335,7 @@ the  actors:  =session=.
 #+END_SRC   
 *** Actor Credentials
 #+BEGIN_SRC spec :tangle spec.txt
-    s.role==admin or s.role==NOC
+    s.role==admin
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
@@ -386,6 +370,44 @@ the  actors:  =session=.
     role-set' =role-set U NCC(nc)
 #+END_SRC       
 
+** Edit OC
+*** Parameters
+#+BEGIN_SRC spec :tangle spec.txt
+    oc: OC, name: Name, s:Session
+#+END_SRC   
+*** Actor Credentials
+#+BEGIN_SRC spec :tangle spec.txt
+    s.role==admin
+#+END_SRC   
+*** Referential Integrity
+#+BEGIN_SRC spec :tangle spec.txt
+    s:session-set
+    oc:oc-set
+#+END_SRC   
+*** Effect
+#+BEGIN_SRC spec :tangle spec.txt
+    oc.name = name
+    role-set' =role-set U OCC(oc)
+#+END_SRC   
+** Edit NC
+*** Parameters
+#+BEGIN_SRC spec :tangle spec.txt
+    nc: NC, name: Name, s:Session
+#+END_SRC   
+*** Actor Credentials
+#+BEGIN_SRC spec :tangle spec.txt
+    s.role==admin or s.role==OCC(oc) where hub(nc)==oc
+#+END_SRC   
+*** Referential Integrity
+#+BEGIN_SRC spec :tangle spec.txt
+    s:session-set
+    nc:nc-set
+#+END_SRC   
+*** Effect
+#+BEGIN_SRC spec :tangle spec.txt
+    nc.name = name
+    role-set' =role-set U NCC(nc)
+#+END_SRC   
 ** login
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
@@ -422,8 +444,8 @@ the  actors:  =session=.
 
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
-    s:Session, old-data:String, time-stamp:String, primary-key-old:Integer,
-    primary-key-current-session:Integer, entity:String 
+    s:Session, old-data:String, time-stamp:String, updating-entity-id:Integer,
+    current-session-id:Integer, entity:String , operation:String 
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
@@ -433,8 +455,8 @@ the  actors:  =session=.
 #+BEGIN_SRC spec :tangle spec.txt
     This function logs an Audit to the database. 
     old-data is a string containing the values of the object before it is changed.
-    primary-key-old contains the id of the object being changed
-    primary-key-current-session contains the id of the session of the user who is changing the object
+    updating-entity-id contains the id of the object being changed
+    current-session-id contains the id of the session of the user who is changing the object
 #+END_SRC          
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
@@ -461,8 +483,9 @@ the  actors:  =session=.
 *** Remarks
 #+BEGIN_SRC spec :tangle spec.txt   
    An admin can delete any user
-   A user with role OCC can delete a user with role NCC only if he belongs to an NC which is a spoke of the OC.
-#+END_SRC   
+   A user with role OCC can delete a user with role NCC only if he belongs to
+   an NC that is a spoke of the OC. 
+ #+END_SRC
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
     u is removed from the user-set
@@ -506,7 +529,7 @@ the  actors:  =session=.
 
 
 
-    
+
 ** create workshop
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
@@ -622,3 +645,5 @@ the  actors:  =session=.
 #+END_HTML
 
    [[https://docs.google.com/drawings/d/1av_XMueESqLkUdYRGZuJskeTzr9yl8_agsGq1JedMMg/edit?usp=sharing][edit image]]
+
+
