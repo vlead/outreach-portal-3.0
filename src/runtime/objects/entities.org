@@ -378,7 +378,7 @@ check_workshop = check_pred(is_workshop)
 
 ** Test Workshop
 
-   Test cases to test Seesion entity
+   Test cases to test workshop entity
 
 #+NAME: class_TestWorkshop
 #+BEGIN_SRC python
