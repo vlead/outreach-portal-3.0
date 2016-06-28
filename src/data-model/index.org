@@ -91,7 +91,8 @@ TYPE Session
 TYPE Workshop
 TYPE Status
 TYPE Target
-TYPE Artefact 
+TYPE Artefact
+TYPE Audit 
 
 
 #+END_SRC
@@ -163,14 +164,6 @@ Sets
  status-set    : set[Status]    ; set of all statuses
 
 Relations
- email      [User,Email]
- name       [User,Name]
- roles      [User,Role]
- host       [OC,Institute] and [NC,Institute]
- spokes     [OC,NC]
- hub        [NC,OC]
- user       [Session,User]
- role       [Session,Role]
 
  photos     [Workshop, Artefact]
  report     [Workshop, Artefact]
@@ -203,16 +196,6 @@ Relations
 #+END_HTML
 
     [[https://drive.google.com/open?id=1VQQRDTdGrAT1_sUL9WlV5PCFS-D1PNvNsMg9NQOo8pg][edit image]]
-
-** Derived Entity sets
-#+BEGIN_SRC spec :tangle spec.txt
-  name-set           : user-set.name       ; set of names in the system
-  email-set          : user-set.email      ; set of emails in the system
-  oc-institute-set   : oc-set.host         ; set of institutes in the system associated with an oc
-  nc-institute-set   : nc-set.host         ; set of institutes in the system associated with a nc
-  logged-in-user-set : session-set.user    ; set of logged in users
-  admin-user-set     : user-set.role==admin; set of admin users
-#+END_SRC
 
 ** Referential Integrity Constraints over entity-sets
    
@@ -249,6 +232,17 @@ These specifications also capture referential integrity.
 
 #+END_SRC
 
+** Derived Entity sets
+#+BEGIN_SRC spec :tangle spec.txt
+  name-set           : user-set.name       ; set of names in the system
+  email-set          : user-set.email      ; set of emails in the system
+  oc-institute-set   : oc-set.host         ; set of institutes in the system associated with an oc
+  nc-institute-set   : nc-set.host         ; set of institutes in the system associated with a nc
+  logged-in-user-set : session-set.user    ; set of logged in users
+  admin-user-set     : user-set.role==admin; set of admin users
+#+END_SRC
+
+
 * Operations 
 
 CRUD operations.  
@@ -275,7 +269,7 @@ the  actors:  =session=.
 #+END_SRC   
 *** Actor credentials
 #+BEGIN_SRC spec :tangle spec.txt
-    s.role==admin or s.role==OCC(oc) where oc:oc-set
+    s.role==admin or s.role==NOC s.role==OCC(oc) where oc:oc-set
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
@@ -283,7 +277,9 @@ the  actors:  =session=.
 #+END_SRC   
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
-    This operation creates a new user with default role being guest.
+    u = new user
+    user-set = (user-set) U (u)
+    'admin' belongs to u.roles
 #+END_SRC   
 ** Add Role
 *** Parameters
