@@ -211,21 +211,16 @@ Sets
 *** =user-set=
 
 
-There is atleast one user  whose role is =admin=.
+    There is atleast one user  whose role is =admin=.
 
-    #+BEGIN_SRC spec :tangle spec.txt
-
-    ;;; The admin-user
-
-    admin-user-set     : user-set.role==admin; set of admin users
-
-    and admin-user-set != NULL
+#+BEGIN_SRC spec :tangle spec.txt
+;;; The admin-user
+admin-user-set     : user-set.role==admin; set of admin users
+and admin-user-set != NULL
     
-    
-    
-    #+END_SRC
+#+END_SRC
 
-These specifications also capture referential integrity.
+    These specifications also capture referential integrity.
 #+BEGIN_SRC spec :tangle spec.txt
 
 ;;; Relation variables with Referential Integrity
@@ -242,12 +237,14 @@ These specifications also capture referential integrity.
 #+BEGIN_SRC spec :tangle spec.txt
   name-set           : user-set.name       ; set of names in the system
   email-set          : user-set.email      ; set of emails in the system
-  oc-institute-set   : oc-set.host         ; set of institutes in the system associated with an oc
-  nc-institute-set   : nc-set.host         ; set of institutes in the system associated with a nc
+  oc-institute-set   : oc-set.host         ; set of institutes in the system which are OCs
+  nc-institute-set   : nc-set.host         ; set of institutes in the system which are NCs
   logged-in-user-set : session-set.user    ; set of logged in users
   admin-user-set     : user-set.role==admin; set of admin users
   active-user-set    : user-set.userStatus==active; set of active users
   inactive-user-set  : user-set.userStatus==inactive ; set of inactive users
+  workshop-targets   : nc-set.workshops.wstarget ; set of workshop targets for a particular nc
+  nc-targets         : oc-set.spokes.nctarget ; set of all nc targets for a particular oc
 #+END_SRC
 * Operations 
 
