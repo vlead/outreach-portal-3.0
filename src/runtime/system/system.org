@@ -347,7 +347,7 @@ class TestAddUser(TestCase):
         System.session_set.append(session_noc)
     
         institute = System.do("create_institute",name="IIT",address="Delhi",session=session)
-        oc = System.do("create_oc",institute=institute,session=session)
+        oc = System.do("create_oc",institute=institute,session=session,spokes=[])
        
         oc_user=User(name=Name(name="ocuser"),email=Email(email="mary@gmail.com"),roles=[])
         
@@ -444,7 +444,7 @@ class TestDeleteUser(TestCase):
 
        
         institute = System.do("create_institute",name="IIT",address="Delhi",session=session)
-        oc = System.do("create_oc",institute=institute,session=session)
+        oc = System.do("create_oc",institute=institute,session=session,spokes=[])
        
         oc_user=User(name=Name(name="maryoc"),email=Email(email="mary@gmail.com"),roles=[])
         
@@ -482,7 +482,7 @@ class TestDeleteUser(TestCase):
 
        
         institute = System.do("create_institute",name="IIT",address="Delhi",session=session)
-        oc = System.do("create_oc",institute=institute,session=session)
+        oc = System.do("create_oc",institute=institute,session=session,spokes=[])
        
         oc_user=User(name=Name(name="maryoc"),email=Email(email="mary@gmail.com"),roles=[])
         
@@ -602,7 +602,7 @@ class TestUpdateUser(TestCase):
 
        
         institute = System.do("create_institute",name="IIT",address="Madras",session=session)
-        oc = System.do("create_oc",institute=institute,session=session)
+        oc = System.do("create_oc",institute=institute,session=session,spokes=[])
        
         oc_user=User(name=Name(name="useroc"),email=Email(email="useroc@gmail.com"),roles=[])
 
@@ -639,7 +639,7 @@ class TestUpdateUser(TestCase):
 
        
         institute = System.do("create_institute",name="IIT",address="Madras",session=session)
-        oc = System.do("create_oc",institute=institute,session=session)
+        oc = System.do("create_oc",institute=institute,session=session,spokes=[])
        
         oc_user=User(name=Name(name="useroc"),email=Email(email="useroc@gmail.com"),roles=[])
 
@@ -893,7 +893,7 @@ class TestCreateInstitute(TestCase):
 #+NAME: class_CreateOC
 #+begin_src python
 class CreateOC():
-    arg_types = {"institute":is_institute, "session":is_session}
+    arg_types = {"institute":is_institute,"spokes":is_spokes, "session":is_session}
     arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):
@@ -920,7 +920,8 @@ class CreateOC():
     @staticmethod        
     def action(args):
         institute = args["institute"]
-        new_oc = OC(institute=institute)
+        spokes=args["spokes"]
+        new_oc = OC(institute=institute,spokes=spokes)
         System.oc_set.append(new_oc)
         new_role = Role(name="OCC",centre_oc=new_oc,centre_nc=None)
         System.role_set.append(new_role)
@@ -946,7 +947,7 @@ class TestCreateOC(TestCase):
         login_role = System.role_set[3]
         sess = System.do("login",user=login_user,role=login_role)
         institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
-        oc = System.do("create_oc",institute=institute,session=sess)
+        oc = System.do("create_oc",institute=institute,spokes=[],session=sess)
         self.assertEqual(oc.get('institute'),institute)
         #self.assertRaises(StateError,System.do,"create_oc",institute=institute,session=sess)
 #+END_SRC
@@ -990,6 +991,8 @@ class CreateNC():
         institute = args["institute"]
         oc = args['hub']
         new_nc = NC(institute=institute,hub=oc)
+        System.nc_set.append(new_nc)
+        oc.append_spoke(new_nc)
         new_role = Role(name="NCC",centre_oc=None,centre_nc=new_nc)
         System.role_set.append(new_role)
         return new_nc
@@ -1012,9 +1015,10 @@ class TestCreateNC(TestCase):
         login_role = System.role_set[0]
         sess = System.do("login",user=login_user,role=login_role)
         institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
-        oc = System.do("create_oc",institute=institute,session=sess)
+        oc = System.do("create_oc",institute=institute,spokes=[],session=sess)
         nc = System.do("create_nc",institute=institute,hub=oc,session=sess)
         self.assertEqual(nc.get('institute'),institute)
+        self.assertEqual(oc.get('spokes')[0],nc)
   
 #+END_SRC
 * =show_sessions=
