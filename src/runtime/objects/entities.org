@@ -76,7 +76,7 @@ check_email = check_pred(is_email)
 #+end_src
 
 ** Test Email
-#+NAME: class_testEmail
+#+NAME: class_TestEmail
 #+BEGIN_SRC python
 class TestEmail(TestCase):
     TESTING = True
@@ -422,6 +422,36 @@ class TestStatus(TestCase):
 #+END_SRC
 
 
+* Artefact
+#+NAME: class_Artefact
+#+BEGIN_SRC python
+Artefact = ClassTemplate.mk_class("Artefact", name=is_alphabetic_str,
+path=is_string)
+
+is_artefact = is_inst(Artefact)
+check_artefact = check_pred(is_artefact)
+
+#+END_SRC
+
+** Test Artefact
+#+NAME: class_TestArtefact
+#+BEGIN_SRC python
+class TestArtefact(TestCase):
+    TESTING = True
+
+    def test_instantiate_artefact(self):
+        print "test_instantiate_artefact"
+        self.assertEqual(is_artefact(Artefact(name="attendance", path="/home")), True)
+        self.assertEqual(Artefact(name="attendance", path="/home").get("name"),
+                         "attendance")
+        self.assertRaises(TypeError, Artefact, name="123")
+
+#+END_SRC
+
+
+
+
+
 * Workshop
   A workshop is an entity that takes two arguments Institute, and Target.
 
@@ -554,6 +584,7 @@ if __name__ == '__main__':
 <<class_Session>>
 <<class_Workshop>>
 <<class_Status>>
+<<class_Artefact>>
 #+end_src
 
 
@@ -570,6 +601,7 @@ if __name__ == '__main__':
 <<class_TestSession>>
 <<class_TestWorkshop>>
 <<class_TestStatus>>
+<<class_TestArtefact>>
 <<run_test_cases>>
 
 #+end_src
