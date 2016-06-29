@@ -191,7 +191,7 @@ class TestPersistenceInstitute(TestCase):
         self.assertRaises(TypeError, Institute, name="IIIT123")
 #+END_SRC
 
-
+   
 * OC
   =OC= is an entity that has an attribute =institute= of type =Institute= and =spokes= of type =list of nc's= where =nc= is of type =NC=.
 
@@ -235,7 +235,37 @@ class TestPersistenceOC(TestCase):
         oc = OC.get_by_id(1)
         self.assertEqual(oc.get("institute").get("name"), "IIIT")
 
+    def test_get_spokes_of_oc(self):
+        print "test_get_spokes_of_oc"
+        
+        inst1 = Institute(name="IIIT",address="Hyderabad")
+        inst1.save()
 
+        inst2 = Institute(name="NIT",address="Suratkal")
+        inst2.save()
+
+        inst3 = Institute(name="IIT",address="Hyderabad")
+        inst3.save()
+
+
+        oc = OC(institute=Institute.get_by_id(1), spokes=[])
+        oc.save()
+        self.assertEqual(is_oc(oc), True)
+
+        oc = OC.get_by_id(1)
+
+        nc1 = NC(institute=Institute.get_by_id(2), hub=OC.get_by_id(1))
+        nc1.save()
+
+        nc2 = NC(institute=Institute.get_by_id(3), hub=OC.get_by_id(1))
+        nc2.save()
+        
+        oc=OC.get_by_id(1)
+        list=oc.spokes
+        
+        self.assertEqual(list[0].get("institute").get("name"), "NIT")
+        self.assertEqual(list[1].get("institute").get("name"), "IIT")
+           
 #+END_SRC
 
 
