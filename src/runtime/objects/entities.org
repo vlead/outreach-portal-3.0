@@ -219,7 +219,7 @@ def are_roles(rls):
     else:
         ret_val = True
 
-    return ret_val 
+    return ret_val
 
 Role.admin = Role(name="admin",centre=None)
 Role.reviewer = Role(name="reviewer",centre=None)
@@ -258,6 +258,7 @@ class TestRole(TestCase):
         occ_role = Role(name="OCC", centre=oc)
         self.assertEqual(occ_role.get("name"), "OCC")
         self.assertEqual(occ_role.get("centre"), oc)
+
 #+END_SRC
 
 
