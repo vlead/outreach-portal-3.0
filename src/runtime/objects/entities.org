@@ -105,7 +105,7 @@ class TestEmail(TestCase):
  institute of type =Institute=.
 #+NAME: class_OC
 #+BEGIN_SRC python
-"""def is_spokes(spo):
+def is_spokes(spo):
     if is_list(spo):
         for nc in spo:
             if not is_nc(nc):
@@ -113,20 +113,20 @@ class TestEmail(TestCase):
     else:
         ret_val = True
 
-    return ret_val"""
-OC= ClassTemplate.mk_class("OC",institute=is_institute)
+    return ret_val
+OC= ClassTemplate.mk_class("OC",institute=is_institute,spokes=is_spokes)
 
 OC.__eq__ = lambda self,other: \
             isinstance(other, self.__class__) and \
             self.get("institute") == other.get("institute")
 
-"""def append_spoke(self,spoke):
+def append_spoke(self,spoke):
     if is_nc(spoke):
         spokes = self.get('spokes')
         spokes.append(spoke)
         self.set(spokes=spokes)
 
-OC.append_spoke = append_spoke"""
+OC.append_spoke = append_spoke
 
 
 is_oc = is_inst(OC)
@@ -143,18 +143,21 @@ class TestOC(TestCase):
 
     def test_instatiate_OC(self):
         print "test_instantiate_user"
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"))
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[])
 
         self.assertEqual(is_oc(oc), True)
 
 
-    def test_sets_institute_on_OC(self):
-        print "test_sets_institute_on_oc"
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"))
-        self.assertEqual((oc.get("institute")).get("name"), "IIITH")
-        ins = Institute(name="MEC",address="Hyderabad")
-        oc.set(institute=ins)
-        self.assertEqual(oc.get('institute').get("name"), "MEC")
+    def test_sets_spokes_on_OC(self):
+        print "test_sets_spokes_on_oc"
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[])
+
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=oc)
+        self.assertEqual((nc.get("institute")).get("name"), "HCU")
+
+        oc.set(spokes=[nc])
+
+        self.assertEqual(oc.get('spokes')[0].get("institute").get("name"), "HCU")
 #+END_SRC
 
 
@@ -181,7 +184,7 @@ class TestNC(TestCase):
 
     def test_instatiate_NC(self):
         print "test_instantiate_user"
-        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad")))
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[]))
 
         self.assertEqual(is_nc(nc), True)
 
@@ -257,7 +260,7 @@ class TestRole(TestCase):
 
     def test_set_and_get_centre(self):
         print "test_set_and_get_centre"
-        oc = OC(institute=Institute(name="IIITH", address="Hyderabad"))
+        oc = OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[])
         occ_role = Role(name="OCC", centre_oc=oc,centre_nc=None)
         self.assertEqual(occ_role.get("name"), "OCC")
         self.assertEqual(occ_role.get("centre_oc"), oc)
@@ -368,6 +371,56 @@ class TestInstitute(TestCase):
         self.assertRaises(TypeError, Institute, name="IIIT123")
 #+END_SRC
    
+
+* Status
+   =Status= is an entity that has a field =name= which is an alphabetic string
+
+#+NAME: class_Status
+#+BEGIN_SRC python
+Status = ClassTemplate.mk_class("Status", name=is_alphabetic_str)
+
+is_status = is_inst(Status)
+check_status = check_pred(is_status)
+
+
+Status.pending = Status(name="pending")
+Status.cancelled = Status(name="cancelled")
+Status.completed = Status(name="completed")
+Status.pending_approval = Status(name="pending for approval")
+Status.rejected = Status(name="rejected")
+Status.approved = Status(name="approved")
+
+Status.is_pending = lambda status: status.name == 'pending'
+Status.is_cancelled = lambda status: status.name == 'cancelled'
+Status.is_completed = lambda status: status.name == 'completed'
+Status.is_pending_approval = lambda status: status.name == 'pending for approval'
+Status.is_rejected = lambda status: status.name == 'rejected'
+Status.is_approved = lambda status: status.name == 'approved'
+#+END_SRC
+
+** Test Status
+#+NAME: class_TestStatus
+#+BEGIN_SRC python
+class TestStatus(TestCase):
+    TESTING = True
+
+    def test_instantiate_status(self):
+        print "test_instantiate_status"
+        self.assertEqual(is_status(Status(name="completed")), True)
+        a_status = Status(name="completed")
+        self.assertEqual(check_status(a_status), a_status)
+        self.assertEqual(Status(name="completed").get("name"), "completed")
+        self.assertRaises(TypeError, Status, name="invalid123")
+
+    def test_set_and_get_status(self):
+        print "test_sets_on_status"
+        u_status = Status(name="completed")
+        self.assertEqual(u_status.get("name"), "completed")
+        u_status.set(name="pending for approval")
+        self.assertEqual(u_status.get("name"), "pending for approval")
+    
+#+END_SRC
+
 
 * Workshop
   A workshop is an entity that takes two arguments Institute, and Target.
@@ -500,6 +553,7 @@ if __name__ == '__main__':
 <<class_User>>
 <<class_Session>>
 <<class_Workshop>>
+<<class_Status>>
 #+end_src
 
 
@@ -515,6 +569,7 @@ if __name__ == '__main__':
 <<class_TestNC>>
 <<class_TestSession>>
 <<class_TestWorkshop>>
+<<class_TestStatus>>
 <<run_test_cases>>
 
 #+end_src
