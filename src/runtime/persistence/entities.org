@@ -20,7 +20,7 @@
 args = {"__tablename__": "names",
         "id": db.Column(db.Integer, primary_key=True),
         "name": db.Column(db.String(128), nullable=False),
-#        "users": db.relationship('User', backref='name')
+        "users": db.relationship('User', backref='name')
         }
 
 Name = ClassPersistenceTemplate.mk_persistent(Name, **args)
@@ -80,7 +80,7 @@ class TestPersistentName(TestCase):
 args = {"__tablename__": "emails",
         "id": db.Column(db.Integer, primary_key=True),
         "email": db.Column(db.String(128), unique=True, nullable=False),
-#        "user": db.relationship('User', backref=db.backref('email', uselist=False))
+        "user": db.relationship('User', backref=db.backref('email', uselist=False))
         }
 
 Email = ClassPersistenceTemplate.mk_persistent(Email, **args)
@@ -417,7 +417,7 @@ class TestPersistenceRole(TestCase):
   A =User= entity has fields =name= of type =Name=, =email= of type =Email= and
   role of type =Role=.
 
-#+NAME: association_Table
+#+NAME: class_association_Table
 #+BEGIN_SRC python
 user_roles = db.Table('user_roles',
 		      db.Column('user_id',db.Integer, db.ForeignKey('users.id')),
@@ -466,10 +466,10 @@ class TestPersistenceUser(TestCase):
         em = Email(email="jimi@gnu.org")
         em.save()
 
-        ro1 = Role(name="user",centre=None)
+        ro1 = Role(name="user",centre_oc=None, centre_nc=None)
         ro1.save()
 
-        ro2 = Role(name="guest",centre=None)
+        ro2 = Role(name="guest",centre_oc=None, centre_nc=None)
         ro2.save()
 
         roles = [ro1, ro2] 
@@ -1580,7 +1580,11 @@ if __name__ == '__main__':
 <<class_Institute>>
 <<class_OC>>
 <<class_NC>>
+<<class_Name>>
+<<class_Email>>
+<<class_association_Table>>
 <<class_Role>>
+<<class_User>>
 #+end_src
 
 ** tests
@@ -1590,5 +1594,6 @@ if __name__ == '__main__':
 <<class_TestOC>>
 <<class_TestNC>>
 <<class_TestRole>>
+<<class_TestUser>>
 <<run_test_cases>>
 #+end_src
