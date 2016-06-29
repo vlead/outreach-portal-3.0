@@ -324,7 +324,7 @@ class TestPersistenceRole(TestCase):
 
     def test_create_role(self):
         print "test_create_role"
-        ro = Role(name="admin")
+        ro = Role(name="admin",centre=None)
         self.assertEqual(is_role(ro), True)
         ro.save()
         ro = Role.get_by_id(1)
@@ -333,10 +333,18 @@ class TestPersistenceRole(TestCase):
 
 #+END_SRC
 
-
+   
 * User
   A =User= entity has fields =name= of type =Name=, =email= of type =Email= and
   role of type =Role=.
+
+#+NAME: association_Table
+#+BEGIN_SRC python
+user_roles = db.Table('user_roles',
+		      db.Column('user_id',db.Integer, db.ForeignKey('users.id')),
+		      db.Column('role_id',db.Integer,db.ForeignKey('roles.id')))
+#+END_SRC
+
 
 #+NAME: class_User
 #+BEGIN_SRC python
@@ -344,8 +352,9 @@ args = {"__tablename__": "users",
         "id": db.Column(db.Integer, primary_key=True),
         "name_id": db.Column(db.Integer, db.ForeignKey('names.id')),
         "email_id": db.Column(db.Integer, db.ForeignKey('emails.id')),
-        "role_id": db.Column(db.Integer, db.ForeignKey('roles.id'))
+        "roles":db.relationship('Role', secondary=user_roles, backref='users') 
         }
+
 
 User = ClassPersistenceTemplate.mk_persistent(User, **args)
 
@@ -377,9 +386,15 @@ class TestPersistenceUser(TestCase):
         na.save()
         em = Email(email="jimi@gnu.org")
         em.save()
-        ro = Role(name="user")
-        ro.save()
-        usr = User(name=na, email=em, role=ro)
+
+        ro1 = Role(name="user",centre=None)
+        ro1.save()
+
+        ro2 = Role(name="guest",centre=None)
+        ro2.save()
+
+        roles = [ro1, ro2] 
+        usr = User(name=na, email=em, roles=roles)
         usr.save()
         self.assertEqual(is_user(usr), True)
         n_usr = User.get_by_id(1)
@@ -389,6 +404,28 @@ class TestPersistenceUser(TestCase):
 
 
 * System
+=======
+'''
+    def test_update_user(self):
+        print "test update user"
+        na1 = Name(name="Jimi Hendrix")
+        na1.save()
+        na2 = Name(name="Bo Didley")
+        na2.save()
+        em1 = Email(email="jimi@gnu.org")
+        em1.save()
+        em2 = Email(email="didley@gnu.org")
+        em2.save()
+        ro1 = Role(name="user",centre=None)
+        ro1.save()
+        ro2 = Role(name="admin",centre=None)
+        ro2.save()
+        usr = User(name=na1, email=em1, roles=[ro1])
+        usr.save()
+
+        usr.update(name=na2, email=em2, roles=[ro2])
+        n_usr = User.get_by_id(1)
+>>>>>>> 447adb07f502048379b72c8917c6f593a6f29e81
 
 ** Constructor
 
@@ -439,7 +476,7 @@ class System ():
         return session.get("role").get('name')== "NOC"
 
 #+end_src
->>>>>>> Stashed changes
+   
 
 *** Test Constructor
 #+NAME: test_system_constructor
@@ -570,6 +607,18 @@ class TestSystemArityAndType(TestCase):
             print str(err)
   
 #+end_src
+=======
+    def test_delete_role(self):
+        print "test delete user"
+        na = Name(name="Jimi Hendrix")
+        na.save()
+        em = Email(email="jimi@gnu.org")
+        em.save()
+        ro = Role(name="user",centre=None)
+        ro.save()
+        usr = User(name=na, email=em, roles=[ro])
+        usr.save()
+>>>>>>> 447adb07f502048379b72c8917c6f593a6f29e81
 
 ** Operations
 *** =AddUser=
@@ -676,6 +725,7 @@ class TestAddUser(TestCase):
         self.assertEqual(u.get("name").get("name"),"ocuser")
 
 
+'''
 #+END_SRC
 
 *** =DeleteUser=
@@ -1460,5 +1510,4 @@ if __name__ == '__main__':
 <<class_TestOC>>
 <<class_TestNC>>
 <<run_test_cases>>
-
 #+end_src
