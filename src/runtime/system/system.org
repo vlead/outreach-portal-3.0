@@ -150,14 +150,14 @@ class TestSystemConstructor(TestCase):
     def test_is_session_OC(self):
         print "test_is_session_OCC"
         admin_user=System.user_set[0]
-        session = Session(user=admin_user,role=Role(name="OCC",centre=None))
+        session = Session(user=admin_user,role=Role(name="OCC",centre_oc=None,centre_nc=None))
         System.session_set.append(session)
         self.assertEqual(System.is_session_OCC(session), True)
     
     def test_is_session_NCC(self):
         print "test_is_session_NCC"
         admin_user=System.user_set[0]
-        session = Session(user=admin_user,role=Role(name="NCC",centre=None))
+        session = Session(user=admin_user,role=Role(name="NCC",centre_oc=None,centre_nc=None))
         System.session_set.append(session)
         self.assertEqual(System.is_session_NCC(session), True)
 
@@ -286,7 +286,7 @@ class AddUser():
         user = args["user"]
         session = args["session"]
         System.user_set.append(user)
-        user.set(roles=[Role(name="guest",centre=None)])
+        user.set(roles=[Role(name="guest",centre_oc=None,centre_nc=None)])
         return user
 #+end_src
 *** Test AddUser
@@ -352,7 +352,7 @@ class TestAddUser(TestCase):
         oc_user=User(name=Name(name="ocuser"),email=Email(email="mary@gmail.com"),roles=[])
         
         
-        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre').get("institute").get("name") == institute.get("name"), System.role_set)
+        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") == institute.get("name"), System.role_set)
         if oc_role:
             oc_user.append_role(oc_role[0])
         
@@ -377,7 +377,7 @@ class DeleteUser():
         if System.is_session_admin(session):
             return True 
         elif System.is_session_OCC(session):
-            role = filter (lambda x: x.get('name') == "NCC" and x.get('centre').get("hub") == session.get("role").centre, user.get('roles'))
+            role = filter (lambda x: x.get('name') == "NCC" and x.get('centre_nc').get("hub") == session.get("role").centre_oc, user.get('roles'))
             if role:
                 return True
         elif System.is_session_noc(session):
@@ -449,7 +449,7 @@ class TestDeleteUser(TestCase):
         oc_user=User(name=Name(name="maryoc"),email=Email(email="mary@gmail.com"),roles=[])
         
         
-        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre').get("institute").get("name") == institute.get("name"), System.role_set)
+        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") == institute.get("name"), System.role_set)
         if oc_role:
             oc_user.append_role(oc_role[0])
 
@@ -457,7 +457,7 @@ class TestDeleteUser(TestCase):
 
         nc_user=User(name=Name(name="xyznc"),email=Email(email="xyz@gmail.com"),roles=[])
 
-        nc_role = filter(lambda x:x.get('name') == "NCC" and x.get('centre').get("institute").get("name") ==institute.get("name"), System.role_set)
+        nc_role = filter(lambda x:x.get('name') == "NCC" and x.get('centre_nc').get("institute").get("name") ==institute.get("name"), System.role_set)
         if nc_role:
             nc_user.append_role(nc_role[0])
 
@@ -487,7 +487,7 @@ class TestDeleteUser(TestCase):
         oc_user=User(name=Name(name="maryoc"),email=Email(email="mary@gmail.com"),roles=[])
         
         
-        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre').get("institute").get("name") == institute.get("name"), System.role_set)
+        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") == institute.get("name"), System.role_set)
         if oc_role:
             oc_user.append_role(oc_role[0])
 
@@ -528,7 +528,7 @@ class UpdateUser():
             if role:
                return True            
         elif System.is_session_OCC(session):
-            role = filter (lambda x: x.get("name") == "NCC" and x.get('centre').get("hub") == session.get("role").centre, user.get('roles'))
+            role = filter (lambda x: x.get("name") == "NCC" and x.get('centre_nc').get("hub") == session.get("role").centre_oc, user.get('roles'))
             if role:
                 return True
         else:
@@ -606,14 +606,14 @@ class TestUpdateUser(TestCase):
        
         oc_user=User(name=Name(name="useroc"),email=Email(email="useroc@gmail.com"),roles=[])
 
-        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre').get("institute").get("name") ==institute.get("name"), System.role_set)
+        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") ==institute.get("name"), System.role_set)
         if oc_role:
             oc_user.append_role(oc_role[0])
         #create nc
         nc = System.do("create_nc",institute=institute,hub=oc,session=session)
         nc_user=User(name=Name(name="usernc"),email=Email(email="usernc@gmail.com"),roles=[])
 
-        nc_role = filter(lambda x:x.get('name') == "NCC" and x.get('centre').get("institute").get("name") ==institute.get("name"), System.role_set)
+        nc_role = filter(lambda x:x.get('name') == "NCC" and x.get('centre_nc').get("institute").get("name") ==institute.get("name"), System.role_set)
         if nc_role:
             nc_user.append_role(nc_role[0])
 
@@ -643,7 +643,7 @@ class TestUpdateUser(TestCase):
        
         oc_user=User(name=Name(name="useroc"),email=Email(email="useroc@gmail.com"),roles=[])
 
-        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre').get("institute").get("name") ==institute.get("name"), System.role_set)
+        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") ==institute.get("name"), System.role_set)
         if oc_role:
             oc_user.append_role(oc_role[0])
 
@@ -693,7 +693,7 @@ class AddRole():
             if role.get('name') != 'NCC':
                 raise StateError("AddRole %s not allowed" %role.get('name'))
             else:
-                if not (session.get('role').get('centre') == role.get('centre').get('hub')):
+                if not (session.get('role').get('centre_oc') == role.get('centre_nc').get('hub')):
                     raise StateError("AddRole %s not allowed" %role.get('name'))
 
     @staticmethod
@@ -923,7 +923,7 @@ class CreateOC():
         spokes=args["spokes"]
         new_oc = OC(institute=institute,spokes=spokes)
         System.oc_set.append(new_oc)
-        new_role = Role(name="OCC",centre=new_oc)
+        new_role = Role(name="OCC",centre_oc=new_oc,centre_nc=None)
         System.role_set.append(new_role)
         return new_oc
 
@@ -966,7 +966,7 @@ class CreateNC():
         if not (System.is_session_admin(session) or System.is_session_OCC(session)):
             raise AuthError("Role not Authorized to perform this action")
         if System.is_session_OCC(session):
-            if oc != session.get('role').get('centre'):
+            if oc != session.get('role').get('centre_oc'):
                 raise AuthError("Role not Authorized to perform this action")
 
     @staticmethod
@@ -993,7 +993,7 @@ class CreateNC():
         new_nc = NC(institute=institute,hub=oc)
         System.nc_set.append(new_nc)
         oc.append_spoke(new_nc)
-        new_role = Role(name="NCC",centre=new_nc)
+        new_role = Role(name="NCC",centre_oc=None,centre_nc=new_nc)
         System.role_set.append(new_role)
         return new_nc
 #+end_src

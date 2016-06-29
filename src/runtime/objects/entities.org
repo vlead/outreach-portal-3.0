@@ -76,7 +76,7 @@ check_email = check_pred(is_email)
 #+end_src
 
 ** Test Email
-#+NAME: class_testEmail
+#+NAME: class_TestEmail
 #+BEGIN_SRC python
 class TestEmail(TestCase):
     TESTING = True
@@ -196,15 +196,21 @@ class TestNC(TestCase):
 
 #+NAME: class_Role
 #+BEGIN_SRC python
-def is_centre(value):
-    if value == None or is_oc(value) or is_nc(value):
+def is_centre_oc(value):
+    if value == None or is_oc(value):
         return True
     else:
         return False
+def is_centre_nc(value):
+    if value == None or is_nc(value):
+        return True
+    else:
+        return False
+
    
 Role = ClassTemplate.mk_class("Role", 
                               name=is_alphabetic_str,
-                              centre=is_centre)
+                              centre_oc=is_centre_oc,centre_nc=is_centre_nc)
 
 is_role = is_inst(Role)
 check_role = check_pred(is_role)
@@ -221,10 +227,10 @@ def are_roles(rls):
 
     return ret_val
 
-Role.admin = Role(name="admin",centre=None)
-Role.reviewer = Role(name="reviewer",centre=None)
-Role.guest = Role(name="guest",centre=None)
-Role.noc = Role(name="NOC",centre=None)
+Role.admin = Role(name="admin",centre_oc=None,centre_nc=None)
+Role.reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
+Role.guest = Role(name="guest",centre_oc=None,centre_nc=None)
+Role.noc = Role(name="NOC",centre_oc=None,centre_nc=None)
 Role.is_admin = lambda role: role.name == 'admin'
 Role.is_reviewer = lambda role: role.name == 'reviewer'
 Role.is_guest = lambda role: role.guest == 'guest'
@@ -239,15 +245,15 @@ class TestRole(TestCase):
 
     def test_instantiate_role(self):
         print "test_instantiate_role"
-        self.assertEqual(is_role(Role(name="admin", centre=None)), True)
-        a_role = Role(name="admin", centre=None)
+        self.assertEqual(is_role(Role(name="admin", centre_oc=None,centre_nc=None)), True)
+        a_role = Role(name="admin", centre_oc=None,centre_nc=None)
         self.assertEqual(check_role(a_role), a_role)
-        self.assertEqual(Role(name="admin", centre=None).get("name"), "admin")
+        self.assertEqual(Role(name="admin", centre_oc=None,centre_nc=None).get("name"), "admin")
         self.assertRaises(TypeError, Role, name="admin123", centre=None)
 
     def test_set_and_get_role(self):
         print "test_sets_on_role"
-        u_role = Role(name="guest", centre=None)
+        u_role = Role(name="guest", centre_oc=None,centre_nc=None)
         self.assertEqual(u_role.get("name"), "guest")
         u_role.set(name="admin")
         self.assertEqual(u_role.get("name"), "admin")
@@ -255,9 +261,9 @@ class TestRole(TestCase):
     def test_set_and_get_centre(self):
         print "test_set_and_get_centre"
         oc = OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[])
-        occ_role = Role(name="OCC", centre=oc)
+        occ_role = Role(name="OCC", centre_oc=oc,centre_nc=None)
         self.assertEqual(occ_role.get("name"), "OCC")
-        self.assertEqual(occ_role.get("centre"), oc)
+        self.assertEqual(occ_role.get("centre_oc"), oc)
 
 #+END_SRC
 
@@ -309,7 +315,7 @@ class TestUser(TestCase):
         print "test_sets_on_user"
         user = User(name=Name(name="Jimi Hendrix"),
                     email=Email(email="jimi@gnu.org"),
-                    roles=[Role(name="guest", centre=None)]
+                    roles=[Role(name="guest", centre_oc=None,centre_nc=None)]
                    )
 
         self.assertEqual(user.get("name").get("name"), "Jimi Hendrix")
@@ -330,7 +336,7 @@ class TestUser(TestCase):
         user = User(name=Name(name="Jimi Hendrix"),
                      email=Email(email="jimi@gnu.org"),
                      roles=[])
-        user.append_role(Role(name="guest",centre=None))
+        user.append_role(Role(name="guest",centre_oc=None,centre_nc=None))
         self.assertTrue(len(user.get('roles'))==1)
 
 #+END_SRC
@@ -365,6 +371,86 @@ class TestInstitute(TestCase):
         self.assertRaises(TypeError, Institute, name="IIIT123")
 #+END_SRC
    
+
+* Status
+   =Status= is an entity that has a field =name= which is an alphabetic string
+
+#+NAME: class_Status
+#+BEGIN_SRC python
+Status = ClassTemplate.mk_class("Status", name=is_alphabetic_str)
+
+is_status = is_inst(Status)
+check_status = check_pred(is_status)
+
+
+Status.pending = Status(name="pending")
+Status.cancelled = Status(name="cancelled")
+Status.completed = Status(name="completed")
+Status.pending_approval = Status(name="pending for approval")
+Status.rejected = Status(name="rejected")
+Status.approved = Status(name="approved")
+
+Status.is_pending = lambda status: status.name == 'pending'
+Status.is_cancelled = lambda status: status.name == 'cancelled'
+Status.is_completed = lambda status: status.name == 'completed'
+Status.is_pending_approval = lambda status: status.name == 'pending for approval'
+Status.is_rejected = lambda status: status.name == 'rejected'
+Status.is_approved = lambda status: status.name == 'approved'
+#+END_SRC
+
+** Test Status
+#+NAME: class_TestStatus
+#+BEGIN_SRC python
+class TestStatus(TestCase):
+    TESTING = True
+
+    def test_instantiate_status(self):
+        print "test_instantiate_status"
+        self.assertEqual(is_status(Status(name="completed")), True)
+        a_status = Status(name="completed")
+        self.assertEqual(check_status(a_status), a_status)
+        self.assertEqual(Status(name="completed").get("name"), "completed")
+        self.assertRaises(TypeError, Status, name="invalid123")
+
+    def test_set_and_get_status(self):
+        print "test_sets_on_status"
+        u_status = Status(name="completed")
+        self.assertEqual(u_status.get("name"), "completed")
+        u_status.set(name="pending for approval")
+        self.assertEqual(u_status.get("name"), "pending for approval")
+    
+#+END_SRC
+
+
+* Artefact
+#+NAME: class_Artefact
+#+BEGIN_SRC python
+Artefact = ClassTemplate.mk_class("Artefact", name=is_alphabetic_str,
+path=is_string)
+
+is_artefact = is_inst(Artefact)
+check_artefact = check_pred(is_artefact)
+
+#+END_SRC
+
+** Test Artefact
+#+NAME: class_TestArtefact
+#+BEGIN_SRC python
+class TestArtefact(TestCase):
+    TESTING = True
+
+    def test_instantiate_artefact(self):
+        print "test_instantiate_artefact"
+        self.assertEqual(is_artefact(Artefact(name="attendance", path="/home")), True)
+        self.assertEqual(Artefact(name="attendance", path="/home").get("name"),
+                         "attendance")
+        self.assertRaises(TypeError, Artefact, name="123")
+
+#+END_SRC
+
+
+
+
 
 * Workshop
   A workshop is an entity that takes two arguments Institute, and Target.
@@ -422,7 +508,7 @@ class TestSession(TestCase):
                     email=Email(email="jimi@gnu.org"),
                     roles=[]
                    )
-        role = Role(name="admin", centre=None)
+        role = Role(name="admin", centre_oc=None,centre_nc=None)
         session = Session(user=user, role=role)
         self.assertEqual(is_session(session), True)
 
@@ -432,7 +518,7 @@ class TestSession(TestCase):
                     email=Email(email="jimi@gnu.org"),
                     roles=[]
                    )
-        role = Role(name="admin", centre=None)
+        role = Role(name="admin", centre_oc=None,centre_nc=None)
         session = Session(user=user, role=role)
 
         user = User(name=Name(name="Bo Didley"),
@@ -497,6 +583,8 @@ if __name__ == '__main__':
 <<class_User>>
 <<class_Session>>
 <<class_Workshop>>
+<<class_Status>>
+<<class_Artefact>>
 #+end_src
 
 
@@ -512,6 +600,8 @@ if __name__ == '__main__':
 <<class_TestNC>>
 <<class_TestSession>>
 <<class_TestWorkshop>>
+<<class_TestStatus>>
+<<class_TestArtefact>>
 <<run_test_cases>>
 
 #+end_src
