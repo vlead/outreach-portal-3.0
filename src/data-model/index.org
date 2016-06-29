@@ -91,7 +91,9 @@ TYPE Institute
 TYPE Session
 TYPE Workshop
 TYPE Status (pending + cancelled + completed + pending approval + approved + rejected)
-TYPE Target
+TYPE OCTarget
+TYPE NCTarget
+TYPE WSTarget (Workshop is abbreviated to WS here)
 TYPE Artefact 
 TYPE AuditEntry
 TYPE Operation
@@ -109,24 +111,26 @@ For each relation, we define its inverse next to it.
 
 ;;; Relations with cardinality constraints
 
-[email, user]          : User?      >    Email!
-[name, user]           : User       >    Name!
-[roles, users]         : User       >    Role+
-[host, oc]             : OC?        >    Institute!
-[spokes, hub]          : OC!        >    NC
-[host, nc]             : NC?        >    Institute!
-[user, session]        : Session    >    User!
-[role, session]        : Session    >    Role!
-[userStatus, user]     : User+      >    UserStatus!
-[operation, audit]     : AuditEntry >    Operation!
-[location, workshop]   : Workshop   > Institute!
-[target, workshop]     : Workshop   > Target !
-[photos, workshop]     : Workshop   > Artefact *
-[reports, workshop]    : Workshop   > Artefact ?
-[feedback, workshop]   : Workshop   > Artefact *
-[attendance, workshop] : Workshop   > Artefact !
-[status, workshop]     : Workshop   > Status !         
-[owner, workshop]      : Workshop   > Role !
+[email, user]          : User ?      >    Email !
+[name, user]           : User        >    Name !
+[roles, users]         : User        >    Role +
+[host, oc]             : OC ?        >    Institute ! 
+[spokes, hub]          : OC !        >    NC
+[host, nc]             : NC ?        >    Institute !
+[nctarget, nc]         : NC          >    NCTarget !
+[octarget, oc]         : OC          >    OCTarget !
+[user, session]        : Session     >    User !
+[role, session]        : Session     >    Role !
+[userStatus, user]     : User +      >    UserStatus !
+[operation, audit]     : AuditEntry  >    Operation !
+[location, workshop]   : Workshop    >    Institute !
+[wstarget, workshop]   : Workshop    >    WSTarget !
+[photos, workshop]     : Workshop    >    Artefact *
+[reports, workshop]    : Workshop    >    Artefact ?
+[feedback, workshop]   : Workshop    >    Artefact *
+[attendance, workshop] : Workshop    >    Artefact !
+[status, workshop]     : Workshop    >    Status !         
+[owner, workshop]      : Workshop    >    Role !
 Note: if s1.user = s2.user -> 
          s1.role != s2.role, where s1 and s2 belong to session-set
 
@@ -540,7 +544,7 @@ the  actors:  =session=.
 ** create workshop
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
-    i: Institute, t: Target, s:  Session
+    i: Institute, t: WSTarget, s:  Session
 #+END_SRC   
 *** Actor credentials
 #+BEGIN_SRC spec :tangle spec.txt    
@@ -564,7 +568,7 @@ the  actors:  =session=.
 ** edit workshop
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
-    w: Workshop, t: Target, st: Status, i: Institute, s:  Session
+    w: Workshop, t: WSTarget, st: Status, i: Institute, s:  Session
 #+END_SRC   
 *** Actor credentials
 #+BEGIN_SRC spec :tangle spec.txt    
