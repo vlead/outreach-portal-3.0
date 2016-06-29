@@ -483,29 +483,6 @@ class TestPersistenceUser(TestCase):
 
 
 * System
-=======
-'''
-    def test_update_user(self):
-        print "test update user"
-        na1 = Name(name="Jimi Hendrix")
-        na1.save()
-        na2 = Name(name="Bo Didley")
-        na2.save()
-        em1 = Email(email="jimi@gnu.org")
-        em1.save()
-        em2 = Email(email="didley@gnu.org")
-        em2.save()
-        ro1 = Role(name="user",centre=None)
-        ro1.save()
-        ro2 = Role(name="admin",centre=None)
-        ro2.save()
-        usr = User(name=na1, email=em1, roles=[ro1])
-        usr.save()
-
-        usr.update(name=na2, email=em2, roles=[ro2])
-        n_usr = User.get_by_id(1)
->>>>>>> 447adb07f502048379b72c8917c6f593a6f29e81
-
 ** Constructor
 
    The constructor ensures that the system ensures the presence of at least one
