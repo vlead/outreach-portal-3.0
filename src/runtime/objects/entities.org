@@ -372,6 +372,56 @@ class TestInstitute(TestCase):
 #+END_SRC
    
 
+* Status
+   =Status= is an entity that has a field =name= which is an alphabetic string
+
+#+NAME: class_Status
+#+BEGIN_SRC python
+Status = ClassTemplate.mk_class("Status", name=is_alphabetic_str)
+
+is_status = is_inst(Status)
+check_status = check_pred(is_status)
+
+
+Status.pending = Status(name="pending")
+Status.cancelled = Status(name="cancelled")
+Status.completed = Status(name="completed")
+Status.pending_approval = Status(name="pending for approval")
+Status.rejected = Status(name="rejected")
+Status.approved = Status(name="approved")
+
+Status.is_pending = lambda status: status.name == 'pending'
+Status.is_cancelled = lambda status: status.name == 'cancelled'
+Status.is_completed = lambda status: status.name == 'completed'
+Status.is_pending_approval = lambda status: status.name == 'pending for approval'
+Status.is_rejected = lambda status: status.name == 'rejected'
+Status.is_approved = lambda status: status.name == 'approved'
+#+END_SRC
+
+** Test Status
+#+NAME: class_TestStatus
+#+BEGIN_SRC python
+class TestStatus(TestCase):
+    TESTING = True
+
+    def test_instantiate_status(self):
+        print "test_instantiate_status"
+        self.assertEqual(is_status(Status(name="completed")), True)
+        a_status = Status(name="completed")
+        self.assertEqual(check_status(a_status), a_status)
+        self.assertEqual(Status(name="completed").get("name"), "completed")
+        self.assertRaises(TypeError, Status, name="invalid123")
+
+    def test_set_and_get_status(self):
+        print "test_sets_on_status"
+        u_status = Status(name="completed")
+        self.assertEqual(u_status.get("name"), "completed")
+        u_status.set(name="pending for approval")
+        self.assertEqual(u_status.get("name"), "pending for approval")
+    
+#+END_SRC
+
+
 * Workshop
   A workshop is an entity that takes two arguments Institute, and Target.
 
@@ -503,6 +553,7 @@ if __name__ == '__main__':
 <<class_User>>
 <<class_Session>>
 <<class_Workshop>>
+<<class_Status>>
 #+end_src
 
 
@@ -518,6 +569,7 @@ if __name__ == '__main__':
 <<class_TestNC>>
 <<class_TestSession>>
 <<class_TestWorkshop>>
+<<class_TestStatus>>
 <<run_test_cases>>
 
 #+end_src

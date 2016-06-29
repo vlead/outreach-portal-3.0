@@ -95,6 +95,7 @@ TYPE Target
 TYPE Artefact 
 TYPE AuditEntry
 TYPE Operation
+TYPE UserStatus (active + inactive)
 #+END_SRC
 
 Note: Outreach Centre Coordinator is abrreviated as OCC
@@ -108,20 +109,27 @@ For each relation, we define its inverse next to it.
 
 ;;; Relations with cardinality constraints
 
-[email, user]          : User?    >    Email!
-[name, user]           : User     >    Name!
-[roles, users]         : User     >    Role+
-[host, oc]             : OC?      >    Institute!
-[spokes, hub]          : OC!      >    NC
-[host, nc]             : NC?      >    Institute!
-[user, session]        : Session  >    User!
-[role, session]        : Session  >    Role!
-[activeStatus, user]   : User+    >    activeStatus!
-[operation, audit]     : AuditEntry    >    Operation!
-
+[email, user]          : User?      >    Email!
+[name, user]           : User       >    Name!
+[roles, users]         : User       >    Role+
+[host, oc]             : OC?        >    Institute!
+[spokes, hub]          : OC!        >    NC
+[host, nc]             : NC?        >    Institute!
+[user, session]        : Session    >    User!
+[role, session]        : Session    >    Role!
+[userStatus, user]     : User+      >    UserStatus!
+[operation, audit]     : AuditEntry >    Operation!
+[location, workshop]   : Workshop   > Institute!
+[target, workshop]     : Workshop   > Target !
+[photos, workshop]     : Workshop   > Artefact *
+[reports, workshop]    : Workshop   > Artefact ?
+[feedback, workshop]   : Workshop   > Artefact *
+[attendance, workshop] : Workshop   > Artefact !
+[status, workshop]     : Workshop   > Status !         
+[owner, workshop]      : Workshop   > Role !
 Note: if s1.user = s2.user -> 
-         s1.role != s2.role
-Note: We weren't sure if we should list the workshop relations here, so we listed them in the next section.
+         s1.role != s2.role, where s1 and s2 belong to session-set
+
 
 #+END_SRC
 
@@ -178,7 +186,7 @@ Sets
 <img src="https://docs.google.com/drawings/d/1pehN8AwI8Om4hYwjM4CPP7nyWEhwCNkSazXrKnXhbMw/pub?w=960&h=720">
 #+END_HTML
 
-    [[https://docs.google.com/drawings/d/1pehN8AwI8Om4hYwjM4CPP7nyWEhwCNkSazXrKnXhbMw/edit?usp=sharing][edit image]]
+[[https://docs.google.com/drawings/d/1pehN8AwI8Om4hYwjM4CPP7nyWEhwCNkSazXrKnXhbMw/edit?usp=sharing][edit image]]
 *** Institute, NC and OC relations
 
 #+BEGIN_HTML
@@ -193,16 +201,6 @@ Sets
 #+END_HTML
 
     [[https://drive.google.com/open?id=1VQQRDTdGrAT1_sUL9WlV5PCFS-D1PNvNsMg9NQOo8pg][edit image]]
-
-** Derived Entity sets
-#+BEGIN_SRC spec :tangle spec.txt
-  name-set           : user-set.name       ; set of names in the system
-  email-set          : user-set.email      ; set of emails in the system
-  oc-institute-set   : oc-set.host         ; set of institutes in the system associated with an oc
-  nc-institute-set   : nc-set.host         ; set of institutes in the system associated with a nc
-  logged-in-user-set : session-set.user    ; set of logged in users
-  admin-user-set     : user-set.role==admin; set of admin users
-#+END_SRC
 
 ** Referential Integrity Constraints over entity-sets
    
@@ -244,8 +242,8 @@ These specifications also capture referential integrity.
   nc-institute-set   : nc-set.host         ; set of institutes in the system associated with a nc
   logged-in-user-set : session-set.user    ; set of logged in users
   admin-user-set     : user-set.role==admin; set of admin users
-  active-user-set    : user-set.activeStatus==True; set of active users
-  inactive-user-set  : user-set.activeStatus==False ; set of inactive users
+  active-user-set    : user-set.userStatus==active; set of active users
+  inactive-user-set  : user-set.userStatus==inactive ; set of inactive users
 #+END_SRC
 * Operations 
 
@@ -283,7 +281,7 @@ the  actors:  =session=.
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
     u = new user
-    active-user-set = (active-user-set) U (u)
+    active-user-set = (active-user-set) U {u}
     roles(u)= {guest}
 #+END_SRC   
 ** Add Role
@@ -555,6 +553,8 @@ the  actors:  =session=.
 #+END_SRC         
 *** Effect 
 #+BEGIN_SRC spec :tangle spec.txt
+    w = new workshop
+    workshop-set = (workshop-set) U {w}
     A workshop with the given details is created and added to workshop-set
 #+END_SRC   
 *** Remarks
@@ -586,6 +586,7 @@ the  actors:  =session=.
 #+END_SRC   
 *** Remarks
 #+BEGIN_SRC spec :tangle spec.txt   
+
     A user with the role of OCC(oc) or NCC(nc) can update a workshop.
     A user need not pass all three parameters to update the details of a workshop.
     We did not feel the necessity for a method to delete a workshop.
@@ -608,6 +609,9 @@ the  actors:  =session=.
 #+END_SRC         
 *** Effect 
 #+BEGIN_SRC spec :tangle spec.txt
+    a is added to w.artefacts
+    a = new artefact
+    artefacts(w) =artefacts(w) U {a}
     The artefact is added to the workshop's artefact set.
 #+END_SRC   
 *** Remarks
@@ -636,6 +640,7 @@ the  actors:  =session=.
 *** Effect 
 #+BEGIN_SRC spec :tangle spec.txt
     The artefact is deleted from the workshop's artefact set.
+    atefacts(w) = artefacts(w) - {a}
 #+END_SRC   
 *** Remarks
 #+BEGIN_SRC spec :tangle spec.txt   
@@ -647,7 +652,7 @@ the  actors:  =session=.
 
 
 
-** Workshop workflow diagram
+* Workshop workflow diagram
 
 #+BEGIN_HTML
 <img src="https://docs.google.com/drawings/d/1av_XMueESqLkUdYRGZuJskeTzr9yl8_agsGq1JedMMg/pub?w=960&h=720">
@@ -655,4 +660,4 @@ the  actors:  =session=.
 
    [[https://docs.google.com/drawings/d/1av_XMueESqLkUdYRGZuJskeTzr9yl8_agsGq1JedMMg/edit?usp=sharing][edit image]]
 
-
+   
