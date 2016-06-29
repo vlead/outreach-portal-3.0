@@ -6,6 +6,7 @@
 #+SETUPFILE: ../org-templates/level-1.org
 #+options: ^:nil
 #+LATEX: Literal LaTeX code for export
+
 * Introduction
   The purpose of this document is to describe the expected behaviour of the new
   outreach portal. It is a specification for the new requirements of this portal.
@@ -89,10 +90,11 @@ TYPE OutreachCentre ( abbreviated: OC )
 TYPE Institute
 TYPE Session
 TYPE Workshop
-TYPE Status
+TYPE Status (pending + cancelled + completed + pending approval + approved + rejected)
 TYPE Target
-TYPE Artefact
-TYPE AuditEntry 
+TYPE Artefact 
+TYPE AuditEntry
+TYPE Operation
 #+END_SRC
 
 Note: Outreach Centre Coordinator is abrreviated as OCC
@@ -115,6 +117,7 @@ For each relation, we define its inverse next to it.
 [user, session]        : Session  >    User!
 [role, session]        : Session  >    Role!
 [activeStatus, user]   : User+    >    activeStatus!
+[operation, audit]     : AuditEntry    >    Operation!
 
 Note: if s1.user = s2.user -> 
          s1.role != s2.role
@@ -320,11 +323,13 @@ the  actors:  =session=.
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
     s:session-set
+    i: ~institute-set
 #+END_SRC   
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
-     Institute is added to i.institute
+     i= newinstitute   
      We also check that the created institute does not exist in the institute set.
+     institute-set = institute-set U {i}
 #+END_SRC   
 
 ** Create OC
@@ -417,13 +422,15 @@ the  actors:  =session=.
 #+END_SRC       
 *** Referential-Integrity
 #+BEGIN_SRC spec :tangle spec.txt
-    u:user-set
+    u:active-user-set
     r:role-set
     r:user.roles
 #+END_SRC      
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
     A session for that user is added to the session-set
+    s: newsession
+    session-set = session-set U {s}
 #+END_SRC   
 ** logout 
 
@@ -438,17 +445,17 @@ the  actors:  =session=.
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
     s is removed from the session-set
+    session-set = session-set - {s}
 #+END_SRC           
-** create audit
+** create AuditEntry
 
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
-    s:Session, old-data:String, time-stamp:String, updating-entity-id:Integer,
-    current-session-id:Integer, entity:String , operation:String 
+    o:Operation 
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
-    s:session-set
+    
 #+END_SRC       
 *** Remarks
 #+BEGIN_SRC spec :tangle spec.txt
@@ -456,12 +463,13 @@ the  actors:  =session=.
     old-data is a string containing the values of the object before it is changed.
     updating-entity-id contains the id of the object being changed
     current-session-id contains the id of the session of the user who is changing the object
+
+    This function logs an AuditEntry to the database. 
 #+END_SRC          
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
-    An Audit record is created and saved in the database.
+    An AuditEntry record is created and saved in the database.
 #+END_SRC    
-
 ** delete User
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
@@ -473,7 +481,7 @@ the  actors:  =session=.
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt    
-    u: user-set
+    u: active-user-set
     s: session-set
     u:~logged-in-user-set
 #+END_SRC       
@@ -487,7 +495,9 @@ the  actors:  =session=.
  #+END_SRC
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
-    u is removed from the user-set
+    active-user-set= active-user-set - {u}   
+    u.activeStatus=false
+    inactive-user-set = inactive-user-set U {u}
 #+END_SRC   
 ** update User
 *** Parameters
@@ -500,7 +510,7 @@ the  actors:  =session=.
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt    
-    u: user-set
+    u: active-user-set
     s: session-set
     u:~logged-in-user-set
     e:~email-set
@@ -644,3 +654,5 @@ the  actors:  =session=.
 #+END_HTML
 
    [[https://docs.google.com/drawings/d/1av_XMueESqLkUdYRGZuJskeTzr9yl8_agsGq1JedMMg/edit?usp=sharing][edit image]]
+
+
