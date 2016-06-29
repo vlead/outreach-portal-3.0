@@ -95,13 +95,6 @@ def is_email_str(value):
         return False
 #+END_SRC
 
-** List predicate
-#+NAME: def_is_email_str
-#+BEGIN_SRC python
-def is_list(lst):
-    return isinstance(lst,list):
-#+END_SRC
-
 
 * Checks
   All checks check on a predicate for a type.  
