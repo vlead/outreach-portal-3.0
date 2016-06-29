@@ -229,8 +229,13 @@ class TestPersistenceOC(TestCase):
 
     def test_create_oc(self):
         print "test_create_oc"
-        oc = OC(institute=Institute(name="IIIT",address="Hyderabad"), spokes=[])
+       
+        inst = Institute(name="IIIT",address="Hyderabad")
+        inst.save()
+
+        oc = OC(institute=Institute.get_by_id(1), spokes=[])
         oc.save()
+
         self.assertEqual(is_oc(oc), True)
         oc = OC.get_by_id(1)
         self.assertEqual(oc.get("institute").get("name"), "IIIT")
@@ -306,9 +311,16 @@ class TestPersistenceNC(TestCase):
 
     def test_create_nc(self):
         print "test_create_nc"
-        oc = OC(institute=Institute(name="NIT",address="Suratkal"), spokes=[])
+
+        inst1 = Institute(name="NIT",address="Suratkal")
+        inst1.save()
+
+        inst2 = Institute(name="IIIT",address="Hyderabad")
+        inst2.save()
+
+        oc = OC(institute=Institute.get_by_id(1), spokes=[])
         oc.save()
-        nc = NC(institute=Institute(name="IIIT",address="Hyderabad"), hub=OC.get_by_id(1))
+        nc = NC(institute=Institute.get_by_id(2), hub=OC.get_by_id(1))
         nc.save()
         self.assertEqual(is_nc(nc), True)
         nc = NC.get_by_id(1)
@@ -324,8 +336,8 @@ class TestPersistenceNC(TestCase):
 args = {"__tablename__": "roles",
         "id": db.Column(db.Integer, primary_key=True),
         "name": db.Column(db.String(128), unique=True, nullable=False),
-        "oc_centre_id": db.Column(db.Integer, db.ForeignKey('oc.id'), nullable=True),
-        "nc_centre_id": db.Column(db.Integer, db.ForeignKey('nc.id'), nullable=True),
+        "centre_oc_id": db.Column(db.Integer, db.ForeignKey('ocs.id'), nullable=True),
+        "centre_nc_id": db.Column(db.Integer, db.ForeignKey('ncs.id'), nullable=True),
 	}
 
 Role = ClassPersistenceTemplate.mk_persistent(Role, **args)
@@ -352,15 +364,52 @@ class TestPersistenceRole(TestCase):
         db.session.remove()
         db.drop_all()
 
-    def test_create_role(self):
+    def test_create_admin_role(self):
         print "test_create_role"
-        ro = Role(name="admin",centre=None)
+        ro = Role(name="admin",centre_oc=None, centre_nc=None)
         self.assertEqual(is_role(ro), True)
         ro.save()
         ro = Role.get_by_id(1)
         self.assertEqual(ro.get("name"), "admin")
-        self.assertRaises(TypeError, Email, email="user@")
 
+
+    def test_create_oc_role(self):
+        print "test_create_oc_role"
+
+        inst = Institute(name="IIT",address="Hyderabad")
+        inst.save()
+
+        oc = OC(institute=Institute.get_by_id(1), spokes=[])
+        oc.save()
+
+        ro = Role(name="OC",centre_oc=OC.get_by_id(1), centre_nc=None)
+        self.assertEqual(is_role(ro), True)
+        ro.save()
+        ro = Role.get_by_id(1)
+        self.assertEqual(ro.get("name"), "OC")
+        self.assertEqual(ro.get("centre_oc").get("institute").get("name"), "IIT")
+
+    def test_create_nc_role(self):
+        print "test_create_nc_role"
+
+        inst1 = Institute(name="IIT",address="Hyderabad")
+        inst1.save()
+
+        inst2 = Institute(name="IIIT",address="Hyderabad")
+        inst2.save()
+
+        oc = OC(institute=Institute.get_by_id(1), spokes=[])
+        oc.save()
+
+        nc = NC(institute=Institute.get_by_id(2), hub=oc)
+        nc.save()
+
+        ro = Role(name="NC", centre_nc=NC.get_by_id(1), centre_oc=None)
+        self.assertEqual(is_role(ro), True)
+        ro.save()
+        ro = Role.get_by_id(1)
+        self.assertEqual(ro.get("name"), "NC")
+        self.assertEqual(ro.get("centre_nc").get("institute").get("name"), "IIIT")
 #+END_SRC
 
    
@@ -1531,6 +1580,7 @@ if __name__ == '__main__':
 <<class_Institute>>
 <<class_OC>>
 <<class_NC>>
+<<class_Role>>
 #+end_src
 
 ** tests
@@ -1539,5 +1589,6 @@ if __name__ == '__main__':
 <<class_TestInstitute>>
 <<class_TestOC>>
 <<class_TestNC>>
+<<class_TestRole>>
 <<run_test_cases>>
 #+end_src
