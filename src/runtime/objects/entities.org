@@ -106,7 +106,7 @@ class TestEmail(TestCase):
 WSTarget = ClassTemplate.mk_class("WSTarget", usage = is_int, participants = is_int, experiments = is_int, date = is_date)
 
 is_wst = is_inst(WSTarget)
-check_wstarget = check_pred(is_wstarget)
+check_wstarget = check_pred(is_wst)
 
 #+END_SRC
 
@@ -119,7 +119,7 @@ class TestWSTarget(TestCase):
     def test_instantiate_wstarget(self):
         print "test_instantiate_wstarget"
         wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
-        self.assertEqual(is_wstarget(wstarget_check), True)
+        self.assertEqual(is_wst(wstarget_check), True)
         self.assertEqual(wstarget_check.get("participants"), 200)
         self.assertRaises(TypeError, WSTarget, participants="123")
 
@@ -143,7 +143,7 @@ def are_wstargets(wstargets):
 
 NCTarget = ClassTemplate.mk_class("NCTarget", usage = is_int, date = is_date, wstargets = are_wstargets )
 is_nct = is_inst(NCTarget)
-check_nctarget = check_pred(is_nctarget)
+check_nctarget = check_pred(is_nct)
 
 #+END_SRC
 
@@ -158,7 +158,7 @@ class TestNCTarget(TestCase):
         date_check = "30-06-2016"
         date_format = "%d-%m-%Y"
         nctarget_check = NCTarget(usage=300, wstargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
-        self.assertEqual(is_nctarget(nctarget_check), True)
+        self.assertEqual(is_nct(nctarget_check), True)
         self.assertEqual(nctarget_check.get("usage"), 300)
         self.assertRaises(TypeError, NCTarget, usage = "abc")
 
@@ -185,7 +185,7 @@ def are_nctargets(nctargets):
 OCTarget = ClassTemplate.mk_class("OCTarget", usage = is_int, date = is_date, nctargets = are_nctargets )
 
 is_oct = is_inst(OCTarget)
-check_octarget = check_pred(is_octarget)
+check_octarget = check_pred(is_oct)
 
 #+END_SRC
 
@@ -200,7 +200,7 @@ class TestOCTarget(TestCase):
         date_check = "30-06-2016"
         date_format = "%d-%m-%Y"
         octarget_check = OCTarget(usage=300, nctargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
-        self.assertEqual(is_octarget(octarget_check), True)
+        self.assertEqual(is_oct(octarget_check), True)
         self.assertEqual(octarget_check.get("usage"), 300)
         self.assertRaises(TypeError, OCTarget, usage = "abc")
 
@@ -548,10 +548,6 @@ class TestInstitute(TestCase):
 #+BEGIN_SRC python
 Status = ClassTemplate.mk_class("Status", name=is_alphabetic_str)
 
-is_status = is_inst(Status)
-check_status = check_pred(is_status)
-
-
 Status.pending = Status(name="pending")
 Status.cancelled = Status(name="cancelled")
 Status.completed = Status(name="completed")
@@ -565,6 +561,10 @@ Status.is_completed = lambda status: status.name == 'completed'
 Status.is_pending_approval = lambda status: status.name == 'pending for approval'
 Status.is_rejected = lambda status: status.name == 'rejected'
 Status.is_approved = lambda status: status.name == 'approved'
+
+is_status = is_inst(Status)
+check_status = check_pred(is_status)
+
 #+END_SRC
 
 ** Test Status
@@ -595,8 +595,7 @@ class TestStatus(TestCase):
 * Artefact
 #+NAME: class_Artefact
 #+BEGIN_SRC python
-Artefact = ClassTemplate.mk_class("Artefact", name=is_alphabetic_str,
-path=is_string)
+Artefact = ClassTemplate.mk_class("Artefact", name=is_alphabetic_str, path=is_string)
 
 is_artefact = is_inst(Artefact)
 check_artefact = check_pred(is_artefact)
@@ -633,15 +632,38 @@ def is_wstarget(value):
     else:
         return False
 
-Workshop = ClassTemplate.mk_class("Workshop", name=is_name, institute=is_institute, ws_target = is_wstarget)
+def are_artefacts(artefacts):
+    ret_val = True
+    if is_list(artefacts):
+        for a in artefacts:
+            if not is_artefact(a):
+                ret_val = False
+    else:
+        ret_val = True
+
+    return ret_val
+
+
+Workshop = ClassTemplate.mk_class("Workshop", name=is_name, institute=is_institute, ws_target = is_wstarget, artefacts = are_artefacts, status = is_status)
+
+is_wkshp = is_inst(Workshop)
+check_workshop = check_pred(is_wkshp)
 
 def is_workshop(value):
-    if value == None or is_inst(Workshop):
+    if value == None or is_wkshp(value):
         return True
     else:
         return False
 
-check_workshop = check_pred(is_workshop)
+
+def add_artefact(artefact):
+    if is_artefact(artefact):
+        artefacts = self.get("artefacts")
+        artefacts.append(artefact)
+        self.set(artefacts = artefacts)
+
+Workshop.add_artefact = add_artefact
+
 
 #+END_SRC
 
@@ -656,9 +678,10 @@ class TestWorkshop(TestCase):
     print "Test create workshop"
     def test_instatiate_Workshop(self):
         print "test_instantiate_workshop"
+        status = Status(name = "pending")
         wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
-        workshop = Workshop(name=Name(name="Test workshop"),institute=Institute(name="IIITH",address="Hyderabad"), ws_target = wstarget_check)
-        self.assertEqual(is_workshop(workshop), True)
+        workshop = Workshop(name=Name(name="Test workshop"), institute=Institute(name="IIITH",address="Hyderabad"), ws_target = wstarget_check, status = status, artefacts = [])
+        self.assertEqual(is_wkshp(workshop), True)
     
 
 #+END_SRC
@@ -762,17 +785,17 @@ if __name__ == '__main__':
 <<class_Name>>
 <<class_Email>>
 <<class_Institute>>
+<<class_WSTarget>>
+<<class_NCTarget>>
+<<class_OCTarget>>
 <<class_OC>>
 <<class_NC>>
 <<class_Role>>
 <<class_User>>
 <<class_Session>>
-<<class_Workshop>>
 <<class_Status>>
 <<class_Artefact>>
-<<class_WSTarget>>
-<<class_NCTarget>>
-<<class_OCTarget>>
+<<class_Workshop>>
 #+end_src
 
 
