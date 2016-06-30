@@ -497,7 +497,19 @@ class TestWSTarget(TestCase):
 * NCTarget
 #+NAME: class_NCTarget
 #+BEGIN_SRC python
-NCTarget = ClassTemplate.mk_class("NCTarget", usage = is_int, date = is_date, wstargets = is_list )
+def are_wstargets(wstargets):
+    ret_val = True
+    if is_list(wstargets):
+        for wst in wstargets:
+            if not is_wstarget(wst):
+                ret_val = False
+    else:
+        ret_val = True
+
+    return ret_val
+
+
+NCTarget = ClassTemplate.mk_class("NCTarget", usage = is_int, date = is_date, wstargets = are_wstargets )
 
 is_nctarget = is_inst(NCTarget)
 check_nctarget = check_pred(is_nctarget)
@@ -518,6 +530,48 @@ class TestNCTarget(TestCase):
         self.assertEqual(is_nctarget(nctarget_check), True)
         self.assertEqual(nctarget_check.get("usage"), 300)
         self.assertRaises(TypeError, NCTarget, usage = "abc")
+
+#+END_SRC
+
+
+
+
+
+* OCTarget
+#+NAME: class_OCTarget
+#+BEGIN_SRC python
+def are_nctargets(nctargets):
+    ret_val = True
+    if is_list(nctargets):
+        for nct in nctargets:
+            if not is_nctarget(nct):
+                ret_val = False
+    else:
+        ret_val = True
+
+    return ret_val
+
+OCTarget = ClassTemplate.mk_class("OCTarget", usage = is_int, date = is_date, nctargets = are_nctargets )
+
+is_octarget = is_inst(OCTarget)
+check_octarget = check_pred(is_octarget)
+
+#+END_SRC
+
+** Test OCTarget
+#+NAME: class_TestOCTarget
+#+BEGIN_SRC python
+class TestOCTarget(TestCase):
+    TESTING = True
+
+    def test_instantiate_octarget(self):
+        print "test_instantiate_octarget"
+        date_check = "30-06-2016"
+        date_format = "%d-%m-%Y"
+        octarget_check = OCTarget(usage=300, nctargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
+        self.assertEqual(is_octarget(octarget_check), True)
+        self.assertEqual(octarget_check.get("usage"), 300)
+        self.assertRaises(TypeError, OCTarget, usage = "abc")
 
 #+END_SRC
 
@@ -662,6 +716,7 @@ if __name__ == '__main__':
 <<class_Artefact>>
 <<class_WSTarget>>
 <<class_NCTarget>>
+<<class_OCTarget>>
 #+end_src
 
 
@@ -681,6 +736,7 @@ if __name__ == '__main__':
 <<class_TestArtefact>>
 <<class_TestWSTarget>>
 <<class_TestNCTarget>>
+<<class_TestOCTarget>>
 <<run_test_cases>>
 
 #+end_src
