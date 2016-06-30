@@ -893,7 +893,7 @@ class TestCreateInstitute(TestCase):
 #+NAME: class_CreateOC
 #+begin_src python
 class CreateOC():
-    arg_types = {"institute":is_institute,"spokes":is_spokes, "session":is_session}
+    arg_types = {"institute":is_institute,"spokes":are_spokes, "session":is_session}
     arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):

@@ -102,10 +102,11 @@ class TestEmail(TestCase):
 
 * OC
   A =OC= entity has fields =name= of type =Name=,
- institute of type =Institute=.
+ institute of type =Institute=. 
 #+NAME: class_OC
 #+BEGIN_SRC python
-def is_spokes(spo):
+def are_spokes(spo):
+    ret_val = True
     if is_list(spo):
         for nc in spo:
             if not is_nc(nc):
@@ -114,7 +115,7 @@ def is_spokes(spo):
         ret_val = True
 
     return ret_val
-OC= ClassTemplate.mk_class("OC",institute=is_institute,spokes=is_spokes)
+OC= ClassTemplate.mk_class("OC",institute=is_institute,spokes=are_spokes)
 
 OC.__eq__ = lambda self,other: \
             isinstance(other, self.__class__) and \

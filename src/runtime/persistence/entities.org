@@ -150,7 +150,7 @@ class TestPersistenceEmail(TestCase):
 #+NAME: class_Institute
 #+BEGIN_SRC python
 args = {"__tablename__": "institutes",
-	    "id": db.Column(db.Integer, primary_key=True),
+        "id": db.Column(db.Integer, primary_key=True),
         "name": db.Column(db.String(128), unique=True, nullable=False),
         "address": db.Column(db.String(128), nullable=False),
         "oc": db.relationship('OC', backref='institute'),
