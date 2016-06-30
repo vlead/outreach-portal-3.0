@@ -753,7 +753,8 @@ class login():
         role = args["role"]
         if role not in System.role_set:
             raise StateError("role %s not in System " % role.get('name'))
-        if (user not in System.user_set):
+        active_user_set= filter(lambda x: x.get("user_status")=="active", System.user_set)
+        if (user not in active_user_set):
             raise StateError("user %s not in System" % user.get('name').get('name'))
 
     @staticmethod        
