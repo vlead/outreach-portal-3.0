@@ -78,6 +78,27 @@ def is_string(value):
 #+END_SRC
 
 
+** Integer predicate
+#+name: def_is_int
+#+BEGIN_SRC  python
+def is_int(value):
+    if (isinstance(value, int)):
+        return True
+    else:
+        return False
+#+END_SRC
+
+** Date predicate
+#+name: def_is_date
+#+BEGIN_SRC  python
+import datetime
+def is_date(value):
+    if (isinstance(value, datetime.date )):
+        return True
+    else:
+        return False
+#+END_SRC
+
 ** Email string predicate
     Email is a type as defined in RFC [[https://tools.ietf.org/html/rfc5321][5321]], [[https://tools.ietf.org/html/rfc5322][5322]] and [[https://tools.ietf.org/html/rfc6531][6531]].
     Following is the constructor for this class.
@@ -124,6 +145,8 @@ def check_pred(p):
 check_alphabetic_str = check_pred(is_alphabetic_str)
 check_email_str = check_pred(is_email_str)
 check_string = check_pred(is_string)
+check_date = check_pred(is_date)
+check_int = check_pred(is_int)
 #+END_SRC
 
 *** Tests for =check_pred=
@@ -198,6 +221,35 @@ class TestCheckString(TestCase):
         self.assertEqual(check_string("Hello"), "Hello")
         self.assertEqual(check_string("M. N. Ray"), "M. N. Ray")
         self.assertRaises(TypeError, check_alphabetic_str, 123)
+
+#+END_SRC
+
+*** Tests for check_date
+#+Name: class_TestCheckDate
+#+BEGIN_SRC python
+
+class TestCheckDate(TestCase):
+    TESTING = True
+    """Tests for date"""
+    def test_check_date(self):
+        print "test_check_date"
+        self.assertEqual(check_date(datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()), datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
+        self.assertEqual(check_date(datetime.datetime.strptime("29-06-2016", "%d-%m-%Y").date()), datetime.datetime.strptime("29-06-2016", "%d-%m-%Y").date())
+        self.assertRaises(TypeError, check_date, 123)
+
+#+END_SRC
+
+*** Tests for check_int
+#+Name: class_TestCheckInt
+#+BEGIN_SRC python
+
+class TestCheckInt(TestCase):
+    TESTING = True
+    """Tests for integer"""
+    def test_check_integer(self):
+        print "test_check_integer"
+        self.assertEqual(check_int(123), 123)
+        self.assertRaises(TypeError, check_int, "abc")
 
 #+END_SRC
 
@@ -307,6 +359,8 @@ if __name__ == '__main__':
 <<def_is_alphabetic_str>>
 <<def_is_string>>
 <<def_is_email_str>>
+<<def_is_date>>
+<<def_is_int>>
 <<def_check_pred>>
 <<def_check_inst>>
 <<def_check_inv>>
@@ -321,6 +375,8 @@ if __name__ == '__main__':
 <<class_TestCheckPred>>
 <<class_TestCheckAlphabeticStr>>
 <<class_TestCheckString>>
+<<class_TestCheckDate>>
+<<class_TestCheckInt>>
 <<more-alphabetic_str-checks>>
 <<class_TestCheckEmailStr>>
 <<class_TestCheckInstance>>
