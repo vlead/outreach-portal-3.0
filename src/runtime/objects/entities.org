@@ -105,7 +105,7 @@ class TestEmail(TestCase):
 #+BEGIN_SRC python
 WSTarget = ClassTemplate.mk_class("WSTarget", participants = is_int, experiments = is_int, date = is_date)
 
-is_wstarget = is_inst(WSTarget)
+
 check_wstarget = check_pred(is_wstarget)
 
 #+END_SRC
@@ -608,7 +608,15 @@ class TestArtefact(TestCase):
 
 #+NAME: class_Workshop
 #+BEGIN_SRC python
-Workshop = ClassTemplate.mk_class("Workshop", name=is_name, institute=is_institute)
+
+def is_wstarget(value):
+    if value == None or is_inst(WSTarget):
+        return True
+    else:
+        return False
+
+Workshop = ClassTemplate.mk_class("Workshop", name=is_name, institute=is_institute, ws_target = is_wstarget)
+
 is_workshop = is_inst(Workshop)
 check_workshop = check_pred(is_workshop)
 
@@ -625,7 +633,7 @@ class TestWorkshop(TestCase):
     print "Test create workshop"
     def test_instatiate_Workshop(self):
         print "test_instantiate_user"
-        workshop = Workshop(name=Name(name="Test workshop"),institute=Institute(name="IIITH",address="Hyderabad"))
+        workshop = Workshop(name=Name(name="Test workshop"),institute=Institute(name="IIITH",address="Hyderabad", wstarget = None))
         self.assertEqual(is_workshop(workshop), True)
     
 
