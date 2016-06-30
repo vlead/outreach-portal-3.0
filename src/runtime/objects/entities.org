@@ -465,6 +465,66 @@ class TestArtefact(TestCase):
 
 #+END_SRC
 
+
+
+
+* WSTarget
+#+NAME: class_WSTarget
+#+BEGIN_SRC python
+WSTarget = ClassTemplate.mk_class("WSTarget", participants = is_int, experiments = is_int, date = is_date)
+
+is_wstarget = is_inst(WSTarget)
+check_wstarget = check_pred(is_wstarget)
+
+#+END_SRC
+
+** Test WSTarget
+#+NAME: class_TestWSTarget
+#+BEGIN_SRC python
+class TestWSTarget(TestCase):
+    TESTING = True
+
+    def test_instantiate_wstarget(self):
+        print "test_instantiate_wstarget"
+        wstarget_check = WSTarget(participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
+        self.assertEqual(is_wstarget(wstarget_check), True)
+        self.assertEqual(wstarget_check.get("participants"), 200)
+        self.assertRaises(TypeError, WSTarget, participants="123")
+
+#+END_SRC
+
+
+* NCTarget
+#+NAME: class_NCTarget
+#+BEGIN_SRC python
+NCTarget = ClassTemplate.mk_class("NCTarget", usage = is_int, date = is_date, wstargets = is_list )
+
+is_nctarget = is_inst(NCTarget)
+check_nctarget = check_pred(is_nctarget)
+
+#+END_SRC
+
+** Test NCTarget
+#+NAME: class_TestNCTarget
+#+BEGIN_SRC python
+class TestNCTarget(TestCase):
+    TESTING = True
+
+    def test_instantiate_nctarget(self):
+        print "test_instantiate_nctarget"
+        date_check = "30-06-2016"
+        date_format = "%d-%m-%Y"
+        nctarget_check = NCTarget(usage=300, wstargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
+        self.assertEqual(is_nctarget(nctarget_check), True)
+        self.assertEqual(nctarget_check.get("usage"), 300)
+        self.assertRaises(TypeError, NCTarget, usage = "abc")
+
+#+END_SRC
+
+
+
+
+
 * Workshop
   A workshop is an entity that takes two arguments Institute, and Target.
 
@@ -558,6 +618,7 @@ class TestSession(TestCase):
 from runtime.utils.type_utils import *
 from runtime.utils.class_templates import *
 from runtime.exceptions.exceptions import *
+import datetime
 #+end_src
 
 
@@ -571,6 +632,7 @@ from unittest import TestCase
 from runtime.utils.type_utils import *
 from runtime.utils.class_templates import *
 from entities import *
+import datetime
 #+end_src
 
 *** Running tests
@@ -598,6 +660,8 @@ if __name__ == '__main__':
 <<class_Workshop>>
 <<class_Status>>
 <<class_Artefact>>
+<<class_WSTarget>>
+<<class_NCTarget>>
 #+end_src
 
 
@@ -615,6 +679,8 @@ if __name__ == '__main__':
 <<class_TestWorkshop>>
 <<class_TestStatus>>
 <<class_TestArtefact>>
+<<class_TestWSTarget>>
+<<class_TestNCTarget>>
 <<run_test_cases>>
 
 #+end_src
