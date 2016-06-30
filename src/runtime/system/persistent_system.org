@@ -154,6 +154,7 @@ class TestSystemConstructor(TestCase):
         System.user_set = User.query.all()
 
     def tearDown(self):
+        System.session_set = []
         db.session.remove()
         db.drop_all()
 
@@ -788,6 +789,7 @@ class TestAddRole(TestCase):
         System.role_set = Role.query.all()
         System.user_set = User.query.all()
     def tearDown(self):
+        System.session_set = []
         db.session.remove()
         db.drop_all()
 
@@ -849,25 +851,34 @@ class Testlogin(TestCase):
 
     def setUp(self):
         db.create_all()
-        admin_user = User(name=Name(name=Config.admin_name), 
-                      email=Email(email="app-admin@vlabs.ac.in"), 
-                     roles=[Role.admin,Role.guest,Role.noc],user_status="active")
+        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
+        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
+        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
+        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
+        name = Name(name="admin")
+        name.save()
+        email = Email(email="app-admin@vlabs.ac.in")
+        email.save()
+        Role_admin.save()
+        Role_guest.save()
+        Role_reviewer.save()
+        Role_noc.save()
+        admin_user = User(name=name,
+                          email=email,
+                          roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
         admin_user.save()
-        System.user_set = User.query.all()
-        Role.admin.save()
-        Role.guest.save()
-        Role.reviewer.save()
-        Role.noc.save()
         System.role_set = Role.query.all()
+        System.user_set = User.query.all()
 
     def tearDown(self):
+        System.session_set = []
         db.session.remove()
         db.drop_all()
    
     def test_login(self):
         print "test_login"
-        login_user=System.user_set[0]
-        login_role = System.role_set[0]
+        login_user=User.get_by_id(1)
+        login_role = Role.get_by_id(1)
         System.do("login",user=login_user,role=login_role)
         session=System.session_set[0]
         self.assertEqual(session.get("user").get("name").get("name"),"admin")
@@ -909,25 +920,34 @@ class Testlogout(TestCase):
 
     def setUp(self):
         db.create_all()
-        admin_user = User(name=Name(name=Config.admin_name), 
-                      email=Email(email="app-admin@vlabs.ac.in"), 
-                     roles=[Role.admin,Role.guest,Role.noc],user_status="active")
+        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
+        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
+        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
+        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
+        name = Name(name="admin")
+        name.save()
+        email = Email(email="app-admin@vlabs.ac.in")
+        email.save()
+        Role_admin.save()
+        Role_guest.save()
+        Role_reviewer.save()
+        Role_noc.save()
+        admin_user = User(name=name,
+                          email=email,
+                          roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
         admin_user.save()
-        System.user_set = User.query.all()
-        Role.admin.save()
-        Role.guest.save()
-        Role.reviewer.save()
-        Role.noc.save()
         System.role_set = Role.query.all()
+        System.user_set = User.query.all()
 
     def tearDown(self):
+        System.session_set = []
         db.session.remove()
         db.drop_all()
    
     def test_logout(self):
         print "test_logout"
-        login_user=System.user_set[0]
-        login_role = System.role_set[0]
+        login_user= User.get_by_id(1)
+        login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
         self.assertEqual(len(System.session_set),1)
         System.do("logout",session=sess)
@@ -961,7 +981,8 @@ class CreateInstitute():
         name = args["name"]
         address = args["address"]
         new_institute = Institute(name=name,address=address)
-        System.institute_set.append(new_institute)
+        new_institute.save()
+        System.institute_set = Institute.query.all()
         return new_institute
 #+end_src
 ** Test create_institute
@@ -975,28 +996,38 @@ class TestCreateInstitute(TestCase):
 
     def setUp(self):
         db.create_all()
-        admin_user = User(name=Name(name=Config.admin_name), 
-                      email=Email(email="app-admin@vlabs.ac.in"), 
-                     roles=[Role.admin,Role.guest,Role.noc],user_status="active")
+        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
+        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
+        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
+        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
+        name = Name(name="admin")
+        name.save()
+        email = Email(email="app-admin@vlabs.ac.in")
+        email.save()
+        Role_admin.save()
+        Role_guest.save()
+        Role_reviewer.save()
+        Role_noc.save()
+        admin_user = User(name=name,
+                              email=email,
+                              roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
         admin_user.save()
-        System.user_set = User.query.all()
-        Role.admin.save()
-        Role.guest.save()
-        Role.reviewer.save()
-        Role.noc.save()
         System.role_set = Role.query.all()
+        System.user_set = User.query.all()
+
 
     def tearDown(self):
+        System.session_set = []
         db.session.remove()
         db.drop_all()
     
     def test_create_institute(self):
         print "test_create_institute"
-        login_user=System.user_set[0]
-        login_role = System.role_set[0]
+        login_user= User.get_by_id(1)
+        login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
         institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
-        self.assertEqual(institute,System.institute_set[0])
+        self.assertEqual(Institute.get_by_id(1).get('name'),'IIIT')
 
 #+END_SRC
 * =create_oc=
@@ -1032,9 +1063,11 @@ class CreateOC():
         institute = args["institute"]
         spokes=args["spokes"]
         new_oc = OC(institute=institute,spokes=spokes)
-        System.oc_set.append(new_oc)
         new_role = Role(name="OCC",centre_oc=new_oc,centre_nc=None)
-        System.role_set.append(new_role)
+        new_oc.save()
+        new_role.save()
+        System.role_set = Role.query.all()
+        System.oc_role = OC.query.all()
         return new_oc
 
 #+end_src
@@ -1049,18 +1082,27 @@ class TestCreateOC(TestCase):
 
     def setUp(self):
         db.create_all()
-        admin_user = User(name=Name(name=Config.admin_name), 
-                      email=Email(email="app-admin@vlabs.ac.in"), 
-                     roles=[Role.admin,Role.guest,Role.noc],user_status="active")
+        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
+        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
+        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
+        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
+        name = Name(name="admin")
+        name.save()
+        email = Email(email="app-admin@vlabs.ac.in")
+        email.save()
+        Role_admin.save()
+        Role_guest.save()
+        Role_reviewer.save()
+        Role_noc.save()
+        admin_user = User(name=name,
+                              email=email,
+                              roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
         admin_user.save()
-        System.user_set = User.query.all()
-        Role.admin.save()
-        Role.guest.save()
-        Role.reviewer.save()
-        Role.noc.save()
         System.role_set = Role.query.all()
+        System.user_set = User.query.all()
 
     def tearDown(self):
+        System.session_set = []
         db.session.remove()
         db.drop_all()
 
@@ -1072,7 +1114,7 @@ class TestCreateOC(TestCase):
         sess = System.do("login",user=login_user,role=login_role)
         institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
         oc = System.do("create_oc",institute=institute,spokes=[],session=sess)
-        self.assertEqual(oc.get('institute'),institute)
+        self.assertEqual(OC.get_by_id(1).get('institute'),Institute.get_by_id(1))
         #self.assertRaises(StateError,System.do,"create_oc",institute=institute,session=sess)
 #+END_SRC
 
@@ -1115,10 +1157,14 @@ class CreateNC():
         institute = args["institute"]
         oc = args['hub']
         new_nc = NC(institute=institute,hub=oc)
-        System.nc_set.append(new_nc)
         oc.append_spoke(new_nc)
         new_role = Role(name="NCC",centre_oc=None,centre_nc=new_nc)
-        System.role_set.append(new_role)
+        new_nc.save()
+        oc.save()
+        new_role.save()
+        System.nc_set = NC.query.all
+        System.role_set = Role.query.all()
+        System.oc_set = OC.query.all()
         return new_nc
 #+end_src
 ** Test CreateNC
@@ -1132,18 +1178,27 @@ class TestCreateNC(TestCase):
 
     def setUp(self):
         db.create_all()
-        admin_user = User(name=Name(name=Config.admin_name), 
-                      email=Email(email="app-admin@vlabs.ac.in"), 
-                     roles=[Role.admin,Role.guest,Role.noc],user_status="active")
+        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
+        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
+        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
+        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
+        name = Name(name="admin")
+        name.save()
+        email = Email(email="app-admin@vlabs.ac.in")
+        email.save()
+        Role_admin.save()
+        Role_guest.save()
+        Role_reviewer.save()
+        Role_noc.save()
+        admin_user = User(name=name,
+                              email=email,
+                              roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
         admin_user.save()
-        System.user_set = User.query.all()
-        Role.admin.save()
-        Role.guest.save()
-        Role.reviewer.save()
-        Role.noc.save()
         System.role_set = Role.query.all()
+        System.user_set = User.query.all()
 
     def tearDown(self):
+        System.session_set = []
         db.session.remove()
         db.drop_all()
 
@@ -1155,8 +1210,8 @@ class TestCreateNC(TestCase):
         institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
         oc = System.do("create_oc",institute=institute,spokes=[],session=sess)
         nc = System.do("create_nc",institute=institute,hub=oc,session=sess)
-        self.assertEqual(nc.get('institute'),institute)
-        self.assertEqual(oc.get('spokes')[0],nc)
+        self.assertEqual(NC.get_by_id(1).get('institute'),institute)
+        self.assertEqual(OC.get_by_id(1).get('spokes')[0],nc)
   
 #+END_SRC
 * =show_sessions=
