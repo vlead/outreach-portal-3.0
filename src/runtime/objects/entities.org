@@ -107,7 +107,6 @@ class TestEmail(TestCase):
 #+BEGIN_SRC python
 def are_spokes(spo):
     ret_val = True
-
     if is_list(spo):
         for nc in spo:
             if not is_nc(nc):
@@ -440,6 +439,7 @@ class TestStatus(TestCase):
 #+END_SRC
 
 
+
 * Artefact
 #+NAME: class_Artefact
 #+BEGIN_SRC python
@@ -465,10 +465,6 @@ class TestArtefact(TestCase):
         self.assertRaises(TypeError, Artefact, name="123")
 
 #+END_SRC
-
-
-
-
 
 * Workshop
   A workshop is an entity that takes two arguments Institute, and Target.
