@@ -67,6 +67,15 @@ def is_alphabetic_str(value):
     else:
         return False
 #+END_SRC
+** String predicate
+#+name: def_is_string
+#+BEGIN_SRC  python
+def is_string(value):
+    if (isinstance(value, str)):
+        return True
+    else:
+        return False
+#+END_SRC
 
 
 ** Email string predicate
@@ -86,15 +95,6 @@ def is_email_str(value):
         return False
 #+END_SRC
 
-** List predicate
-#+NAME: def_is_email_str
-#+BEGIN_SRC python
-def is_list(value):
-    if isinstance(value,basestring):
-        return True
-    else:
-        return False
-#+END_SRC
 
 * Checks
   All checks check on a predicate for a type.  
@@ -123,6 +123,7 @@ def check_pred(p):
 
 check_alphabetic_str = check_pred(is_alphabetic_str)
 check_email_str = check_pred(is_email_str)
+check_string = check_pred(is_string)
 #+END_SRC
 
 *** Tests for =check_pred=
@@ -182,6 +183,21 @@ class TestCheckEmailStr(TestCase):
         print "test_check_email_str"
         self.assertEqual(check_email_str("web@gnu.org"), "web@gnu.org")
         self.assertRaises(TypeError, check_email_str, "@gnu.org")
+
+#+END_SRC
+
+*** Tests for check_string
+#+Name: class_TestCheckString
+#+BEGIN_SRC python
+
+class TestCheckString(TestCase):
+    TESTING = True
+    """Tests for strings"""
+    def test_check_string(self):
+        print "test_check_string"
+        self.assertEqual(check_string("Hello"), "Hello")
+        self.assertEqual(check_string("M. N. Ray"), "M. N. Ray")
+        self.assertRaises(TypeError, check_alphabetic_str, 123)
 
 #+END_SRC
 
@@ -289,6 +305,7 @@ if __name__ == '__main__':
 <<imports_for_sources>>
 <<def_is_inst>>
 <<def_is_alphabetic_str>>
+<<def_is_string>>
 <<def_is_email_str>>
 <<def_check_pred>>
 <<def_check_inst>>
@@ -303,6 +320,7 @@ if __name__ == '__main__':
 <<class_TestIsInstance>>
 <<class_TestCheckPred>>
 <<class_TestCheckAlphabeticStr>>
+<<class_TestCheckString>>
 <<more-alphabetic_str-checks>>
 <<class_TestCheckEmailStr>>
 <<class_TestCheckInstance>>

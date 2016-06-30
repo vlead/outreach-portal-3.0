@@ -32,6 +32,10 @@ Virtual Labs are captured here.
 
    
 * Role
+  Different privileges for accessing the system is maintained by roles.  A role
+  whose type =Role= defines a set of privileges i.e. what is accessible and
+  what is not accessible in the system. 
+
 ** Req 1 
    There are 6 kinds of roles: =admin=, =guest=, =reviewer=, =noc= =occ(oc)=,
    =ncc(nc)=.  Each role determines what data access privileges are available
@@ -88,6 +92,7 @@ Virtual Labs are captured here.
 
 
 * Outreach Center
+  Outreach activity is 
   
 ** Req 1
    An outreach center (=OC=) is hosted in an institute. 
