@@ -105,7 +105,7 @@ class TestEmail(TestCase):
   institute of type =Institute=.
 #+NAME: class_OC
 #+BEGIN_SRC python
-def is_spokes(spo):
+def are_spokes(spo):
     ret_val = True
 
     if is_list(spo):
@@ -117,7 +117,7 @@ def is_spokes(spo):
 
     return ret_val
 
-OC= ClassTemplate.mk_class("OC",institute=is_institute,spokes=is_spokes)
+OC= ClassTemplate.mk_class("OC",institute=is_institute,spokes=are_spokes)
 
 OC.__eq__ = lambda self,other: \
             isinstance(other, self.__class__) and \
@@ -277,10 +277,25 @@ class TestRole(TestCase):
 
 #+NAME: class_User
 #+BEGIN_SRC python
+def is_user_status(s):
+    ret_val = True
+
+    if is_str(s) and (s=="active" or s=="inactive"):
+        ret_val = True
+    else:        
+        ret_val = False
+
+
+
+    return ret_val
+
+
+
 User = ClassTemplate.mk_class("User", 
                               name=is_name, 
                               email=is_email,
-                              roles=are_roles
+                              roles=are_roles,
+                              user_status=is_user_status
                               )
 
 
@@ -293,7 +308,6 @@ def append_role(self,role):
         roles = self.get('roles')
         roles.append(role)
         self.set(roles=roles)
-
 User.append_role = append_role
 
 is_user = is_inst(User)
@@ -311,26 +325,27 @@ class TestUser(TestCase):
         print "test_instantiate_user"
         user = User(name=Name(name="Jimi Hendrix"),
                     email=Email(email="jimi@gnu.org"),
-                    roles=[])
+                    roles=[],user_status="active")
         self.assertEqual(is_user(user), True)
 
     def test_sets_on_user(self):
         print "test_sets_on_user"
         user = User(name=Name(name="Jimi Hendrix"),
                     email=Email(email="jimi@gnu.org"),
-                    roles=[Role(name="guest", centre_oc=None,centre_nc=None)]
+                    roles=[Role(name="guest", centre_oc=None,centre_nc=None)],
+                    user_status="active"
                    )
 
         self.assertEqual(user.get("name").get("name"), "Jimi Hendrix")
         self.assertEqual(user.get("email").get("email"), "jimi@gnu.org")
         self.assertEqual(user.get("roles")[0].get("name"), "guest")
-
+        self.assertEqual(user.get("user_status"),"active")
         
     def test_equality_on_user(self):
         print "test_equality_on_user"
         user1 = User(name=Name(name="Jimi Hendrix"),
                      email=Email(email="jimi@gnu.org"),
-                     roles=[]
+                     roles=[],user_status="active"
                     )
         self.assertEqual(user1 == user1, True)
         
@@ -338,7 +353,7 @@ class TestUser(TestCase):
         print "test_append_role"
         user = User(name=Name(name="Jimi Hendrix"),
                      email=Email(email="jimi@gnu.org"),
-                     roles=[])
+                     roles=[],user_status="active")
         user.append_role(Role(name="guest",centre_oc=None,centre_nc=None))
         self.assertTrue(len(user.get('roles'))==1)
 
@@ -509,7 +524,7 @@ class TestSession(TestCase):
         print "test_instantiate_user"
         user = User(name=Name(name="Jimi Hendrix"),
                     email=Email(email="jimi@gnu.org"),
-                    roles=[]
+                    roles=[],user_status="active"
                    )
         role = Role(name="admin", centre_oc=None,centre_nc=None)
         session = Session(user=user, role=role)
@@ -519,14 +534,14 @@ class TestSession(TestCase):
         print "test_sets_on_session"
         user = User(name=Name(name="Jimi Hendrix"),
                     email=Email(email="jimi@gnu.org"),
-                    roles=[]
+                    roles=[],user_status="active"
                    )
         role = Role(name="admin", centre_oc=None,centre_nc=None)
         session = Session(user=user, role=role)
 
         user = User(name=Name(name="Bo Didley"),
                     email=Email(email="didley@gnu.org"),
-                    roles=[]
+                    roles=[],user_status="active"
                    )
 
         session.set(user=user)
