@@ -100,6 +100,116 @@ class TestEmail(TestCase):
 #+END_SRC
 
 
+* WSTarget
+#+NAME: class_WSTarget
+#+BEGIN_SRC python
+WSTarget = ClassTemplate.mk_class("WSTarget", participants = is_int, experiments = is_int, date = is_date)
+
+is_wstarget = is_inst(WSTarget)
+check_wstarget = check_pred(is_wstarget)
+
+#+END_SRC
+
+** Test WSTarget
+#+NAME: class_TestWSTarget
+#+BEGIN_SRC python
+class TestWSTarget(TestCase):
+    TESTING = True
+
+    def test_instantiate_wstarget(self):
+        print "test_instantiate_wstarget"
+        wstarget_check = WSTarget(participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
+        self.assertEqual(is_wstarget(wstarget_check), True)
+        self.assertEqual(wstarget_check.get("participants"), 200)
+        self.assertRaises(TypeError, WSTarget, participants="123")
+
+#+END_SRC
+
+
+* NCTarget
+#+NAME: class_NCTarget
+#+BEGIN_SRC python
+def are_wstargets(wstargets):
+    ret_val = True
+    if is_list(wstargets):
+        for wst in wstargets:
+            if not is_wstarget(wst):
+                ret_val = False
+    else:
+        ret_val = True
+
+    return ret_val
+
+
+NCTarget = ClassTemplate.mk_class("NCTarget", usage = is_int, date = is_date, wstargets = are_wstargets )
+
+check_nctarget = check_pred(is_nctarget)
+
+#+END_SRC
+
+** Test NCTarget
+#+NAME: class_TestNCTarget
+#+BEGIN_SRC python
+class TestNCTarget(TestCase):
+    TESTING = True
+
+    def test_instantiate_nctarget(self):
+        print "test_instantiate_nctarget"
+        date_check = "30-06-2016"
+        date_format = "%d-%m-%Y"
+        nctarget_check = NCTarget(usage=300, wstargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
+        self.assertEqual(is_nctarget(nctarget_check), True)
+        self.assertEqual(nctarget_check.get("usage"), 300)
+        self.assertRaises(TypeError, NCTarget, usage = "abc")
+
+#+END_SRC
+
+
+
+
+
+* OCTarget
+#+NAME: class_OCTarget
+#+BEGIN_SRC python
+def are_nctargets(nctargets):
+    ret_val = True
+    if is_list(nctargets):
+        for nct in nctargets:
+            if not is_nctarget(nct):
+                ret_val = False
+    else:
+        ret_val = True
+
+    return ret_val
+
+OCTarget = ClassTemplate.mk_class("OCTarget", usage = is_int, date = is_date, nctargets = are_nctargets )
+
+
+check_octarget = check_pred(is_octarget)
+
+#+END_SRC
+
+** Test OCTarget
+#+NAME: class_TestOCTarget
+#+BEGIN_SRC python
+class TestOCTarget(TestCase):
+    TESTING = True
+
+    def test_instantiate_octarget(self):
+        print "test_instantiate_octarget"
+        date_check = "30-06-2016"
+        date_format = "%d-%m-%Y"
+        octarget_check = OCTarget(usage=300, nctargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
+        self.assertEqual(is_octarget(octarget_check), True)
+        self.assertEqual(octarget_check.get("usage"), 300)
+        self.assertRaises(TypeError, OCTarget, usage = "abc")
+
+#+END_SRC
+
+
+
+
+
 * OC
   A =OC= entity has fields =name= of type =Name=,
   institute of type =Institute=.
@@ -116,7 +226,14 @@ def are_spokes(spo):
         ret_val = True
 
     return ret_val
-OC= ClassTemplate.mk_class("OC",institute=is_institute,spokes=are_spokes)
+
+def is_octarget(value):
+    if value == None or is_inst(OCTarget):
+        return True
+    else:
+        return False
+    
+OC= ClassTemplate.mk_class("OC",institute=is_institute,spokes=are_spokes, oc_target = is_octarget)
 
 OC.__eq__ = lambda self,other: \
             isinstance(other, self.__class__) and \
@@ -128,8 +245,13 @@ def append_spoke(self,spoke):
         spokes.append(spoke)
         self.set(spokes=spokes)
 
-OC.append_spoke = append_spoke
+def add_oc_target( self, oc_target):
+    if is_octarget(oc_target):
+        self.oc_target = oc_target
 
+
+OC.append_spoke = append_spoke
+OC.add_oc_target = add_oc_target
 
 is_oc = is_inst(OC)
 check_oc = check_pred(is_oc)
@@ -144,17 +266,17 @@ class TestOC(TestCase):
     TESTING = True
 
     def test_instatiate_OC(self):
-        print "test_instantiate_user"
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[])
+        print "test_instantiate_OC"
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
 
         self.assertEqual(is_oc(oc), True)
 
 
     def test_sets_spokes_on_OC(self):
         print "test_sets_spokes_on_oc"
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[])
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
 
-        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=oc)
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=oc, nc_target = None)
         self.assertEqual((nc.get("institute")).get("name"), "HCU")
 
         oc.set(spokes=[nc])
@@ -169,8 +291,20 @@ class TestOC(TestCase):
  institute of type =Institute=.
 #+NAME: class_NC
 #+BEGIN_SRC python
+def is_nctarget(value):
+    if value == None or is_inst(NCTarget):
+        return True
+    else:
+        return False
+    
 
-NC= ClassTemplate.mk_class("NC", institute=is_institute, hub=is_oc)
+NC= ClassTemplate.mk_class("NC", institute=is_institute, hub=is_oc, nc_target = is_nctarget)
+
+def add_nc_target( self, nc_target):
+    if is_nctarget(nc_target):
+        self.nc_target = nc_target
+
+NC.add_nc_target = add_nc_target
 
 is_nc = is_inst(NC)
 check_nc = check_pred(is_nc)
@@ -185,8 +319,8 @@ class TestNC(TestCase):
     TESTING = True
 
     def test_instatiate_NC(self):
-        print "test_instantiate_user"
-        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[]))
+        print "test_instantiate_NC"
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[], oc_target = None), nc_target = None)
 
         self.assertEqual(is_nc(nc), True)
 
@@ -203,6 +337,7 @@ def is_centre_oc(value):
         return True
     else:
         return False
+
 def is_centre_nc(value):
     if value == None or is_nc(value):
         return True
@@ -262,7 +397,7 @@ class TestRole(TestCase):
 
     def test_set_and_get_centre(self):
         print "test_set_and_get_centre"
-        oc = OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[])
+        oc = OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[], oc_target = None)
         occ_role = Role(name="OCC", centre_oc=oc,centre_nc=None)
         self.assertEqual(occ_role.get("name"), "OCC")
         self.assertEqual(occ_role.get("centre_oc"), oc)
@@ -464,117 +599,6 @@ class TestArtefact(TestCase):
         self.assertRaises(TypeError, Artefact, name="123")
 
 #+END_SRC
-
-
-
-
-* WSTarget
-#+NAME: class_WSTarget
-#+BEGIN_SRC python
-WSTarget = ClassTemplate.mk_class("WSTarget", participants = is_int, experiments = is_int, date = is_date)
-
-is_wstarget = is_inst(WSTarget)
-check_wstarget = check_pred(is_wstarget)
-
-#+END_SRC
-
-** Test WSTarget
-#+NAME: class_TestWSTarget
-#+BEGIN_SRC python
-class TestWSTarget(TestCase):
-    TESTING = True
-
-    def test_instantiate_wstarget(self):
-        print "test_instantiate_wstarget"
-        wstarget_check = WSTarget(participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
-        self.assertEqual(is_wstarget(wstarget_check), True)
-        self.assertEqual(wstarget_check.get("participants"), 200)
-        self.assertRaises(TypeError, WSTarget, participants="123")
-
-#+END_SRC
-
-
-* NCTarget
-#+NAME: class_NCTarget
-#+BEGIN_SRC python
-def are_wstargets(wstargets):
-    ret_val = True
-    if is_list(wstargets):
-        for wst in wstargets:
-            if not is_wstarget(wst):
-                ret_val = False
-    else:
-        ret_val = True
-
-    return ret_val
-
-
-NCTarget = ClassTemplate.mk_class("NCTarget", usage = is_int, date = is_date, wstargets = are_wstargets )
-
-is_nctarget = is_inst(NCTarget)
-check_nctarget = check_pred(is_nctarget)
-
-#+END_SRC
-
-** Test NCTarget
-#+NAME: class_TestNCTarget
-#+BEGIN_SRC python
-class TestNCTarget(TestCase):
-    TESTING = True
-
-    def test_instantiate_nctarget(self):
-        print "test_instantiate_nctarget"
-        date_check = "30-06-2016"
-        date_format = "%d-%m-%Y"
-        nctarget_check = NCTarget(usage=300, wstargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
-        self.assertEqual(is_nctarget(nctarget_check), True)
-        self.assertEqual(nctarget_check.get("usage"), 300)
-        self.assertRaises(TypeError, NCTarget, usage = "abc")
-
-#+END_SRC
-
-
-
-
-
-* OCTarget
-#+NAME: class_OCTarget
-#+BEGIN_SRC python
-def are_nctargets(nctargets):
-    ret_val = True
-    if is_list(nctargets):
-        for nct in nctargets:
-            if not is_nctarget(nct):
-                ret_val = False
-    else:
-        ret_val = True
-
-    return ret_val
-
-OCTarget = ClassTemplate.mk_class("OCTarget", usage = is_int, date = is_date, nctargets = are_nctargets )
-
-is_octarget = is_inst(OCTarget)
-check_octarget = check_pred(is_octarget)
-
-#+END_SRC
-
-** Test OCTarget
-#+NAME: class_TestOCTarget
-#+BEGIN_SRC python
-class TestOCTarget(TestCase):
-    TESTING = True
-
-    def test_instantiate_octarget(self):
-        print "test_instantiate_octarget"
-        date_check = "30-06-2016"
-        date_format = "%d-%m-%Y"
-        octarget_check = OCTarget(usage=300, nctargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
-        self.assertEqual(is_octarget(octarget_check), True)
-        self.assertEqual(octarget_check.get("usage"), 300)
-        self.assertRaises(TypeError, OCTarget, usage = "abc")
-
-#+END_SRC
-
 
 
 
