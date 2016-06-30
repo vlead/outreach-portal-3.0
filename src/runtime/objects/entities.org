@@ -103,9 +103,9 @@ class TestEmail(TestCase):
 * WSTarget
 #+NAME: class_WSTarget
 #+BEGIN_SRC python
-WSTarget = ClassTemplate.mk_class("WSTarget", participants = is_int, experiments = is_int, date = is_date)
+WSTarget = ClassTemplate.mk_class("WSTarget", usage = is_int, participants = is_int, experiments = is_int, date = is_date)
 
-
+is_wst = is_inst(WSTarget)
 check_wstarget = check_pred(is_wstarget)
 
 #+END_SRC
@@ -118,7 +118,7 @@ class TestWSTarget(TestCase):
 
     def test_instantiate_wstarget(self):
         print "test_instantiate_wstarget"
-        wstarget_check = WSTarget(participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
+        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
         self.assertEqual(is_wstarget(wstarget_check), True)
         self.assertEqual(wstarget_check.get("participants"), 200)
         self.assertRaises(TypeError, WSTarget, participants="123")
@@ -142,7 +142,7 @@ def are_wstargets(wstargets):
 
 
 NCTarget = ClassTemplate.mk_class("NCTarget", usage = is_int, date = is_date, wstargets = are_wstargets )
-
+is_nct = is_inst(NCTarget)
 check_nctarget = check_pred(is_nctarget)
 
 #+END_SRC
@@ -184,7 +184,7 @@ def are_nctargets(nctargets):
 
 OCTarget = ClassTemplate.mk_class("OCTarget", usage = is_int, date = is_date, nctargets = are_nctargets )
 
-
+is_oct = is_inst(OCTarget)
 check_octarget = check_pred(is_octarget)
 
 #+END_SRC
@@ -228,7 +228,7 @@ def are_spokes(spo):
     return ret_val
 
 def is_octarget(value):
-    if value == None or is_inst(OCTarget):
+    if value == None or is_oct(value):
         return True
     else:
         return False
@@ -247,7 +247,7 @@ def append_spoke(self,spoke):
 
 def add_oc_target( self, oc_target):
     if is_octarget(oc_target):
-        self.oc_target = oc_target
+        self.set(oc_target = oc_target)
 
 
 OC.append_spoke = append_spoke
@@ -276,7 +276,7 @@ class TestOC(TestCase):
         print "test_sets_spokes_on_oc"
         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
 
-        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=oc, nc_target = None)
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=oc, nc_target = None, workshops = [])
         self.assertEqual((nc.get("institute")).get("name"), "HCU")
 
         oc.set(spokes=[nc])
@@ -291,21 +291,39 @@ class TestOC(TestCase):
  institute of type =Institute=.
 #+NAME: class_NC
 #+BEGIN_SRC python
+def are_workshops(wkshps):
+    ret_val = True
+    if is_list(wkshps):
+        for w in wkshps:
+            if not is_workshop(w):
+                ret_val = False
+    else:
+        ret_val = True
+
+    return ret_val
+
+
 def is_nctarget(value):
-    if value == None or is_inst(NCTarget):
+    if value == None or is_nct(value):
         return True
     else:
         return False
     
 
-NC= ClassTemplate.mk_class("NC", institute=is_institute, hub=is_oc, nc_target = is_nctarget)
+NC= ClassTemplate.mk_class("NC", institute=is_institute, hub=is_oc, nc_target = is_nctarget, workshops = are_workshops)
 
 def add_nc_target( self, nc_target):
     if is_nctarget(nc_target):
         self.nc_target = nc_target
 
-NC.add_nc_target = add_nc_target
+def add_workshop_to_nc( self, workshop):
+    if is_workshop(workshop):
+        workshops = self.get("workshops")
+        workshops.append(workshop)
+        self.set(workshops = workshops)
 
+NC.add_nc_target = add_nc_target
+NC.add_workshop_to_nc = add_workshop_to_nc
 is_nc = is_inst(NC)
 check_nc = check_pred(is_nc)
 
@@ -320,7 +338,7 @@ class TestNC(TestCase):
 
     def test_instatiate_NC(self):
         print "test_instantiate_NC"
-        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[], oc_target = None), nc_target = None)
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[], oc_target = None), nc_target = None, workshops = [])
 
         self.assertEqual(is_nc(nc), True)
 
@@ -610,14 +628,19 @@ class TestArtefact(TestCase):
 #+BEGIN_SRC python
 
 def is_wstarget(value):
-    if value == None or is_inst(WSTarget):
+    if value == None or is_wst(value):
         return True
     else:
         return False
 
 Workshop = ClassTemplate.mk_class("Workshop", name=is_name, institute=is_institute, ws_target = is_wstarget)
 
-is_workshop = is_inst(Workshop)
+def is_workshop(value):
+    if value == None or is_inst(Workshop):
+        return True
+    else:
+        return False
+
 check_workshop = check_pred(is_workshop)
 
 #+END_SRC
@@ -632,8 +655,9 @@ class TestWorkshop(TestCase):
     TESTING = True
     print "Test create workshop"
     def test_instatiate_Workshop(self):
-        print "test_instantiate_user"
-        workshop = Workshop(name=Name(name="Test workshop"),institute=Institute(name="IIITH",address="Hyderabad", wstarget = None))
+        print "test_instantiate_workshop"
+        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
+        workshop = Workshop(name=Name(name="Test workshop"),institute=Institute(name="IIITH",address="Hyderabad"), ws_target = wstarget_check)
         self.assertEqual(is_workshop(workshop), True)
     
 
