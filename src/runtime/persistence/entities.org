@@ -1572,5 +1572,7 @@ if __name__ == '__main__':
 <<class_TestNC>>
 <<class_TestRole>>
 <<class_TestUser>>
+<<class_TestName>>
+<<class_TestEmail>>
 <<run_test_cases>>
 #+end_src
