@@ -84,9 +84,9 @@ The class corresponding to each operation has five fields:
 class System ():
     
     user_set = []
-    active_user_set=[admin_user]
+    active_user_set=[]
     session_set = []
-    role_set = [Role.admin,Role.reviewer,Role.guest,Role.noc]
+    role_set = []
     institute_set = []
     oc_set = []
     nc_set = []
@@ -128,6 +128,35 @@ class System ():
 #+BEGIN_SRC python
 class TestSystemConstructor(TestCase):
     TESTING = True
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
+        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
+        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
+        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
+        name = Name(name="admin")
+        name.save()
+        email = Email(email="app-admin@vlabs.ac.in")
+        email.save()
+        Role_admin.save()
+        Role_guest.save()
+        Role_reviewer.save()
+        Role_noc.save()
+        admin_user = User(name=name,
+                          email=email,
+                          roles=[Role_admin,Role_guest,Role_noc],user_status="active")
+        admin_user.save()
+        System.role_set = Role.query.all()
+        System.user_set = User.query.all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
 
    
     def test_system_constructor(self):
@@ -244,6 +273,12 @@ class TestSystemArityAndType(TestCase):
         state_check = cls.state_check
         arity_and_type_checks_needed = cls.arity_and_type_checks_needed
         try:
+            System.user_set = User.query.all()
+            System.active_user_set = User.query.filter_by(user_status='active')
+            System.role_set = Role.query.all()
+            System.institute_set = Institute.query.all()
+            System.oc_set = OC.query.all()
+            System.nc_set = NC.query.all()
             if arity_and_type_checks_needed:
                System.arity_check(args.keys(), len(arg_types.keys()))
                System.type_check(args, arg_types)
@@ -299,10 +334,23 @@ class TestAddUser(TestCase):
 
     def setUp(self):
         db.create_all()
-        admin_user = User(name=Name(name=Config.admin_name), 
-                      email=Email(email="app-admin@vlabs.ac.in"), 
-                     roles=[Role.admin,Role.guest,Role.noc],user_status="active")
+        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
+        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
+        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
+        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
+        name = Name(name="admin")
+        name.save()
+        email = Email(email="app-admin@vlabs.ac.in")
+        email.save()
+        Role_admin.save()
+        Role_guest.save()
+        Role_reviewer.save()
+        Role_noc.save()
+        admin_user = User(name=name,
+                          email=email,
+                          roles=[Role_admin,Role_guest,Role_noc],user_status="active")
         admin_user.save()
+        System.role_set = Role.query.all()
         System.user_set = User.query.all()
 
     def tearDown(self):
@@ -705,6 +753,7 @@ class AddRole():
         user = args["user"]
         role = args['role']
         user.append_role(role)
+        user.save()
         return user
                 
 
@@ -714,24 +763,42 @@ class AddRole():
 #+BEGIN_SRC python
 class TestAddRole(TestCase):
     TESTING = True
-    def setUp(self):
-        pass
+    def create_app(self):
+        app = create_app(config)
+        return app
 
+    def setUp(self):
+        db.create_all()
+        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
+        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
+        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
+        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
+        name = Name(name="admin")
+        name.save()
+        email = Email(email="app-admin@vlabs.ac.in")
+        email.save()
+        Role_admin.save()
+        Role_guest.save()
+        Role_reviewer.save()
+        Role_noc.save()
+        admin_user = User(name=name,
+                          email=email,
+                          roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
+        admin_user.save()
+        System.role_set = Role.query.all()
+        System.user_set = User.query.all()
     def tearDown(self):
-        System.session_set = []
-        System.institute_set = []
-        System.oc_set = []
-        System.nc_set = []
+        db.session.remove()
+        db.drop_all()
 
     def test_add_role(self):
         print "test_add_role"
-        login_user=System.user_set[0]
-        login_role = System.role_set[0]
+        login_user=User.get_by_id(1)
+        login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
-        us = System.do("add_role",user=login_user,role=Role.reviewer,session=sess)
-        self.assertTrue(len(us.get('roles'))==4)
-        
-        
+        System.do("add_role",user=login_user,role=Role.get_by_id(2),session=sess)
+        self.assertEqual(len(User.get_by_id(1).get('roles')),4)
+
 #+END_SRC
 * =login=
 #+NAME: class_login
@@ -776,14 +843,27 @@ class login():
 #+BEGIN_SRC python
 class Testlogin(TestCase):
     TESTING = True
+    def create_app(self):
+        app = create_app(config)
+        return app
+
     def setUp(self):
-        pass
+        db.create_all()
+        admin_user = User(name=Name(name=Config.admin_name), 
+                      email=Email(email="app-admin@vlabs.ac.in"), 
+                     roles=[Role.admin,Role.guest,Role.noc],user_status="active")
+        admin_user.save()
+        System.user_set = User.query.all()
+        Role.admin.save()
+        Role.guest.save()
+        Role.reviewer.save()
+        Role.noc.save()
+        System.role_set = Role.query.all()
 
     def tearDown(self):
-        System.session_set = []
-        System.institute_set = []
-        System.oc_set = []
-        System.nc_set = []
+        db.session.remove()
+        db.drop_all()
+   
     def test_login(self):
         print "test_login"
         login_user=System.user_set[0]
@@ -823,14 +903,27 @@ class logout():
 #+BEGIN_SRC python
 class Testlogout(TestCase):
     TESTING = True
+    def create_app(self):
+        app = create_app(config)
+        return app
+
     def setUp(self):
-        pass
+        db.create_all()
+        admin_user = User(name=Name(name=Config.admin_name), 
+                      email=Email(email="app-admin@vlabs.ac.in"), 
+                     roles=[Role.admin,Role.guest,Role.noc],user_status="active")
+        admin_user.save()
+        System.user_set = User.query.all()
+        Role.admin.save()
+        Role.guest.save()
+        Role.reviewer.save()
+        Role.noc.save()
+        System.role_set = Role.query.all()
 
     def tearDown(self):
-        System.session_set = []
-        System.institute_set = []
-        System.oc_set = []
-        System.nc_set = []
+        db.session.remove()
+        db.drop_all()
+   
     def test_logout(self):
         print "test_logout"
         login_user=System.user_set[0]
@@ -876,14 +969,27 @@ class CreateInstitute():
 #+BEGIN_SRC python
 class TestCreateInstitute(TestCase):
     TESTING = True
+    def create_app(self):
+        app = create_app(config)
+        return app
+
     def setUp(self):
-        pass
+        db.create_all()
+        admin_user = User(name=Name(name=Config.admin_name), 
+                      email=Email(email="app-admin@vlabs.ac.in"), 
+                     roles=[Role.admin,Role.guest,Role.noc],user_status="active")
+        admin_user.save()
+        System.user_set = User.query.all()
+        Role.admin.save()
+        Role.guest.save()
+        Role.reviewer.save()
+        Role.noc.save()
+        System.role_set = Role.query.all()
 
     def tearDown(self):
-        System.session_set = []
-        System.institute_set = []
-        System.oc_set = []
-        System.nc_set = []
+        db.session.remove()
+        db.drop_all()
+    
     def test_create_institute(self):
         print "test_create_institute"
         login_user=System.user_set[0]
@@ -937,14 +1043,28 @@ class CreateOC():
 #+BEGIN_SRC python
 class TestCreateOC(TestCase):
     TESTING = True
+    def create_app(self):
+        app = create_app(config)
+        return app
+
     def setUp(self):
-        pass
+        db.create_all()
+        admin_user = User(name=Name(name=Config.admin_name), 
+                      email=Email(email="app-admin@vlabs.ac.in"), 
+                     roles=[Role.admin,Role.guest,Role.noc],user_status="active")
+        admin_user.save()
+        System.user_set = User.query.all()
+        Role.admin.save()
+        Role.guest.save()
+        Role.reviewer.save()
+        Role.noc.save()
+        System.role_set = Role.query.all()
 
     def tearDown(self):
-        System.session_set = []
-        System.institute_set = []
-        System.oc_set = []
-        System.nc_set = []
+        db.session.remove()
+        db.drop_all()
+
+    
     def test_create_oc(self):
         print "test_create_oc"
         login_user=System.user_set[0]
@@ -1006,13 +1126,27 @@ class CreateNC():
 #+BEGIN_SRC python
 class TestCreateNC(TestCase):
     TESTING = True
+    def create_app(self):
+        app = create_app(config)
+        return app
+
     def setUp(self):
-        pass
+        db.create_all()
+        admin_user = User(name=Name(name=Config.admin_name), 
+                      email=Email(email="app-admin@vlabs.ac.in"), 
+                     roles=[Role.admin,Role.guest,Role.noc],user_status="active")
+        admin_user.save()
+        System.user_set = User.query.all()
+        Role.admin.save()
+        Role.guest.save()
+        Role.reviewer.save()
+        Role.noc.save()
+        System.role_set = Role.query.all()
+
     def tearDown(self):
-        System.session_set = []
-        System.institute_set = []
-        System.oc_set = []
-        System.nc_set = []
+        db.session.remove()
+        db.drop_all()
+
     def test_create_nc(self):
         print "test_create_nc"
         login_user=System.user_set[0]
@@ -1070,14 +1204,27 @@ ops_table = {'add_user' : AddUser,'login':login,'delete_user':DeleteUser,'logout
 #+BEGIN_SRC python
 class TestUpdateInstitute(TestCase):
     TESTING = True
+    def create_app(self):
+        app = create_app(config)
+        return app
+
     def setUp(self):
-        pass
+        db.create_all()
+        admin_user = User(name=Name(name=Config.admin_name), 
+                      email=Email(email="app-admin@vlabs.ac.in"), 
+                     roles=[Role.admin,Role.guest,Role.noc],user_status="active")
+        admin_user.save()
+        System.user_set = User.query.all()
+        Role.admin.save()
+        Role.guest.save()
+        Role.reviewer.save()
+        Role.noc.save()
+        System.role_set = Role.query.all()
 
     def tearDown(self):
-        System.session_set = []
-        System.institute_set = []
-        System.oc_set = []
-        System.nc_set = []
+        db.session.remove()
+        db.drop_all()
+   
     def test_update_institute(self):
         print "test_update_institute"
         login_user = System.user_set[0]
@@ -1102,7 +1249,7 @@ class TestUpdateInstitute(TestCase):
 from runtime.persistence.entities import *
 from runtime.config.config import Config
 from runtime.exceptions.custom_exceptions import *
-
+from runtime.utils.class_persistence_template import *
 #+end_src
 
 
@@ -1112,16 +1259,17 @@ from runtime.exceptions.custom_exceptions import *
 #+BEGIN_SRC python
 # -*- coding: utf-8 -*-
 import unittest
-from unittest import TestCase
-#from runtime.utils.class_persistence_template import *
-#from runtime.rest.app import create_app
+from flask.ext.testing import TestCase
+from runtime.utils.class_persistence_template import *
+from runtime.rest.app import create_app
+from sqlalchemy.exc import IntegrityError
+from runtime.persistence.entities import *
 
-from system import *
+from persistent_system import *
 
-#config = {
-#   'SQLALCHEMY_DATABASE_URI': ''
-#}
-
+config = {
+         'SQLALCHEMY_DATABASE_URI': ''
+         }
 #+end_src
 
 *** Running tests
