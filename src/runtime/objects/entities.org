@@ -555,12 +555,12 @@ Status.pending_approval = Status(name="pending for approval")
 Status.rejected = Status(name="rejected")
 Status.approved = Status(name="approved")
 
-Status.is_pending = lambda status: status.name == 'pending'
-Status.is_cancelled = lambda status: status.name == 'cancelled'
-Status.is_completed = lambda status: status.name == 'completed'
-Status.is_pending_approval = lambda status: status.name == 'pending for approval'
-Status.is_rejected = lambda status: status.name == 'rejected'
-Status.is_approved = lambda status: status.name == 'approved'
+Status.is_pending = lambda status: status.get('name') == 'pending'
+Status.is_cancelled = lambda status: status.get('name') == 'cancelled'
+Status.is_completed = lambda status: status.get('name') == 'completed'
+Status.is_pending_approval = lambda status: status.get('name') == 'pending for approval'
+Status.is_rejected = lambda status: status.get('name') == 'rejected'
+Status.is_approved = lambda status: status.get('name') == 'approved'
 
 is_status = is_inst(Status)
 check_status = check_pred(is_status)
