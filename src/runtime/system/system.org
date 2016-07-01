@@ -1270,7 +1270,7 @@ class TestCancelWorkshop(TestCase):
         
         System.do("cancel_workshop", workshop = new_workshop, session = nc_session)
         self.assertEqual(new_workshop.get("status").get("name"), Status.cancelled.get("name"))
-        
+        self.assertEqual(nc.get("workshops")[0].get("status").get("name"), Status.cancelled.get("name"))
         
 
     #+END_SRC
