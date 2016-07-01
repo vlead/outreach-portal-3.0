@@ -73,6 +73,13 @@ class ClassPersistenceTemplate():
         return fn
 
     @staticmethod
+    def mk_save_handler(cls):
+        def fn(obj):
+            obj.save()
+
+        cls.custom_handlers.append(fn)
+
+    @staticmethod
     def mk_delete(cls):
         def fn(obj):
             db.session.delete(obj)
@@ -108,6 +115,7 @@ class ClassPersistenceTemplate():
         cls.delete = ClassPersistenceTemplate.mk_delete(cls)
         cls.get_by_id = ClassPersistenceTemplate.mk_get_by_id(cls)
         cls.get_all = ClassPersistenceTemplate.mk_get_all(cls)
+        ClassPersistenceTemplate.mk_save_handler(cls)
         return cls
 
 #+END_SRC
