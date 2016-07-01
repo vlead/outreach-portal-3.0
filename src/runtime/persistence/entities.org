@@ -188,7 +188,7 @@ class TestPersistenceInstitute(TestCase):
 #+BEGIN_SRC python
 args = {"__tablename__": "ocs",
 	"id": db.Column(db.Integer, primary_key=True),
-        "institute_id": db.Column(db.Integer, unique=True, db.ForeignKey('institutes.id')),
+        "institute_id": db.Column(db.Integer, db.ForeignKey('institutes.id')),
         "spokes": db.relationship('NC', backref='hub')        
 	}
 
@@ -262,7 +262,7 @@ class TestPersistenceOC(TestCase):
 #+BEGIN_SRC python
 args = {"__tablename__": "ncs",
 	"id": db.Column(db.Integer, primary_key=True),
-        "institute_id": db.Column(db.Integer, unique=True, db.ForeignKey('institutes.id')),
+        "institute_id": db.Column(db.Integer, db.ForeignKey('institutes.id')),
         "hub_id": db.Column(db.Integer, db.ForeignKey('ocs.id')),
 	}
 

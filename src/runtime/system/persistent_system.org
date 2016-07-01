@@ -139,17 +139,17 @@ class TestSystemConstructor(TestCase):
         Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
         Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
         name = Name(name="admin")
-        name.save()
+        
         email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        Role_admin.save()
-        Role_guest.save()
-        Role_reviewer.save()
-        Role_noc.save()
+        
+        
+        
+        
+        
         admin_user = User(name=name,
                           email=email,
                           roles=[Role_admin,Role_guest,Role_noc],user_status="active")
-        admin_user.save()
+        
         System.role_set = Role.query.all()
         System.user_set = User.query.all()
 
@@ -323,7 +323,6 @@ class AddUser():
         session = args["session"]
         rl = Role.query.filter_by(name='guest').first()
         user.set(roles=[rl])
-        user.save()
         System.user_set = User.query.all()
         return user
 #+end_src
@@ -344,17 +343,17 @@ class TestAddUser(TestCase):
         Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
         Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
         name = Name(name="admin")
-        name.save()
+        
         email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        Role_admin.save()
-        Role_guest.save()
-        Role_reviewer.save()
-        Role_noc.save()
+        
+        
+        
+        
+        
         admin_user = User(name=name,
                           email=email,
                           roles=[Role_admin,Role_guest,Role_noc],user_status="active")
-        admin_user.save()
+        
         System.role_set = Role.query.all()
         System.user_set = User.query.all()
 
@@ -369,9 +368,9 @@ class TestAddUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         name = Name(name="me")
-        name.save()
+        
         email = Email(email="abc@gmail.com")
-        email.save()
+        
         user=User(name=Name.get_by_id(2),email=Email.get_by_id(2),roles=[],user_status="active")
 
         System.do("add_user",user=user,session=session)
@@ -386,9 +385,9 @@ class TestAddUser(TestCase):
         System.session_set.append(session)
         
         name = Name(name="nocuser")
-        name.save()
+        
         email = Email(email="abc@gmail.com")
-        email.save()
+        
 
         noc_user=User(name=Name.get_by_id(2),email=Email.get_by_id(2),roles=[],user_status="active")
 
@@ -407,9 +406,9 @@ class TestAddUser(TestCase):
         System.session_set.append(session)
         
         name = Name(name="nocuser")
-        name.save()
+        
         email = Email(email="abc@gmail.com")
-        email.save()
+        
 
         noc_user=User(name=Name.get_by_id(2),email=Email.get_by_id(2),roles=[],user_status="active")
 
@@ -422,9 +421,9 @@ class TestAddUser(TestCase):
         oc = System.do("create_oc",institute=institute,session=session,spokes=[])
        
         name = Name(name="ocuser")
-        name.save()
+        
         email = Email(email="mary@gmail.com")
-        email.save()
+        
 
         oc_user=User(name=Name.get_by_id(3),email=Email.get_by_id(3),roles=[],user_status="active")
         
@@ -498,17 +497,17 @@ class TestDeleteUser(TestCase):
         Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
         Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
         name = Name(name="admin")
-        name.save()
+        
         email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        Role_admin.save()
-        Role_guest.save()
-        Role_reviewer.save()
-        Role_noc.save()
+        
+        
+        
+        
+        
         admin_user = User(name=name,
                           email=email,
                           roles=[Role_admin,Role_guest,Role_noc],user_status="active")
-        admin_user.save()
+        
         System.role_set = Role.query.all()
         System.user_set = User.query.all()
 
@@ -523,9 +522,9 @@ class TestDeleteUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         name = Name(name="me")
-        name.save()
+        
         email = Email(email="abc@gmail.com")
-        email.save()
+        
         other_admin_user=User(name=Name.get_by_id(2),email=Email.get_by_id(2),roles=[],user_status="active")
         System.do("add_user", user=other_admin_user, session=session)
         other_admin_user.append_role(Role.admin)
@@ -546,9 +545,9 @@ class TestDeleteUser(TestCase):
         oc = System.do("create_oc",institute=institute,session=session,spokes=[])
        
         name = Name(name="maryoc")
-        name.save()
+        
         email = Email(email="mary@gmail.com")
-        email.save()
+        
         oc_user=User(name=Name.get_by_id(2),email=Email.get_by_id(2),roles=[],user_status="active")
         
           
@@ -559,9 +558,9 @@ class TestDeleteUser(TestCase):
         nc = System.do("create_nc",institute=institute,hub=oc,session=session)
         
         name1 = Name(name="xyznc")
-        name1.save()
+        
         email1 = Email(email="xyz@gmail.com")
-        email1.save()
+        
 
         nc_user=User(name=Name.get_by_id(3),email=Email.get_by_id(3),roles=[],user_status="active")
 
@@ -593,9 +592,9 @@ class TestDeleteUser(TestCase):
         oc = System.do("create_oc",institute=institute,session=session,spokes=[])
        
         name = Name(name="maryoc")
-        name.save()
+        
         email = Email(email="mary@gmail.com")
-        email.save()
+        
        
         oc_user=User(name=Name.get_by_id(2),email=Email.get_by_id(2),roles=[],user_status="active")
         
@@ -605,9 +604,9 @@ class TestDeleteUser(TestCase):
             oc_user.append_role(oc_role[0])
 
         name1 = Name(name="xyznc")
-        name1.save()
+        
         email1 = Email(email="xyz@gmail.com")
-        email1.save()
+        
         noc_user=User(name=Name.get_by_id(3),email=Email.get_by_id(3),roles=[],user_status="active")
 
         noc_user.append_role(Role.noc)
@@ -680,7 +679,7 @@ class UpdateUser():
 
         user.set(name=name)
         user.set(email=email)
-        user.save()
+        
         System.user_set = User.query.all()
 #+end_src
 *** Test UpdateUser
@@ -700,17 +699,17 @@ class TestUpdateUser(TestCase):
         Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
         Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
         name = Name(name="admin")
-        name.save()
+        
         email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        Role_admin.save()
-        Role_guest.save()
-        Role_reviewer.save()
-        Role_noc.save()
+        
+        
+        
+        
+        
         admin_user = User(name=name,
                           email=email,
                           roles=[Role_admin,Role_guest,Role_noc],user_status="active")
-        admin_user.save()
+        
         System.role_set = Role.query.all()
         System.user_set = User.query.all()
 
@@ -726,16 +725,16 @@ class TestUpdateUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         name = Name(name="me")
-        name.save()
+        
         email= Email(email="abc@gmail.com")
-        email.save()
+        
       
  
         other_user=User(name=Name.get_by_id(2),email=Email.get_by_id(2),roles=[],user_status="active")
         System.do("add_user", user=other_user, session=session)
 
         name3 = Name(name="john")
-        name3.save()
+        
         System.do("update_user",name=Name.get_by_id(3), user=other_user,session=session)
        
         self.assertEqual(other_user.get("name").get("name"), "john")
@@ -751,9 +750,9 @@ class TestUpdateUser(TestCase):
         oc = System.do("create_oc",institute=institute,session=session,spokes=[])
        
         name = Name(name="useroc")
-        name.save()
+
         email = Email(email="useroc@gmail.com")
-        email.save()
+
       
         
         oc_user=User(name=Name.get_by_id(2),email=Email.get_by_id(2),roles=[],user_status="active")
@@ -765,10 +764,10 @@ class TestUpdateUser(TestCase):
         nc = System.do("create_nc",institute=institute,hub=oc,session=session)
         
         name1 = Name(name="usernc")
-        name1.save()
+
         
         email1 = Email(email="usernc@gmail.com")
-        email1.save()
+
 
         nc_user=User(name=Name.get_by_id(3),email=Email.get_by_id(3),roles=[],user_status="active")
 
@@ -785,7 +784,7 @@ class TestUpdateUser(TestCase):
 
         length = len(System.user_set)
         name4= Name(name="jack")
-        name4.save()
+
         System.do("update_user", name=Name.get_by_id(4), user=nc_user,session=oc_session)
         new_length = len(System.user_set)
 
@@ -804,9 +803,9 @@ class TestUpdateUser(TestCase):
        
 
         name = Name(name="useroc")
-        name.save()
+
         email = Email(email="useroc@gmail.com")
-        email.save()
+
       
         
         oc_user=User(name=Name.get_by_id(2),email=Email.get_by_id(2),roles=[],user_status="active")
@@ -818,9 +817,9 @@ class TestUpdateUser(TestCase):
             oc_user.append_role(oc_role[0])
 
         name3= Name(name="usernoc")
-        name3.save()
+
         email1= Email(email="usernoc@gmail.com")
-        email1.save()
+
        
         noc_user=User(name=Name.get_by_id(3),email=Email.get_by_id(3),roles=[],user_status="active")
 
@@ -834,7 +833,7 @@ class TestUpdateUser(TestCase):
 
         length = len(System.user_set)
         name4 = Name(name="jack")
-        name4.save()
+
         System.do("update_user", name=Name.get_by_id(4), user=oc_user,session=noc_session)
         new_length = len(System.user_set)
 
@@ -878,7 +877,7 @@ class AddRole():
         user = args["user"]
         role = args['role']
         user.append_role(role)
-        user.save()
+
         return user
                 
 
@@ -899,17 +898,17 @@ class TestAddRole(TestCase):
         Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
         Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
         name = Name(name="admin")
-        name.save()
+
         email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        Role_admin.save()
-        Role_guest.save()
-        Role_reviewer.save()
-        Role_noc.save()
+
+
+
+
+
         admin_user = User(name=name,
                           email=email,
                           roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
+
         System.role_set = Role.query.all()
         System.user_set = User.query.all()
     def tearDown(self):
@@ -980,17 +979,17 @@ class Testlogin(TestCase):
         Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
         Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
         name = Name(name="admin")
-        name.save()
+
         email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        Role_admin.save()
-        Role_guest.save()
-        Role_reviewer.save()
-        Role_noc.save()
+
+
+
+
+
         admin_user = User(name=name,
                           email=email,
                           roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
+
         System.role_set = Role.query.all()
         System.user_set = User.query.all()
 
@@ -1049,17 +1048,17 @@ class Testlogout(TestCase):
         Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
         Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
         name = Name(name="admin")
-        name.save()
+
         email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        Role_admin.save()
-        Role_guest.save()
-        Role_reviewer.save()
-        Role_noc.save()
+
+
+
+
+
         admin_user = User(name=name,
                           email=email,
                           roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
+
         System.role_set = Role.query.all()
         System.user_set = User.query.all()
 
@@ -1105,7 +1104,7 @@ class CreateInstitute():
         name = args["name"]
         address = args["address"]
         new_institute = Institute(name=name,address=address)
-        new_institute.save()
+
         System.institute_set = Institute.query.all()
         return new_institute
 #+end_src
@@ -1125,17 +1124,17 @@ class TestCreateInstitute(TestCase):
         Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
         Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
         name = Name(name="admin")
-        name.save()
+
         email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        Role_admin.save()
-        Role_guest.save()
-        Role_reviewer.save()
-        Role_noc.save()
+
+
+
+
+
         admin_user = User(name=name,
                               email=email,
                               roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
+
         System.role_set = Role.query.all()
         System.user_set = User.query.all()
 
@@ -1188,8 +1187,8 @@ class CreateOC():
         spokes=args["spokes"]
         new_oc = OC(institute=institute,spokes=spokes)
         new_role = Role(name="OCC",centre_oc=new_oc,centre_nc=None)
-        new_oc.save()
-        new_role.save()
+
+
         System.role_set = Role.query.all()
         System.oc_role = OC.query.all()
         return new_oc
@@ -1211,17 +1210,17 @@ class TestCreateOC(TestCase):
         Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
         Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
         name = Name(name="admin")
-        name.save()
+
         email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        Role_admin.save()
-        Role_guest.save()
-        Role_reviewer.save()
-        Role_noc.save()
+
+
+
+
+
         admin_user = User(name=name,
                               email=email,
                               roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
+
         System.role_set = Role.query.all()
         System.user_set = User.query.all()
 
@@ -1283,9 +1282,9 @@ class CreateNC():
         new_nc = NC(institute=institute,hub=oc)
         oc.append_spoke(new_nc)
         new_role = Role(name="NCC",centre_oc=None,centre_nc=new_nc)
-        new_nc.save()
-        oc.save()
-        new_role.save()
+
+
+
         System.nc_set = NC.query.all
         System.role_set = Role.query.all()
         System.oc_set = OC.query.all()
@@ -1307,17 +1306,16 @@ class TestCreateNC(TestCase):
         Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
         Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
         name = Name(name="admin")
-        name.save()
+
         email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        Role_admin.save()
-        Role_guest.save()
-        Role_reviewer.save()
-        Role_noc.save()
+
+
+
+
         admin_user = User(name=name,
                               email=email,
                               roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
+
         System.role_set = Role.query.all()
         System.user_set = User.query.all()
 
@@ -1375,7 +1373,7 @@ class UpdateInstitute():
 
         institute.set(name=name)
         institute.set(address=address)
-        institute.save()
+
         
 ops_table = {'add_user' : AddUser,'login':login,'delete_user':DeleteUser,'logout':logout,'create_institute':CreateInstitute,'create_oc':CreateOC,'create_nc':CreateNC,'update_user':UpdateUser,'update_institute':UpdateInstitute,'add_role':AddRole}                        
 #+end_src
@@ -1395,17 +1393,17 @@ class TestUpdateInstitute(TestCase):
         Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
         Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
         name = Name(name="admin")
-        name.save()
+
         email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        Role_admin.save()
-        Role_guest.save()
-        Role_reviewer.save()
-        Role_noc.save()
+
+
+
+
+
         admin_user = User(name=name,
                           email=email,
                           roles=[Role_admin,Role_guest,Role_noc],user_status="active")
-        admin_user.save()
+
         System.role_set = Role.query.all()
         System.user_set = User.query.all()
 
