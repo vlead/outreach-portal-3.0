@@ -1226,7 +1226,7 @@ class CancelWorkshop():
     def action(args):
         workshop = args["workshop"]
         workshop.set(status = Status.cancelled)
-        print workshop.get('status').get('name')
+        
         
 #+end_src
 ** Test CancelWorkshop
@@ -1275,12 +1275,103 @@ class TestCancelWorkshop(TestCase):
 
     #+END_SRC
 
+* =reschedule_workshop=
+#+NAME: class_RescheduleWorkshop
+#+begin_src python
+class RescheduleWorkshop():
+    arg_types = {"workshop":is_workshop, "session":is_session, "wstarget" : is_wst}
+    arity_and_type_checks_needed = True   
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        workshop = args['workshop']
+        wstarget = args['wstarget']
+        
+        if System.is_session_NCC(session):
+            role = session.get('role')
+            nc_centre = role.get('centre_nc')
+            if workshop in nc_centre.get('workshops'):
+                return True
+            
+        else:
+            raise AuthError("Role not Authorized to perform this action")
+
+    @staticmethod
+    def state_check(args):
+        workshop = args["workshop"]
+        session = args["session"]
+        wstarget = args['wstarget']
+        workshop_status = workshop.get("status")
+        if not Status.is_cancelled(workshop_status):
+            raise StateError("cannot reschedule workshop")
+        
+                    
+    @staticmethod
+    def action(args):
+        workshop = args["workshop"]
+        wstarget = args['wstarget']
+        workshop.set(status = Status.pending)
+        workshop.set(ws_target = wstarget)
+        
+#+end_src
+** Test RescheduleWorkshop
+#+NAME: test_RescheduleWorkshop
+#+BEGIN_SRC python
+class TestRescheduleWorkshop(TestCase):
+    TESTING = True
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in", System.user_set)
+        System.user_set = admin
+        System.session_set = []
+        System.institute_set = []
+        System.oc_set = []
+        System.nc_set = []
+        System.workshop_set = []
+
+    def test_reschedule_workshop(self):
+        print "test_reschedule_workshop"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role.admin)
+        System.session_set.append(session)
+        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=session)
+        workshop_institute = System.do("create_institute", name = "NITK", address = "Surathkal", session = session)
+        oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
+        nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
+        target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date)
+        
+        
+        ws_status = Status.pending
+        nc_user=User(name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),roles=[],user_status="active")
+        nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
+        nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
+        System.session_set.append(nc_session)
+        System.do("add_user",user=nc_user,session=session)
+        
+        new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
+        
+        System.do("cancel_workshop", workshop = new_workshop, session = nc_session)
+        
+        new_target_date = datetime.datetime.strptime("05-07-2016", "%d-%m-%Y").date()
+        new_wstarget = WSTarget(usage = 3000, participants = 200, experiments = 20, date = new_target_date)
+
+        System.do("reschedule_workshop", workshop = new_workshop, session = nc_session, wstarget = new_wstarget)
+
+        self.assertEqual(new_workshop.get("status").get("name"), Status.pending.get("name"))
+        self.assertEqual(nc.get("workshops")[0].get("status").get("name"), Status.pending.get("name"))
+        self.assertEqual(new_workshop.get("ws_target").get("date"), new_target_date)
+        
+    #+END_SRC
+
 * ops_table
 #+NAME: ops_table
 #+BEGIN_SRC python
 ops_table = {'add_user' :
 AddUser,'login':login,'delete_user':DeleteUser,'logout':logout,'create_institute':CreateInstitute,'create_oc':CreateOC,'create_nc':CreateNC,'update_user':UpdateUser,'update_institute':UpdateInstitute,'add_role':AddRole,
-'create_workshop' : CreateWorkshop, 'cancel_workshop' : CancelWorkshop}                        
+'create_workshop' : CreateWorkshop, 'cancel_workshop' : CancelWorkshop, 'reschedule_workshop' : RescheduleWorkshop}                        
 #+END_SRC
 * Infra                                                         :boilerplate:
 
@@ -1345,6 +1436,7 @@ if __name__ == '__main__':
 <<class_UpdateInstitute>>
 <<class_CreateWorkshop>>
 <<class_CancelWorkshop>>
+<<class_RescheduleWorkshop>>
 <<ops_table>>
 #+end_src
 
@@ -1365,6 +1457,7 @@ if __name__ == '__main__':
 <<test_UpdateInstitute>>
 <<test_CreateWorkshop>>
 <<test_CancelWorkshop>>
+<<test_RescheduleWorkshop>>
 <<run_test_cases>>
 
 #+end_src
