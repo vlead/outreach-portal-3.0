@@ -1475,7 +1475,7 @@ class UploadArtefact():
         workshop = args["workshop"]
         session = args["session"]
         workshop_status = workshop.get("status")
-        if not Status.is_completed(workshop_status):
+        if not (Status.is_completed(workshop_status) or Status.is_pending_approval(workshop_status) or Status.is_rejected(workshop_status) or Status.is_approved(workshop_status)):
             raise StateError("cannot upload artefact")
         
                     
@@ -1487,12 +1487,13 @@ class UploadArtefact():
         artefacts = workshop.get("artefacts")
         artefacts.append(new_artefact)
         workshop.set(artefacts = artefacts)
+        
         workshop.set(status = Status.pending_approval)
         
         
 #+end_src
-** Test ConductWorkshop
-#+NAME: test_ConductWorkshop
+** Test UploadArtefact
+#+NAME: test_UploadArtefact
 #+BEGIN_SRC python
 class TestUploadArtefact(TestCase):
     TESTING = True
@@ -1531,13 +1532,14 @@ class TestUploadArtefact(TestCase):
         new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
         
         System.do("conduct_workshop", workshop = new_workshop, session = nc_session)
+        print new_workshop.get("status").get("name")
 
         new_artefact = Artefact(name = "Photo", path = "/main/photos")
 
         System.do("upload_artefact", workshop = new_workshop, session = nc_session, artefact = new_artefact)
         
         self.assertEqual(new_workshop.get("artefacts")[0].get("name"), new_artefact.get("name"))
-        
+        self.assertEqual(new_workshop.get("status").get("name") , Status.pending_approval.get("name"))
         
 
     #+END_SRC
