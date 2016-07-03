@@ -565,25 +565,21 @@ the  actors:  =session=.
 ** edit workshop
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
-    w: Workshop, t: WSTarget, st: Status, i: Institute, s:  Session
+    w: Workshop, t: WSTarget, s:  Session
 #+END_SRC   
 *** Actor credentials
 #+BEGIN_SRC spec :tangle spec.txt    
     s.role==NCC(nc) where nc:nc-set
-    or s.role==OCC(oc) where oc:oc-set
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt    
     s: session-set
     w: workshop-set
-    i: institute-set
 #+END_SRC         
 *** Effect 
 #+BEGIN_SRC spec :tangle spec.txt
     A workshop is updated with the given details.
-    w.location = i
     w.target = t
-    w.status = st
 #+END_SRC   
 *** Remarks
 #+BEGIN_SRC spec :tangle spec.txt   
