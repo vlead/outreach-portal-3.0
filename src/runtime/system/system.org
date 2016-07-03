@@ -1532,7 +1532,7 @@ class TestUploadArtefact(TestCase):
         new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
         
         System.do("conduct_workshop", workshop = new_workshop, session = nc_session)
-        print new_workshop.get("status").get("name")
+        
 
         new_artefact = Artefact(name = "Photo", path = "/main/photos")
 
@@ -1544,13 +1544,119 @@ class TestUploadArtefact(TestCase):
 
     #+END_SRC
 
+* =approve_workshop=
+#+NAME: class_ApproveWorkshop
+#+begin_src python
+class ApproveWorkshop():
+    arg_types = {"workshop":is_workshop, "session":is_session}
+    arity_and_type_checks_needed = True   
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        workshop = args['workshop']
+        role = session.get('role')
+        oc_centre = role.get('centre_oc')
+        
+        spokes  = oc_centre.get("spokes")
+        if System.is_session_OCC(session):
+            for nc in spokes:
+                if workshop in nc.get("workshops"):
+                    return True
+        else:
+            raise AuthError("Role not Authorized to perform this action")
+
+    @staticmethod
+    def state_check(args):
+        workshop = args["workshop"]
+        session = args["session"]
+        workshop_status = workshop.get("status")
+        if not Status.is_pending_approval(workshop_status):
+            raise StateError("cannot approve workshop")
+        
+                    
+    @staticmethod
+    def action(args):
+        workshop = args["workshop"]
+        workshop.set(status = Status.approved)
+        
+        
+#+end_src
+** Test ApproveWorkshop
+#+NAME: test_ApproveWorkshop
+#+BEGIN_SRC python
+class TestApproveWorkshop(TestCase):
+    TESTING = True
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in", System.user_set)
+        System.user_set = admin
+        System.session_set = []
+        System.institute_set = []
+        System.oc_set = []
+        System.nc_set = []
+        System.workshop_set = []
+
+    def test_approve_workshop(self):
+        print "test_approve_workshop"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role.admin)
+        System.session_set.append(session)
+        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=session)
+        workshop_institute = System.do("create_institute", name = "NITK", address = "Surathkal", session = session)
+        oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
+        nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
+        target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date)
+        
+        
+        ws_status = Status.pending
+        nc_user=User(name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),roles=[],user_status="active")
+        nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
+        nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
+        System.session_set.append(nc_session)
+        System.do("add_user",user=nc_user,session=session)
+
+        oc_user=User(name=Name(name="ocuser"),email=Email(email="ocuser@gmail.com"),roles=[],user_status="active")
+        oc_user.set(roles=[Role(name = "OCC", centre_oc = oc, centre_nc = None)])
+        oc_session = Session(user = oc_user, role = Role(name = "OCC", centre_oc = oc, centre_nc = None))
+        System.session_set.append(oc_session)
+        System.do("add_user",user=oc_user,session=session)
+        
+        new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
+        System.do("conduct_workshop", workshop = new_workshop, session = nc_session)
+        new_artefact = Artefact(name = "Photo", path = "/main/photos")
+
+        System.do("upload_artefact", workshop = new_workshop, session = nc_session, artefact = new_artefact)
+        
+        System.do("approve_workshop", workshop = new_workshop, session = oc_session)
+        self.assertEqual(new_workshop.get("status").get("name"), Status.approved.get("name"))
+        
+        
+
+    #+END_SRC
 
 * ops_table
 #+NAME: ops_table
 #+BEGIN_SRC python
-ops_table = {'add_user' :
-AddUser,'login':login,'delete_user':DeleteUser,'logout':logout,'create_institute':CreateInstitute,'create_oc':CreateOC,'create_nc':CreateNC,'update_user':UpdateUser,'update_institute':UpdateInstitute,'add_role':AddRole,
-'create_workshop' : CreateWorkshop, 'cancel_workshop' : CancelWorkshop, 'reschedule_workshop' : RescheduleWorkshop, 'conduct_workshop' : ConductWorkshop, 'upload_artefact' : UploadArtefact}                        
+ops_table = {'add_user' : AddUser, 
+             'login': login, 
+             'delete_user': DeleteUser,
+             'logout': logout, 
+             'create_institute': CreateInstitute, 
+             'create_oc': CreateOC, 
+             'create_nc': CreateNC, 
+             'update_user': UpdateUser, 
+             'update_institute': UpdateInstitute, 
+             'add_role': AddRole,
+             'create_workshop' : CreateWorkshop, 
+             'cancel_workshop' : CancelWorkshop, 
+             'reschedule_workshop' : RescheduleWorkshop, 
+             'conduct_workshop' : ConductWorkshop, 
+             'upload_artefact' : UploadArtefact,
+             'approve_workshop' : ApproveWorkshop
+             }                        
 #+END_SRC
 * Infra                                                         :boilerplate:
 
@@ -1618,6 +1724,7 @@ if __name__ == '__main__':
 <<class_RescheduleWorkshop>>
 <<class_ConductWorkshop>>
 <<class_UploadArtefact>>
+<<class_ApproveWorkshop>>
 <<ops_table>>
 #+end_src
 
@@ -1641,5 +1748,6 @@ if __name__ == '__main__':
 <<test_RescheduleWorkshop>>
 <<test_ConductWorkshop>>
 <<test_UploadArtefact>>
+<<test_ApproveWorkshop>>
 <<run_test_cases>>
 #+end_src
