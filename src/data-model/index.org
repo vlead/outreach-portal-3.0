@@ -589,6 +589,72 @@ the  actors:  =session=.
     We did not feel the necessity for a method to delete a workshop.
 #+END_SRC   
 
+** approve workshop
+*** Parameters
+#+BEGIN_SRC spec :tangle spec.txt
+    w: Workshop, s:  Session
+#+END_SRC   
+*** Actor credentials
+#+BEGIN_SRC spec :tangle spec.txt    
+    s.role==OCC(oc) where oc:oc-set and oc == hub(nc), where nc: nc-set and nc is the nodal centre to which the workshop belongs.
+#+END_SRC   
+*** Referential Integrity
+#+BEGIN_SRC spec :tangle spec.txt    
+    s: session-set
+    w: workshop-set
+#+END_SRC         
+*** Effect 
+#+BEGIN_SRC spec :tangle spec.txt
+    w.status = approved
+#+END_SRC   
+*** Remarks
+#+BEGIN_SRC spec :tangle spec.txt   
+    Only a user with the role of OCC(oc) can approve a workshop.   
+#+END_SRC   
+** reject workshop
+*** Parameters
+#+BEGIN_SRC spec :tangle spec.txt
+    w: Workshop, s:  Session
+#+END_SRC   
+*** Actor credentials
+#+BEGIN_SRC spec :tangle spec.txt    
+    s.role==OCC(oc) where oc:oc-set and oc == hub(nc), where nc: nc-set and nc is the nodal centre to which the workshop belongs.
+#+END_SRC   
+*** Referential Integrity
+#+BEGIN_SRC spec :tangle spec.txt    
+    s: session-set
+    w: workshop-set
+#+END_SRC         
+*** Effect 
+#+BEGIN_SRC spec :tangle spec.txt
+    w.status = rejected
+#+END_SRC   
+*** Remarks
+#+BEGIN_SRC spec :tangle spec.txt   
+    Only a user with the role of OCC(oc) can reject a workshop.   
+#+END_SRC   
+** reschedule workshop
+*** Parameters
+#+BEGIN_SRC spec :tangle spec.txt
+    w: Workshop, s:  Session, wt: WSTarget
+#+END_SRC   
+*** Actor credentials
+#+BEGIN_SRC spec :tangle spec.txt    
+    s.role==NCC(nc) where nc: nc-set
+#+END_SRC   
+*** Referential Integrity
+#+BEGIN_SRC spec :tangle spec.txt    
+    s: session-set
+    w: workshop-set
+#+END_SRC         
+*** Effect 
+#+BEGIN_SRC spec :tangle spec.txt
+    w.target = wt
+#+END_SRC   
+*** Remarks
+#+BEGIN_SRC spec :tangle spec.txt   
+    The workshop target is changed to a new target.
+#+END_SRC   
 
 ** add artefact
 *** Parameters
