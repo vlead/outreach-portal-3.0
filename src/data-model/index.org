@@ -575,7 +575,6 @@ the  actors:  =session=.
 #+BEGIN_SRC spec :tangle spec.txt    
     s: session-set
     w: workshop-set
-    i: institute-set
 #+END_SRC         
 *** Effect 
 #+BEGIN_SRC spec :tangle spec.txt
