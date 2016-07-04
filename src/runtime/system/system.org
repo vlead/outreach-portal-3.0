@@ -263,7 +263,7 @@ class TestSystemArityAndType(TestCase):
 #+NAME: class_adduser
 #+begin_src python
 class AddUser():
-    arg_types = {"user":is_user, "session":is_session}
+    arg_types = {"name":is_name, "email":is_email,  "session":is_session}
     arity_and_type_checks_needed = True 
   
     @staticmethod
@@ -274,20 +274,19 @@ class AddUser():
 
     @staticmethod
     def state_check(args):
-        user = args["user"]
+        
         session = args["session"]
         if not (session in System.session_set):
             raise StateError("user not in session %s" % session.get("user").get("name").get("name"))
-        if (user in System.user_set):
-            raise StateError("user %s already in System" % user.get("name").get("name"))
 
     
     @staticmethod
     def action(args):
-        user = args["user"]
+        user_name = args["name"]
+        user_email = args["email"]
         session = args["session"]
+        user = User(name=user_name, email= user_email, roles= [Role.guest], user_status="active")
         System.user_set.append(user)
-        user.set(roles=[Role(name="guest",centre_oc=None,centre_nc=None)])
         return user
 #+end_src
 *** Test AddUser
@@ -311,13 +310,14 @@ class TestAddUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
  
-        user=User(name=Name(name="me"),email=Email(email="abc@gmail.com"),roles=[],user_status="active")
+        name=Name(name="me")
+        email=Email(email="abc@gmail.com")
 
-        System.do("add_user",user=user,session=session)
+        u = System.do("add_user",name=name, email=email, session=session)
         
-        u=System.user_set[1]
+        u = System.user_set[1]
         self.assertEqual(u.get("name").get("name"),"me")
-
+'''
     def test_add_user_noc_by_admin(self):
         print "test_add_user_by_noc"
         admin_user=System.user_set[0]
@@ -362,7 +362,7 @@ class TestAddUser(TestCase):
         u=System.user_set[2]
         self.assertEqual(u.get("name").get("name"),"ocuser")
 
-
+'''
 #+END_SRC
 
 * =DeleteUser=
@@ -407,7 +407,7 @@ class DeleteUser():
 
 #+end_src
 ** Test DeleteUser
-#+NAME: test_adduser
+#+NAME: test_deleteuser
 #+BEGIN_SRC python
 class TestDeleteUser(TestCase):
     TESTING = True
@@ -566,7 +566,7 @@ class UpdateUser():
         user.set(email=email)
 #+end_src
 *** Test UpdateUser
-#+NAME: test_adduser
+#+NAME: test_updateuser
 #+BEGIN_SRC python
 class TestUpdateUser(TestCase):
     TESTING = True
@@ -1159,6 +1159,7 @@ if __name__ == '__main__':
 <<test_system_constructor>>
 <<test_arity_and_types>>
 <<test_adduser>>
+'''
 <<test_login>>
 <<test_logout>>
 <<test_CreateInstitute>>
@@ -1166,7 +1167,7 @@ if __name__ == '__main__':
 <<test_CreateNC>>
 <<test_AddRole>>
 <<test_UpdateInstitute>>
-
+'''
 <<run_test_cases>>
 
 #+end_src
