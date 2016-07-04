@@ -191,7 +191,42 @@ class TestPersistenceInstitute(TestCase):
         self.assertRaises(TypeError, Institute, name="IIIT123")
 #+END_SRC
 
-   
+
+* WSTarget   
+#+NAME: class_WSTarget
+#+BEGIN_SRC python
+args = {"__tablename__": "wstargets",
+        "id": db.Column(db.Integer, primary_key = True),
+        "usage": db.Column(db.Integer),
+        "participants": db.Column(db.Integer),
+        "experiments": db.Column(db.Integer),
+        "date": db.Column(db.Date)
+        }
+
+WSTarget = ClassPersistenceTemplate.mk_persistent(WSTarget, **args)
+
+is_wst = is_inst(WSTarget)
+check_wstarget = check_pred(is_wst)
+#+END_SRC
+
+** Test WSTarget
+#+NAME: class_TestWSTarget
+#+BEGIN_SRC python
+class TestWSTarget(TestCase):
+    TESTING = True
+
+    def test_instantiate_wstarget(self):
+        print "test_instantiate_wstarget"
+        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
+        wstarget_check.save()
+        self.assertEqual(is_wst(wstarget_check), True)
+        wst_check = WSTarget.get_by_id(1)
+        self.assertEqual(wst_check.get("participants"), 200)
+        self.assertRaises(TypeError, WSTarget, participants="123")
+
+#+END_SRC
+
+
 * OC
   =OC= is an entity that has an attribute =institute= of type =Institute= and =spokes= of type =list of nc's= where =nc= is of type =NC=.
 
@@ -1520,6 +1555,8 @@ class TestUpdateInstitute(TestCase):
 # -*- coding: utf-8 -*-
 from runtime.objects.entities import *
 from runtime.utils.class_persistence_template import *
+from sqlalchemy.types import Date
+import datetime
 #+end_src
 
 
@@ -1533,7 +1570,8 @@ from flask_testing import TestCase
 from sqlalchemy.exc import IntegrityError
 from entities import *
 from runtime.rest.app import create_app
-
+from sqlalchemy.types import Date
+import datetime
 
 config = {
     'SQLALCHEMY_DATABASE_URI': ''
@@ -1556,6 +1594,7 @@ if __name__ == '__main__':
 #+BEGIN_SRC python :tangle entities.py :eval no :noweb yes
 <<imports_for_sources>>
 <<class_Institute>>
+<<class_WSTarget>>
 <<class_OC>>
 <<class_NC>>
 <<class_Name>>
@@ -1569,6 +1608,7 @@ if __name__ == '__main__':
 #+BEGIN_SRC python :tangle test_entities.py :eval no :noweb yes
 <<imports_for_tests>>
 <<class_TestInstitute>>
+<<class_TestWSTarget>>
 <<class_TestOC>>
 <<class_TestNC>>
 <<class_TestRole>>
