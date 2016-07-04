@@ -664,7 +664,7 @@ class TestSystemArityAndType(TestCase):
             print str(err)
   
 #+end_src
-=======
+
     def test_delete_role(self):
         print "test delete user"
         na = Name(name="Jimi Hendrix")
@@ -675,7 +675,7 @@ class TestSystemArityAndType(TestCase):
         ro.save()
         usr = User(name=na, email=em, roles=[ro])
         usr.save()
->>>>>>> 447adb07f502048379b72c8917c6f593a6f29e81
+
 
 ** Operations
 *** =AddUser=
