@@ -233,6 +233,10 @@ class ClassTemplate():
 
             # now save the state
             obj.state = tmp
+
+            for handler in cls.custom_handlers:
+                handler(obj)
+
         return fn
 
 
