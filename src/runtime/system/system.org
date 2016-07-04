@@ -304,6 +304,7 @@ class TestAddUser(TestCase):
         System.institute_set = []
         System.oc_set = []
         System.nc_set = []
+
     def test_add_user_by_admin(self):
         print "test_add_user_by_admin"
         admin_user=System.user_set[0]
@@ -313,20 +314,22 @@ class TestAddUser(TestCase):
         name=Name(name="me")
         email=Email(email="abc@gmail.com")
 
-        u = System.do("add_user",name=name, email=email, session=session)
+        u = System.do("add_user", name=name, email=email, session=session)
         
         u = System.user_set[1]
         self.assertEqual(u.get("name").get("name"),"me")
-'''
+
     def test_add_user_noc_by_admin(self):
         print "test_add_user_by_noc"
         admin_user=System.user_set[0]
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
  
-        noc_user=User(name=Name(name="nocuser"),email=Email(email="abc@gmail.com"),roles=[],user_status="active")
+        name=Name(name="nocuser")
+        email=Email(email="abc@gmail.com")
 
-        System.do("add_user",user=noc_user,session=session)
+        noc_user= System.do("add_user", name=name, email=email, session=session)
+        
 
         session_noc = Session(user=noc_user,role=Role.noc)
         System.session_set.append(session_noc)
@@ -339,30 +342,32 @@ class TestAddUser(TestCase):
         admin_user=System.user_set[0]
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
- 
-        noc_user=User(name=Name(name="nocuser"),email=Email(email="abc@gmail.com"),roles=[],user_status="active")
+        
+        name=Name(name="nocuser")
+        email=Email(email="abc@gmail.com") 
 
-        System.do("add_user",user=noc_user,session=session)
+        noc_user=System.do("add_user", name=name, email=email, session=session)
 
-        session_noc = Session(user=noc_user,role=Role.noc)
+        session_noc = Session(user=noc_user, role=Role.noc)
         System.session_set.append(session_noc)
     
-        institute = System.do("create_institute",name="IIT",address="Delhi",session=session)
-        oc = System.do("create_oc",institute=institute,session=session,spokes=[])
-       
-        oc_user=User(name=Name(name="ocuser"),email=Email(email="mary@gmail.com"),roles=[],user_status="active")
+        institute = System.do("create_institute", name="IIT", address="Delhi", session=session)
+        oc = System.do("create_oc",institute=institute, session=session, spokes=[])
+
+        name1 = Name(name="ocuser")
+        email1 = Email(email="mary@gmail.com")       
+
+        oc_user = System.do("add_user", name=name1, email=email1, session=session)
         
         
         oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") == institute.get("name"), System.role_set)
         if oc_role:
             oc_user.append_role(oc_role[0])
         
-        System.do("add_user",user=oc_user,session=session_noc)
+        System.do("add_user", name=name1, email=email1, session=session_noc)
 
         u=System.user_set[2]
         self.assertEqual(u.get("name").get("name"),"ocuser")
-
-'''
 #+END_SRC
 
 * =DeleteUser=
@@ -378,7 +383,7 @@ class DeleteUser():
         if System.is_session_admin(session):
             return True 
         elif System.is_session_OCC(session):
-            role = filter (lambda x: x.get('name') == "NCC" and x.get('centre_nc').get("hub") == session.get("role").centre_oc, user.get('roles'))
+            role = filter (lambda x: x.get('name') == "NCC" and x.get('centre_nc').get("hub") == session.get("role").get('centre_oc'), user.get('roles'))
             if role:
                 return True
         elif System.is_session_noc(session):
@@ -421,17 +426,21 @@ class TestDeleteUser(TestCase):
         System.institute_set = []
         System.oc_set = []
         System.nc_set = []
+
     def test_delete_admin_user(self):
         print "test_delete_user"
         admin_user=System.user_set[0]
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         
-        other_admin_user=User(name=Name(name="me"),email=Email(email="abc@gmail.com"),roles=[],user_status="active")
-        System.do("add_user", user=other_admin_user, session=session)
+        name=Name(name="me")
+        email=Email(email="abc@gmail.com")
+
+        other_admin_user= System.do("add_user", name=name, email=email, session=session)
+
         other_admin_user.append_role(Role.admin)
         length = len(System.user_set)
-        System.do("delete_user",user=other_admin_user,session=session)
+        System.do("delete_user", user=other_admin_user, session=session)
         self.assertEqual(other_admin_user.get("user_status"),"inactive")
         
         
@@ -446,7 +455,9 @@ class TestDeleteUser(TestCase):
         institute = System.do("create_institute",name="IIT",address="Delhi",session=session)
         oc = System.do("create_oc",institute=institute,session=session,spokes=[])
        
-        oc_user=User(name=Name(name="maryoc"),email=Email(email="mary@gmail.com"),roles=[],user_status="active")
+        name = Name(name="maryoc")
+        email = Email(email="mary@gmail.com")
+        oc_user= System.do("add_user", name=name, email=email, session=session)
         
         
         oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") == institute.get("name"), System.role_set)
@@ -455,22 +466,21 @@ class TestDeleteUser(TestCase):
 
         nc = System.do("create_nc",institute=institute,hub=oc,session=session)
 
-        nc_user=User(name=Name(name="xyznc"),email=Email(email="xyz@gmail.com"),roles=[],user_status="active")
+        name1 = Name(name="xyznc")
+        email1 = Email(email="xyz@gmail.com")
+
+        nc_user = System.do("add_user", name=name1, email=email1, session=session)
 
         nc_role = filter(lambda x:x.get('name') == "NCC" and x.get('centre_nc').get("institute").get("name") ==institute.get("name"), System.role_set)
         if nc_role:
             nc_user.append_role(nc_role[0])
 
-       
-        System.do("add_user", user=oc_user, session=session)
-        System.do("add_user", user=nc_user, session=session)
 
         oc_session = Session(user=oc_user,role=oc_role[0])
         System.session_set.append(oc_session)
 
         length = len(System.user_set)
-        System.do("delete_user",user=nc_user,session=oc_session)
-        
+        System.do("delete_user", user=nc_user, session=oc_session)
        
         self.assertEqual(nc_user.get("user_status"),"inactive")
 
@@ -482,31 +492,32 @@ class TestDeleteUser(TestCase):
 
        
         institute = System.do("create_institute",name="IIT",address="Delhi",session=session)
-        oc = System.do("create_oc",institute=institute,session=session,spokes=[])
+        oc = System.do("create_oc",institute=institute, session=session, spokes=[])
        
-        oc_user=User(name=Name(name="maryoc"),email=Email(email="mary@gmail.com"),roles=[],user_status="active")
+        name = Name(name="maryoc")
+        email = Email(email="mary@gmail.com")
+
+        oc_user= System.do("add_user", name=name, email=email, session=session)
         
         
         oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") == institute.get("name"), System.role_set)
         if oc_role:
             oc_user.append_role(oc_role[0])
 
+        name1=Name(name="xyznc")
+        email1=Email(email="xyz@gmail.com")
 
-        noc_user=User(name=Name(name="xyznc"),email=Email(email="xyz@gmail.com"),roles=[],user_status="active")
+        noc_user = System.do("add_user", name=name1, email=email1, session=session)
 
         noc_user.append_role(Role.noc)
 
        
-        System.do("add_user", user=oc_user, session=session)
-        System.do("add_user", user=noc_user, session=session)
-
         noc_session = Session(user=noc_user,role=Role.noc)
         System.session_set.append(noc_session)
 
         length = len(System.user_set)
-        System.do("delete_user",user=oc_user,session=noc_session)
+        System.do("delete_user", user=oc_user, session=noc_session)
         
-       
         self.assertEqual(oc_user.get("user_status"),"inactive")
 
 #+END_SRC
@@ -583,19 +594,21 @@ class TestUpdateUser(TestCase):
 
     def test_update_user_by_admin(self):
         print "test_update_user_by_admin"
-        admin_user=System.user_set[0]
+        admin_user = System.user_set[0]
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
- 
-        other_user=User(name=Name(name="me"),email=Email(email="abc@gmail.com"),roles=[],user_status="active")
-        System.do("add_user", user=other_user, session=session)
+
+        name = Name(name="me")
+        email = Email(email="abc@gmail.com") 
+
+        other_user= System.do("add_user", name=name, email=email, session=session)
 
         System.do("update_user",name=Name(name="john"), user=other_user,session=session)
        
         self.assertEqual(other_user.get("name").get("name"), "john")
 
     def test_update_user_by_occ(self):
-        print "test_delete_user_by_occ"
+        print "test_update_user_by_occ"
         admin_user=System.user_set[0]
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
@@ -603,24 +616,28 @@ class TestUpdateUser(TestCase):
        
         institute = System.do("create_institute",name="IIT",address="Madras",session=session)
         oc = System.do("create_oc",institute=institute,session=session,spokes=[])
-       
-        oc_user=User(name=Name(name="useroc"),email=Email(email="useroc@gmail.com"),roles=[],user_status="active")
+
+        name=Name(name="useroc")
+        email=Email(email="useroc@gmail.com")       
+
+        oc_user=System.do("add_user", name=name, email=email, session=session)
 
         oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") ==institute.get("name"), System.role_set)
         if oc_role:
             oc_user.append_role(oc_role[0])
         #create nc
         nc = System.do("create_nc",institute=institute,hub=oc,session=session)
-        nc_user=User(name=Name(name="usernc"),email=Email(email="usernc@gmail.com"),roles=[],user_status="active")
+
+        name1=Name(name="usernc")
+        email1=Email(email="usernc@gmail.com")
+
+        nc_user= System.do("add_user", name=name1, email=email1, session=session)
 
         nc_role = filter(lambda x:x.get('name') == "NCC" and x.get('centre_nc').get("institute").get("name") ==institute.get("name"), System.role_set)
         if nc_role:
             nc_user.append_role(nc_role[0])
 
        
-        System.do("add_user", user=oc_user, session=session)
-        System.do("add_user", user=nc_user, session=session)
-
         oc_session = Session(user=oc_user,role=oc_role[0])
         System.session_set.append(oc_session)
 
@@ -636,23 +653,26 @@ class TestUpdateUser(TestCase):
         admin_user=System.user_set[0]
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-
        
         institute = System.do("create_institute",name="IIT",address="Madras",session=session)
         oc = System.do("create_oc",institute=institute,session=session,spokes=[])
        
-        oc_user=User(name=Name(name="useroc"),email=Email(email="useroc@gmail.com"),roles=[],user_status="active")
+        name=Name(name="useroc")
+        email=Email(email="useroc@gmail.com")
+
+        oc_user= System.do("add_user", name=name, email=email, session=session)
 
         oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") ==institute.get("name"), System.role_set)
         if oc_role:
             oc_user.append_role(oc_role[0])
 
-        noc_user=User(name=Name(name="usernoc"),email=Email(email="usernoc@gmail.com"),roles=[],user_status="active")
+        name1=Name(name="usernoc")
+        email1=Email(email="usernoc@gmail.com")
+
+        noc_user=System.do("add_user", name=name1, email=email1, session=session)
 
         noc_user.append_role(Role.noc)
        
-        System.do("add_user", user=oc_user, session=session)
-        System.do("add_user", user=noc_user, session=session)
 
         noc_session = Session(user=noc_user,role=Role.noc)
         System.session_set.append(noc_session)
@@ -1159,6 +1179,7 @@ if __name__ == '__main__':
 <<test_system_constructor>>
 <<test_arity_and_types>>
 <<test_adduser>>
+<<test_deleteuser>>
 '''
 <<test_login>>
 <<test_logout>>
