@@ -306,7 +306,7 @@ def append_role(self,role):
     if is_role(role):
         roles = self.get('roles')
         roles.append(role)
-        self.set(roles=roles)
+        #self.set(roles=roles)
 User.append_role = append_role
 
 is_user = is_inst(User)

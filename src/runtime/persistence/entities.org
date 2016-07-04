@@ -56,9 +56,10 @@ class TestPersistentName(TestCase):
     def test_update_name(self):
         print "test update name"
         na = Name(name="Jimi Hendrix")
-        na.update(name="Bo Didley")
-        self.assertEqual(na.get("name"), "Bo Didley")
-
+        #na.update(name="Bo Didley")
+        self.assertEqual(Name.get_by_id(1).get("name"), "Jimi Hendrix")
+        na.set(name="Bo Didley")
+        self.assertEqual(Name.get_by_id(1).get("name"), "Bo Didley")
     def test_delete_name(self):
         print "test delete name"
         na = Name(name="Jimi Hendrix")
