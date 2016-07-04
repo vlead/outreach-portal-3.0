@@ -215,9 +215,25 @@ check_wstarget = check_pred(is_wst)
 class TestWSTarget(TestCase):
     TESTING = True
 
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
     def test_instantiate_wstarget(self):
         print "test_instantiate_wstarget"
-        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
+        octarget_check = OCTarget(usage = 4000, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nctargets = [])
+        octarget_check.save()
+        
+        nctarget_check = NCTarget(usage = 4000, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), wstargets = [], oc_target = OCTarget.get_by_id(1))
+        nctarget_check.save()
+        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nc_target = NCTarget.get_by_id(1))
         wstarget_check.save()
         self.assertEqual(is_wst(wstarget_check), True)
         wst_check = WSTarget.get_by_id(1)
@@ -250,9 +266,23 @@ check_nctarget = check_pred(is_nct)
 class TestNCTarget(TestCase):
     TESTING = True
 
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
     def test_instantiate_nctarget(self):
         print "test_instantiate_nctarget"
-        nctarget_check = NCTarget(usage = 4000, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), wstargets = [])
+        octarget_check = OCTarget(usage = 4000, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nctargets = [])
+        octarget_check.save()
+        
+        nctarget_check = NCTarget(usage = 4000, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), wstargets = [], oc_target = OCTarget.get_by_id(1))
         nctarget_check.save()
         self.assertEqual(is_nct(nctarget_check), True)
         nct_check = NCTarget.get_by_id(1)
@@ -285,6 +315,17 @@ check_octarget = check_pred(is_oct)
 #+BEGIN_SRC python
 class TestOCTarget(TestCase):
     TESTING = True
+
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
 
     def test_instantiate_octarget(self):
         print "test_instantiate_octarget"
@@ -366,10 +407,10 @@ class TestPersistenceOC(TestCase):
 
         oc = OC.get_by_id(1)
 
-        nc1 = NC(institute=Institute.get_by_id(2), hub=OC.get_by_id(1), nc_target = None)
+        nc1 = NC(institute=Institute.get_by_id(2), hub=OC.get_by_id(1), nc_target = None, workshops = [])
         nc1.save()
 
-        nc2 = NC(institute=Institute.get_by_id(3), hub=OC.get_by_id(1), nc_target = None)
+        nc2 = NC(institute=Institute.get_by_id(3), hub=OC.get_by_id(1), nc_target = None, workshops = [])
         nc2.save()
         
         oc=OC.get_by_id(1)
@@ -425,10 +466,16 @@ class TestPersistenceNC(TestCase):
 
         inst2 = Institute(name="IIIT",address="Hyderabad")
         inst2.save()
-
+        
+        octarget_check = OCTarget(usage = 4000, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nctargets = [])
+        octarget_check.save()
+        
+        nctarget_check = NCTarget(usage = 4000, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), wstargets = [], oc_target = OCTarget.get_by_id(1))
+        nctarget_check.save()
+        
         oc = OC(institute=Institute.get_by_id(1), spokes=[], oc_target = None)
         oc.save()
-        nc = NC(institute=Institute.get_by_id(2), hub=OC.get_by_id(1), nc_target = None)
+        nc = NC(institute=Institute.get_by_id(2), hub=OC.get_by_id(1), nc_target = None, workshops = [])
         nc.save()
         self.assertEqual(is_nc(nc), True)
         nc = NC.get_by_id(1)
@@ -509,7 +556,7 @@ class TestPersistenceRole(TestCase):
         oc = OC(institute=Institute.get_by_id(1), spokes=[], oc_target = None)
         oc.save()
 
-        nc = NC(institute=Institute.get_by_id(2), hub=oc, nc_target = None)
+        nc = NC(institute=Institute.get_by_id(2), hub=oc, nc_target = None, workshops = [])
         nc.save()
 
         ro = Role(name="NC", centre_nc=NC.get_by_id(1), centre_oc=None)
