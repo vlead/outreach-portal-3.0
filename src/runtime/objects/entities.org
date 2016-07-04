@@ -99,11 +99,29 @@ class TestEmail(TestCase):
 
 #+END_SRC
 
+* is_nctarget
+#+NAME: is_nctarget
+#+BEGIN_SRC pytho
+def is_nctarget(value):
+    if value == None or is_nct(value):
+        return True
+    else:
+        return False
+#+END_SRC
+* is_octarget
+#+NAME: is_octarget
+#+BEGIN_SRC python
+def is_octarget(value):
+    if value == None or is_oct(value):
+        return True
+    else:
+        return False
 
+#+END_SRC
 * WSTarget
 #+NAME: class_WSTarget
 #+BEGIN_SRC python
-WSTarget = ClassTemplate.mk_class("WSTarget", usage = is_int, participants = is_int, experiments = is_int, date = is_date)
+WSTarget = ClassTemplate.mk_class("WSTarget", usage = is_int, participants = is_int, experiments = is_int, date = is_date, nc_target = is_nctarget)
 
 is_wst = is_inst(WSTarget)
 check_wstarget = check_pred(is_wst)
@@ -118,7 +136,7 @@ class TestWSTarget(TestCase):
 
     def test_instantiate_wstarget(self):
         print "test_instantiate_wstarget"
-        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
+        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nc_target = None)
         self.assertEqual(is_wst(wstarget_check), True)
         self.assertEqual(wstarget_check.get("participants"), 200)
         self.assertRaises(TypeError, WSTarget, participants="123")
@@ -141,7 +159,7 @@ def are_wstargets(wstargets):
     return ret_val
 
 
-NCTarget = ClassTemplate.mk_class("NCTarget", usage = is_int, date = is_date, wstargets = are_wstargets )
+NCTarget = ClassTemplate.mk_class("NCTarget", usage = is_int, date = is_date, wstargets = are_wstargets, oc_target = is_octarget )
 is_nct = is_inst(NCTarget)
 check_nctarget = check_pred(is_nct)
 
@@ -157,7 +175,7 @@ class TestNCTarget(TestCase):
         print "test_instantiate_nctarget"
         date_check = "30-06-2016"
         date_format = "%d-%m-%Y"
-        nctarget_check = NCTarget(usage=300, wstargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
+        nctarget_check = NCTarget(usage=300, wstargets = [],  date = datetime.datetime.strptime(date_check, date_format).date(), oc_target = None)
         self.assertEqual(is_nct(nctarget_check), True)
         self.assertEqual(nctarget_check.get("usage"), 300)
         self.assertRaises(TypeError, NCTarget, usage = "abc")
@@ -227,11 +245,6 @@ def are_spokes(spo):
 
     return ret_val
 
-def is_octarget(value):
-    if value == None or is_oct(value):
-        return True
-    else:
-        return False
     
 OC= ClassTemplate.mk_class("OC",institute=is_institute,spokes=are_spokes, oc_target = is_octarget)
 
@@ -303,11 +316,6 @@ def are_workshops(wkshps):
     return ret_val
 
 
-def is_nctarget(value):
-    if value == None or is_nct(value):
-        return True
-    else:
-        return False
     
 
 NC= ClassTemplate.mk_class("NC", institute=is_institute, hub=is_oc, nc_target = is_nctarget, workshops = are_workshops)
@@ -679,7 +687,9 @@ class TestWorkshop(TestCase):
     def test_instatiate_Workshop(self):
         print "test_instantiate_workshop"
         status = Status(name = "pending")
-        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
+        oc_target = OCTarget(usage = 400, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nctargets = [])
+        nc_target = NCTarget(usage = 400, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), oc_target = oc_target, wstargets = [])
+        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nc_target = nc_target)
         workshop = Workshop(name=Name(name="Test workshop"), institute=Institute(name="IIITH",address="Hyderabad"), ws_target = wstarget_check, status = status, artefacts = [])
         self.assertEqual(is_wkshp(workshop), True)
     
@@ -785,6 +795,8 @@ if __name__ == '__main__':
 <<class_Name>>
 <<class_Email>>
 <<class_Institute>>
+<<is_nctarget>>
+<<is_octarget>>
 <<class_WSTarget>>
 <<class_NCTarget>>
 <<class_OCTarget>>

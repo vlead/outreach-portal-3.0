@@ -191,7 +191,6 @@ class TestPersistenceInstitute(TestCase):
         self.assertRaises(TypeError, Institute, name="IIIT123")
 #+END_SRC
 
-
 * WSTarget   
 #+NAME: class_WSTarget
 #+BEGIN_SRC python
@@ -200,7 +199,8 @@ args = {"__tablename__": "wstargets",
         "usage": db.Column(db.Integer),
         "participants": db.Column(db.Integer),
         "experiments": db.Column(db.Integer),
-        "date": db.Column(db.Date)
+        "date": db.Column(db.Date),
+        "nctarget_id": db.Column(db.Integer, db.ForeignKey('nctargets.id'))
         }
 
 WSTarget = ClassPersistenceTemplate.mk_persistent(WSTarget, **args)
@@ -227,6 +227,77 @@ class TestWSTarget(TestCase):
 #+END_SRC
 
 
+* NCTarget   
+#+NAME: class_NCTarget
+#+BEGIN_SRC python
+args = {"__tablename__": "nctargets",
+        "id": db.Column(db.Integer, primary_key = True),
+        "usage": db.Column(db.Integer),
+        "date": db.Column(db.Date),
+        "octarget_id": db.Column(db.Integer, db.ForeignKey('octargets.id')),
+        "wstargets": db.relationship('WSTarget', backref='nctarget')
+        }
+
+NCTarget = ClassPersistenceTemplate.mk_persistent(NCTarget, **args)
+
+is_nct = is_inst(NCTarget)
+check_nctarget = check_pred(is_nct)
+#+END_SRC
+
+** Test NCTarget
+#+NAME: class_TestNCTarget
+#+BEGIN_SRC python
+class TestNCTarget(TestCase):
+    TESTING = True
+
+    def test_instantiate_nctarget(self):
+        print "test_instantiate_nctarget"
+        nctarget_check = NCTarget(usage = 4000, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), wstargets = [])
+        nctarget_check.save()
+        self.assertEqual(is_nct(nctarget_check), True)
+        nct_check = NCTarget.get_by_id(1)
+        self.assertEqual(nct_check.get("usage"), 4000)
+        self.assertRaises(TypeError, NCTarget, usage="123")
+
+#+END_SRC
+
+
+
+
+* OCTarget   
+#+NAME: class_OCTarget
+#+BEGIN_SRC python
+args = {"__tablename__": "octargets",
+        "id": db.Column(db.Integer, primary_key = True),
+        "usage": db.Column(db.Integer),
+        "date": db.Column(db.Date),
+        "nctargets": db.relationship('NCTarget', backref='octarget')
+        }
+
+OCTarget = ClassPersistenceTemplate.mk_persistent(OCTarget, **args)
+
+is_oct = is_inst(OCTarget)
+check_octarget = check_pred(is_oct)
+#+END_SRC
+
+** Test OCTarget
+#+NAME: class_TestOCTarget
+#+BEGIN_SRC python
+class TestOCTarget(TestCase):
+    TESTING = True
+
+    def test_instantiate_octarget(self):
+        print "test_instantiate_octarget"
+        octarget_check = OCTarget(usage = 4000, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nctargets = [])
+        octarget_check.save()
+        self.assertEqual(is_oct(octarget_check), True)
+        oct_check = OCTarget.get_by_id(1)
+        self.assertEqual(oct_check.get("usage"), 4000)
+        self.assertRaises(TypeError, OCTarget, usage="123")
+
+#+END_SRC
+
+
 * OC
   =OC= is an entity that has an attribute =institute= of type =Institute= and =spokes= of type =list of nc's= where =nc= is of type =NC=.
 
@@ -235,7 +306,8 @@ class TestWSTarget(TestCase):
 args = {"__tablename__": "ocs",
 	"id": db.Column(db.Integer, primary_key=True),
         "institute_id": db.Column(db.Integer, db.ForeignKey('institutes.id')),
-        "spokes": db.relationship('NC', backref='hub')        
+        "spokes": db.relationship('NC', backref='hub'),
+        "oc_target": db.Column(db.Integer, db.ForeignKey('octargets.id'))
 	}
 
 OC = ClassPersistenceTemplate.mk_persistent(OC, **args)
@@ -268,7 +340,7 @@ class TestPersistenceOC(TestCase):
         inst = Institute(name="IIIT",address="Hyderabad")
         inst.save()
 
-        oc = OC(institute=Institute.get_by_id(1), spokes=[])
+        oc = OC(institute=Institute.get_by_id(1), spokes=[], oc_target = None)
         oc.save()
 
         self.assertEqual(is_oc(oc), True)
@@ -288,16 +360,16 @@ class TestPersistenceOC(TestCase):
         inst3.save()
 
 
-        oc = OC(institute=Institute.get_by_id(1), spokes=[])
+        oc = OC(institute=Institute.get_by_id(1), spokes=[], oc_target = None)
         oc.save()
         self.assertEqual(is_oc(oc), True)
 
         oc = OC.get_by_id(1)
 
-        nc1 = NC(institute=Institute.get_by_id(2), hub=OC.get_by_id(1))
+        nc1 = NC(institute=Institute.get_by_id(2), hub=OC.get_by_id(1), nc_target = None)
         nc1.save()
 
-        nc2 = NC(institute=Institute.get_by_id(3), hub=OC.get_by_id(1))
+        nc2 = NC(institute=Institute.get_by_id(3), hub=OC.get_by_id(1), nc_target = None)
         nc2.save()
         
         oc=OC.get_by_id(1)
@@ -318,6 +390,7 @@ args = {"__tablename__": "ncs",
 	"id": db.Column(db.Integer, primary_key=True),
         "institute_id": db.Column(db.Integer, db.ForeignKey('institutes.id')),
         "hub_id": db.Column(db.Integer, db.ForeignKey('ocs.id')),
+        "nc_target": db.Column(db.Integer, db.ForeignKey('nctargets.id'))
 	}
 
 NC = ClassPersistenceTemplate.mk_persistent(NC, **args)
@@ -353,9 +426,9 @@ class TestPersistenceNC(TestCase):
         inst2 = Institute(name="IIIT",address="Hyderabad")
         inst2.save()
 
-        oc = OC(institute=Institute.get_by_id(1), spokes=[])
+        oc = OC(institute=Institute.get_by_id(1), spokes=[], oc_target = None)
         oc.save()
-        nc = NC(institute=Institute.get_by_id(2), hub=OC.get_by_id(1))
+        nc = NC(institute=Institute.get_by_id(2), hub=OC.get_by_id(1), nc_target = None)
         nc.save()
         self.assertEqual(is_nc(nc), True)
         nc = NC.get_by_id(1)
@@ -414,7 +487,7 @@ class TestPersistenceRole(TestCase):
         inst = Institute(name="IIT",address="Hyderabad")
         inst.save()
 
-        oc = OC(institute=Institute.get_by_id(1), spokes=[])
+        oc = OC(institute=Institute.get_by_id(1), spokes=[], oc_target = None)
         oc.save()
 
         ro = Role(name="OC",centre_oc=OC.get_by_id(1), centre_nc=None)
@@ -433,10 +506,10 @@ class TestPersistenceRole(TestCase):
         inst2 = Institute(name="IIIT",address="Hyderabad")
         inst2.save()
 
-        oc = OC(institute=Institute.get_by_id(1), spokes=[])
+        oc = OC(institute=Institute.get_by_id(1), spokes=[], oc_target = None)
         oc.save()
 
-        nc = NC(institute=Institute.get_by_id(2), hub=oc)
+        nc = NC(institute=Institute.get_by_id(2), hub=oc, nc_target = None)
         nc.save()
 
         ro = Role(name="NC", centre_nc=NC.get_by_id(1), centre_oc=None)
@@ -1349,12 +1422,13 @@ class TestCreateInstitute(TestCase):
 #+NAME: class_CreateOC
 #+begin_src python
 class CreateOC():
-    arg_types = {"institute":is_institute,"spokes":is_spokes, "session":is_session}
+    arg_types = {"institute":is_institute,"spokes":is_spokes, "session":is_session, "oc_target": is_octarget}
     arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):
         session = args['session']
         institute = args['institute']
+        oc_target = args['oc_target']
         if not (System.is_session_admin(session) or System.is_session_noc(session)):
             raise AuthError("Role not Authorized to perform this action")
 
@@ -1362,6 +1436,7 @@ class CreateOC():
     def state_check(args):
         session = args["session"]
         institute = args['institute']
+        oc_target = args['oc_target']
         if not (session in System.session_set):
             raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
         if institute not in System.institute_set:
@@ -1377,7 +1452,8 @@ class CreateOC():
     def action(args):
         institute = args["institute"]
         spokes=args["spokes"]
-        new_oc = OC(institute=institute,spokes=spokes)
+        oc_target = args['oc_target']
+        new_oc = OC(institute=institute,spokes=spokes, oc_target = oc_target)
         System.oc_set.append(new_oc)
         new_role = Role(name="OCC",centre_oc=new_oc,centre_nc=None)
         System.role_set.append(new_role)
@@ -1403,7 +1479,7 @@ class TestCreateOC(TestCase):
         login_role = System.role_set[3]
         sess = System.do("login",user=login_user,role=login_role)
         institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
-        oc = System.do("create_oc",institute=institute,spokes=[],session=sess)
+        oc = System.do("create_oc",institute=institute,spokes=[],session=sess, oc_target = None)
         self.assertEqual(oc.get('institute'),institute)
         #self.assertRaises(StateError,System.do,"create_oc",institute=institute,session=sess)
 #+END_SRC
@@ -1412,12 +1488,13 @@ class TestCreateOC(TestCase):
 #+NAME: class_CreateNC
 #+begin_src python
 class CreateNC():
-    arg_types = {"institute":is_institute,"hub":is_oc,"session":is_session}
+    arg_types = {"institute":is_institute,"hub":is_oc,"session":is_session, "nc_target": is_nctarget, workshops = are_workshops}
     arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):
         session = args['session']
         institute = args['institute']
+        nc_target = args['nc_target']
         oc = args['hub']
         if not (System.is_session_admin(session) or System.is_session_OCC(session)):
             raise AuthError("Role not Authorized to perform this action")
@@ -1430,6 +1507,7 @@ class CreateNC():
         session = args["session"]
         institute = args['institute']
         oc = args['hub']
+        nc_target = args['nc_target']
         if not (session in System.session_set):
             raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
         if institute not in System.institute_set:
@@ -1446,7 +1524,8 @@ class CreateNC():
     def action(args):
         institute = args["institute"]
         oc = args['hub']
-        new_nc = NC(institute=institute,hub=oc)
+        nc_target = args['nc_target']
+        new_nc = NC(institute=institute,hub=oc, nc_target = None)
         System.nc_set.append(new_nc)
         oc.append_spoke(new_nc)
         new_role = Role(name="NCC",centre_oc=None,centre_nc=new_nc)
@@ -1594,6 +1673,10 @@ if __name__ == '__main__':
 #+BEGIN_SRC python :tangle entities.py :eval no :noweb yes
 <<imports_for_sources>>
 <<class_Institute>>
+
+
+<<class_OCTarget>>
+<<class_NCTarget>>
 <<class_WSTarget>>
 <<class_OC>>
 <<class_NC>>
@@ -1609,6 +1692,8 @@ if __name__ == '__main__':
 <<imports_for_tests>>
 <<class_TestInstitute>>
 <<class_TestWSTarget>>
+<<class_TestNCTarget>>
+<<class_TestOCTarget>>
 <<class_TestOC>>
 <<class_TestNC>>
 <<class_TestRole>>

@@ -1175,7 +1175,9 @@ class TestCreateWorkshop(TestCase):
         oc = System.do("create_oc",institute=institute,spokes=[],session=sess, oc_target = None)
         nc = System.do("create_nc",institute=institute,hub=oc,session=sess, nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date)
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
         session = Session(user=login_user,role=Role.admin)
         System.session_set.append(session)
         ws_status = Status.pending
@@ -1256,7 +1258,9 @@ class TestCancelWorkshop(TestCase):
         oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
         nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date)
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target)
         
         
         ws_status = Status.pending
@@ -1341,7 +1345,10 @@ class TestRescheduleWorkshop(TestCase):
         oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
         nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date)
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target)
         
         
         ws_status = Status.pending
@@ -1356,7 +1363,7 @@ class TestRescheduleWorkshop(TestCase):
         System.do("cancel_workshop", workshop = new_workshop, session = nc_session)
         
         new_target_date = datetime.datetime.strptime("05-07-2016", "%d-%m-%Y").date()
-        new_wstarget = WSTarget(usage = 3000, participants = 200, experiments = 20, date = new_target_date)
+        new_wstarget = WSTarget(usage = 3000, participants = 200, experiments = 20, date = new_target_date, nc_target = nc_target)
 
         System.do("reschedule_workshop", workshop = new_workshop, session = nc_session, wstarget = new_wstarget)
 
@@ -1430,7 +1437,9 @@ class TestConductWorkshop(TestCase):
         oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
         nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date)
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, wstargets = [], oc_target = oc_target)
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target)
         
         
         ws_status = Status.pending
@@ -1519,7 +1528,11 @@ class TestUploadArtefact(TestCase):
         oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
         nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date)
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, wstargets = [], oc_target = oc_target)
+        
+        
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target)
         
         
         ws_status = Status.pending
@@ -1608,7 +1621,9 @@ class TestApproveWorkshop(TestCase):
         oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
         nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date)
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target)
         
         
         ws_status = Status.pending
@@ -1701,7 +1716,9 @@ class TestRejectWorkshop(TestCase):
         oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
         nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date)
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target)
         
         
         ws_status = Status.pending
@@ -1802,11 +1819,13 @@ class TestDeleteArtefact(TestCase):
         oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
         nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date)
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target)
         
         
         ws_status = Status.pending
-        nc_user=User(name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),roles=[],user_status="active")
+        nc_user=User(name=Name(name="ncusernew"),email=Email(email="ncusernew@gmail.com"),roles=[],user_status="active")
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
         nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
