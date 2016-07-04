@@ -237,11 +237,11 @@ class TestOCTarget(TestCase):
 def are_spokes(spo):
     ret_val = True
     if is_list(spo):
-        for nc in spo:
-            if not is_nc(nc):
-                ret_val = False
+	for nc in spo:
+	    if not is_nc(nc):
+		ret_val = False
     else:
-        ret_val = True
+	ret_val = True
 
     return ret_val
 
@@ -249,14 +249,14 @@ def are_spokes(spo):
 OC= ClassTemplate.mk_class("OC",institute=is_institute,spokes=are_spokes, oc_target = is_octarget)
 
 OC.__eq__ = lambda self,other: \
-            isinstance(other, self.__class__) and \
-            self.get("institute") == other.get("institute")
+	    isinstance(other, self.__class__) and \
+	    self.get("institute") == other.get("institute")
 
 def append_spoke(self,spoke):
     if is_nc(spoke):
-        spokes = self.get('spokes')
-        spokes.append(spoke)
-        self.set(spokes=spokes)
+	spokes = self.get('spokes')
+	spokes.append(spoke)
+	self.set(spokes=spokes)
 
 def add_oc_target( self, oc_target):
     if is_octarget(oc_target):
@@ -269,6 +269,14 @@ OC.add_oc_target = add_oc_target
 is_oc = is_inst(OC)
 check_oc = check_pred(is_oc)
 
+def to_client(self):
+    return {
+	'institute': self.get("institute").to_client()
+    }
+#+END_SRC
+
+
+       
 #+END_SRC
 
 ** Test OC
@@ -295,6 +303,18 @@ class TestOC(TestCase):
         oc.set(spokes=[nc])
 
         self.assertEqual(oc.get('spokes')[0].get("institute").get("name"), "HCU")
+
+
+    def test_to_client_OC(self):
+        print "test_to_client_oc"
+
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
+        oc_dict =  oc.to_client()
+
+        self.assertEqual("IIITH", oc_dict['institute']['name'])
+        self.assertEqual("Hyderabad", oc_dict['institute']['address'])
+
+
 #+END_SRC
 
 
@@ -467,7 +487,7 @@ def append_role(self,role):
     if is_role(role):
         roles = self.get('roles')
         roles.append(role)
-        self.set(roles=roles)
+        #self.set(roles=roles)
 User.append_role = append_role
 
 is_user = is_inst(User)
@@ -530,6 +550,12 @@ string and =address= which is a string
 Institute = ClassTemplate.mk_class("Institute", name=is_alphabetic_str, address=is_str)
 is_institute = is_inst(Institute)
 check_institute = check_pred(is_institute)
+
+def to_client(self):
+    return {
+	'name': self.get("name"),
+        'address': self.get("address")
+    }
 
 #+END_SRC
 

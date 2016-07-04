@@ -65,12 +65,11 @@ class ClassPersistenceTemplate():
         return fn
 
     @staticmethod
-    def mk_update(cls):
-        def fn(obj, **args):
-            obj.set(**args)
+    def mk_save_handler(cls):
+        def fn(obj):
             obj.save()
 
-        return fn
+        cls.custom_handlers.append(fn)
 
     @staticmethod
     def mk_delete(cls):
@@ -104,10 +103,10 @@ class ClassPersistenceTemplate():
         cls = type(cls.__name__, (db.Model,), dict(cls.__dict__))
 
         cls.save = ClassPersistenceTemplate.mk_save(cls)
-        cls.update = ClassPersistenceTemplate.mk_update(cls)
         cls.delete = ClassPersistenceTemplate.mk_delete(cls)
         cls.get_by_id = ClassPersistenceTemplate.mk_get_by_id(cls)
         cls.get_all = ClassPersistenceTemplate.mk_get_all(cls)
+        ClassPersistenceTemplate.mk_save_handler(cls)
         return cls
 
 #+END_SRC
@@ -139,10 +138,10 @@ class TestPersistence(TestCase):
         PName = ClassPersistenceTemplate.mk_persistent(Name, **args)
         self.setUp()
         p_name = PName(name="Jimi Hendrix")
-        p_name.save()
+        #p_name.save()
         name = PName.get_by_id(1)
         self.assertEqual(name.get("name"), "Jimi Hendrix")
-        p_name.update(name="Bo Didley")
+        p_name.set(name="Bo Didley")
         names = PName.get_all()
         self.assertEqual(names[0].get("name"), "Bo Didley")
         names[0].delete()
