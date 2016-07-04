@@ -115,7 +115,7 @@ class TestPersistenceEmail(TestCase):
     def test_update_email(self):
         print "test update email"
         em = Email(email="jimi@gnu.org")
-        em.update(email="didley@gnu.org")
+        em.set(email="didley@gnu.org")
         em = Email.get_by_id(1)
         self.assertEqual(em.get("email"), "didley@gnu.org")
 

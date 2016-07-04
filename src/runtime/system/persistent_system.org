@@ -1,4 +1,4 @@
-#+TITLE: System implementation for OutReach Portal 3.0
++TITLE: System implementation for OutReach Portal 3.0
 #+AUTHOR: VLEAD
 #+DATE: [2016-06-07 Tue]
 #+SETUPFILE: ../../org-templates/level-2.org
@@ -509,11 +509,9 @@ class TestDeleteUser(TestCase):
         email = Email(email="abc@gmail.com")
         
         other_admin_user = System.do("add_user", name=Name.get_by_id(2), email=Email.get_by_id(2), session=session)
-
-        other_admin_user.append_role(Role.admin)
-        length = len(System.user_set)
+        System.do("add_role", user = other_admin_user, role = Role.get_by_id(1), session = session)
+        #other_admin_user.append_role(Role.admin)
         System.do("delete_user", user=other_admin_user, session=session)
-        length = len(System.user_set)
         self.assertEqual(other_admin_user.get("user_status"),"inactive")
         
 
