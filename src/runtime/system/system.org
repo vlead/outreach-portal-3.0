@@ -1830,6 +1830,61 @@ class TestDeleteArtefact(TestCase):
 
     #+END_SRC
 
+* =makeUser=
+#+NAME: class_makeuser
+#+begin_src python
+class MakeUser():
+    arg_types = {"name":is_str, "email":is_str, "session":is_session}
+    arity_and_type_checks_needed = True 
+  
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        if not (System.is_session_admin(session) or System.is_session_OCC(session) or System.is_session_noc(session)):
+            raise AuthError("Role not Authorized to perform this action")
+
+    @staticmethod
+    def state_check(args):
+        pass
+         
+               
+    @staticmethod
+    def action(args):
+        session = args["session"]
+        name = args["name"]
+        email = args["email"]
+        u = User(name=Name(name=name),email=Email(email=email),roles=[],user_status="active")
+        System.do("add_user",user=u,session=session)
+      
+   
+   
+#+end_src
+*** Test MakeUser
+#+NAME: test_makeuser
+#+BEGIN_SRC python
+class TestMakeUser(TestCase):
+    TESTING = True
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in", System.user_set)
+        System.user_set = admin
+        System.session_set = []
+        System.institute_set = []
+        System.oc_set = []
+        System.nc_set = []
+    def test_make_user_by_admin(self):
+        print "test_make_user_by_admin"
+        admin_user=System.user_set[0]
+        session = Session(user=admin_user,role=Role.admin)
+        System.session_set.append(session)
+ 
+        System.do("make_user",name="me",email="abc@gmail.com",session=session)
+                
+        u=System.user_set[1]
+        self.assertEqual(u.get("name").get("name"),"me")
+#+END_SRC
 * ops_table
 #+NAME: ops_table
 #+BEGIN_SRC python
@@ -1850,7 +1905,8 @@ ops_table = {'add_user' : AddUser,
              'upload_artefact' : UploadArtefact,
              'approve_workshop' : ApproveWorkshop,
              'reject_workshop' : RejectWorkshop,
-             'delete_artefact' : DeleteArtefact
+             'delete_artefact' : DeleteArtefact,
+             'make_user': MakeUser
              }                        
 #+END_SRC
 * Infra                                                         :boilerplate:
@@ -1922,6 +1978,7 @@ if __name__ == '__main__':
 <<class_ApproveWorkshop>>
 <<class_RejectWorkshop>>
 <<class_DeleteArtefact>>
+<<class_makeuser>>
 <<ops_table>>
 #+end_src
 
@@ -1948,5 +2005,6 @@ if __name__ == '__main__':
 <<test_ApproveWorkshop>>
 <<test_RejectWorkshop>>
 <<test_DeleteArtefact>>
+<<test_makeuser>>
 <<run_test_cases>>
 #+end_src
