@@ -384,7 +384,8 @@ class TestStatus(TestCase):
 args = {"__tablename__": "artefacts",
         "id": db.Column(db.Integer, primary_key = True),
         "name": db.Column(db.String),
-        "path": db.Column(db.String)
+        "path": db.Column(db.String),
+        "workshop_id": db.Column(db.Integer, db.ForeignKey('workshops.id'))
         }
 
 Artefact = ClassPersistenceTemplate.mk_persistent(Artefact, **args)
@@ -421,6 +422,67 @@ class TestArtefact(TestCase):
 
 #+END_SRC
 
+* Workshop
+  A workshop is an entity that takes two arguments Institute, and Target.
+
+#+NAME: class_Workshop
+#+BEGIN_SRC python
+args = {"__tablename__": "workshops",
+        "id": db.Column(db.Integer, primary_key = True),
+        "name_id": db.Column(db.Integer, db.ForeignKey('names.id')),
+        "institute_id": db.Column(db.Integer, db.ForeignKey('institutes.id')),
+        "ws_target_id": db.Column(db.Integer, db.ForeignKey('wstargets.id')),
+        "artefacts": db.relationship('Artefact', backref = 'workshop'),
+        "status_id": db.Column(db.Integer, db.ForeignKey('status.id')),
+        "nc_id": db.Column(db.Integer, db.ForeignKey('ncs.id')),
+        }
+
+Workshop = ClassPersistenceTemplate.mk_persistent(Workshop, **args)
+
+
+is_wkshp = is_inst(Workshop)
+check_workshop = check_pred(is_wkshp)
+
+#+END_SRC
+
+** Test Workshop
+
+   Test cases to test workshop entity
+
+#+NAME: class_TestWorkshop
+#+BEGIN_SRC python
+class TestWorkshop(TestCase):
+    TESTING = True
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
+    print "Test create workshop"
+    def test_instatiate_Workshop(self):
+        print "test_instantiate_workshop"
+        status = Status(name = "pending")
+        status.save()
+        oc_target = OCTarget(usage = 400, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nctargets = [])
+        nc_target = NCTarget(usage = 400, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), oc_target = oc_target, wstargets = [])
+        oc_target.save()
+        nc_target.save()
+        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nc_target = nc_target)
+        wstarget_check.save()
+        workshop = Workshop(name=Name(name="Test workshop"), institute=Institute(name="IIITH",address="Hyderabad"), ws_target = wstarget_check, status = status, artefacts = [])
+        workshop.save()
+        self.assertEqual(is_wkshp(workshop), True)
+        workshop = Workshop.get_by_id(1)
+        self.assertEqual(workshop.get("name").get("name"), "Test workshop")
+
+#+END_SRC
+  
 * OC
   =OC= is an entity that has an attribute =institute= of type =Institute= and =spokes= of type =list of nc's= where =nc= is of type =NC=.
 
@@ -507,8 +569,9 @@ args = {"__tablename__": "ncs",
 	"id": db.Column(db.Integer, primary_key=True),
         "institute_id": db.Column(db.Integer, db.ForeignKey('institutes.id')),
         "hub_id": db.Column(db.Integer, db.ForeignKey('ocs.id')),
-        "nc_target": db.Column(db.Integer, db.ForeignKey('nctargets.id'))
-	}
+        "nc_target": db.Column(db.Integer, db.ForeignKey('nctargets.id')),
+	"workshops": db.relationship('Workshop', backref = 'nc')
+        }
 
 NC = ClassPersistenceTemplate.mk_persistent(NC, **args)
 
@@ -769,6 +832,7 @@ if __name__ == '__main__':
 <<class_NC>>
 <<class_Status>>
 <<class_Artefact>>
+<<class_Workshop>>
 <<class_Name>>
 <<class_Email>>
 <<class_association_Table>>
@@ -787,6 +851,7 @@ if __name__ == '__main__':
 <<class_TestNC>>
 <<class_TestStatus>>
 <<class_TestArtefact>>
+<<class_TestWorkshop>>
 <<class_TestRole>>
 <<class_TestUser>>
 <<class_TestName>>
