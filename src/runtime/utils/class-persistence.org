@@ -138,7 +138,7 @@ class TestPersistence(TestCase):
         PName = ClassPersistenceTemplate.mk_persistent(Name, **args)
         self.setUp()
         p_name = PName(name="Jimi Hendrix")
-        #p_name.save()
+        p_name.save()
         name = PName.get_by_id(1)
         self.assertEqual(name.get("name"), "Jimi Hendrix")
         p_name.set(name="Bo Didley")
