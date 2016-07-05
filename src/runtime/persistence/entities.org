@@ -378,6 +378,48 @@ class TestStatus(TestCase):
 
 #+END_SRC
 
+* Artefact   
+#+NAME: class_Artefact
+#+BEGIN_SRC python
+args = {"__tablename__": "artefacts",
+        "id": db.Column(db.Integer, primary_key = True),
+        "name": db.Column(db.String),
+        "path": db.Column(db.String)
+        }
+
+Artefact = ClassPersistenceTemplate.mk_persistent(Artefact, **args)
+
+is_artefact = is_inst(Artefact)
+check_artefact = check_pred(is_artefact)
+#+END_SRC
+
+** Test Artefact
+#+NAME: class_TestArtefact
+#+BEGIN_SRC python
+class TestArtefact(TestCase):
+    TESTING = True
+
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
+    def test_instantiate_artefact(self):
+        print "test_instantiate_artefact"
+        artefact_check = Artefact(name = "photo", path = "/main/photos")
+        artefact_check.save()
+        self.assertEqual(is_artefact(artefact_check), True)
+        art_check = Artefact.get_by_id(1)
+        self.assertEqual(art_check.get("name"), "photo")
+        self.assertRaises(TypeError, Artefact, name = "123")
+
+#+END_SRC
 
 * OC
   =OC= is an entity that has an attribute =institute= of type =Institute= and =spokes= of type =list of nc's= where =nc= is of type =NC=.
@@ -726,6 +768,7 @@ if __name__ == '__main__':
 <<class_OC>>
 <<class_NC>>
 <<class_Status>>
+<<class_Artefact>>
 <<class_Name>>
 <<class_Email>>
 <<class_association_Table>>
@@ -743,6 +786,7 @@ if __name__ == '__main__':
 <<class_TestOC>>
 <<class_TestNC>>
 <<class_TestStatus>>
+<<class_TestArtefact>>
 <<class_TestRole>>
 <<class_TestUser>>
 <<class_TestName>>
