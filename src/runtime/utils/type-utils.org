@@ -29,6 +29,8 @@ is_bool = is_inst(bool)
 is_str = is_inst(str)
 is_dict = is_inst(dict)
 is_list = is_inst(list)
+is_date = is_inst(datetime.date)
+is_string = is_inst(str)
 #+END_SRC
 
 *** Test Instance predicate
@@ -67,37 +69,6 @@ def is_alphabetic_str(value):
     else:
         return False
 #+END_SRC
-** String predicate
-#+name: def_is_string
-#+BEGIN_SRC  python
-def is_string(value):
-    if (isinstance(value, str)):
-        return True
-    else:
-        return False
-#+END_SRC
-
-
-** Integer predicate
-#+name: def_is_int
-#+BEGIN_SRC  python
-def is_int(value):
-    if (isinstance(value, int)):
-        return True
-    else:
-        return False
-#+END_SRC
-
-** Date predicate
-#+name: def_is_date
-#+BEGIN_SRC  python
-import datetime
-def is_date(value):
-    if (isinstance(value, datetime.date )):
-        return True
-    else:
-        return False
-#+END_SRC
 
 ** Email string predicate
     Email is a type as defined in RFC [[https://tools.ietf.org/html/rfc5321][5321]], [[https://tools.ietf.org/html/rfc5322][5322]] and [[https://tools.ietf.org/html/rfc6531][6531]].
@@ -119,7 +90,7 @@ def is_email_str(value):
 
 * Checks
   All checks check on a predicate for a type.  
-
+  
 ** =check_pred=
 
 A /check/ is a partial function that takes an argument and
@@ -324,7 +295,7 @@ def check_inv(inv, *name):
 #+BEGIN_SRC python
 import re
 import types
-
+import datetime
 #+END_SRC
 
 
@@ -336,7 +307,7 @@ import types
 # -*- coding: utf-8 -*-
 import unittest
 from unittest import TestCase
-from datetime import datetime
+import datetime
 from type_utils import *
 import types
 #+end_src
