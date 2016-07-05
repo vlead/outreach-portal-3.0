@@ -217,7 +217,7 @@ class TestWSTarget(TestCase):
         db.drop_all()
 
     def test_instantiate_wstarget(self):
-        print "test_instantiate_wstarget"
+        print "test_instantiate_wstarget_persistence"
         octarget_check = OCTarget(usage = 4000, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nctargets = [])
         octarget_check.save()
         
@@ -325,6 +325,49 @@ class TestOCTarget(TestCase):
         oct_check = OCTarget.get_by_id(1)
         self.assertEqual(oct_check.get("usage"), 4000)
         self.assertRaises(TypeError, OCTarget, usage="123")
+
+#+END_SRC
+
+
+* Status   
+#+NAME: class_Status
+#+BEGIN_SRC python
+args = {"__tablename__": "status",
+        "id": db.Column(db.Integer, primary_key = True),
+        "name": db.Column(db.String)
+        }
+
+Status = ClassPersistenceTemplate.mk_persistent(Status, **args)
+
+is_status = is_inst(Status)
+check_status = check_pred(is_status)
+#+END_SRC
+
+** Test Status
+#+NAME: class_TestStatus
+#+BEGIN_SRC python
+class TestStatus(TestCase):
+    TESTING = True
+
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
+    def test_instantiate_status(self):
+        print "test_instantiate_status"
+        status_check = Status(name = "pending")
+        status_check.save()
+        self.assertEqual(is_status(status_check), True)
+        stat_check = Status.get_by_id(1)
+        self.assertEqual(stat_check.get("name"), "pending")
+        self.assertRaises(TypeError, Status, name = 123)
 
 #+END_SRC
 
@@ -674,6 +717,7 @@ if __name__ == '__main__':
 <<class_WSTarget>>
 <<class_OC>>
 <<class_NC>>
+<<class_Status>>
 <<class_Name>>
 <<class_Email>>
 <<class_association_Table>>
@@ -690,6 +734,7 @@ if __name__ == '__main__':
 <<class_TestOCTarget>>
 <<class_TestOC>>
 <<class_TestNC>>
+<<class_TestStatus>>
 <<class_TestRole>>
 <<class_TestUser>>
 <<class_TestName>>
