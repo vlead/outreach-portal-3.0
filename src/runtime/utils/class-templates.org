@@ -194,8 +194,8 @@ class ClassTemplate():
             for key, value in args.iteritems():
                     obj.state[key] = value
 
-            for handler in cls.custom_handlers:
-                handler(obj)
+#            for handler in cls.custom_handlers:
+#                handler(obj)
 
         return fn
 
