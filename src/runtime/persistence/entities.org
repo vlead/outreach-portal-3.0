@@ -48,6 +48,7 @@ class TestPersistentName(TestCase):
     def test_create_name(self):
         print "test_create_name"
         na = Name(name="Jimi Hendrix")
+        na.save()
         self.assertEqual(is_name(na), True)
         new_name = Name.get_by_id(1)
         self.assertEqual(new_name.get("name"), "Jimi Hendrix")
@@ -56,13 +57,16 @@ class TestPersistentName(TestCase):
     def test_update_name(self):
         print "test update name"
         na = Name(name="Jimi Hendrix")
+        na.save()
         #na.update(name="Bo Didley")
         self.assertEqual(Name.get_by_id(1).get("name"), "Jimi Hendrix")
         na.set(name="Bo Didley")
         self.assertEqual(Name.get_by_id(1).get("name"), "Bo Didley")
+    
     def test_delete_name(self):
         print "test delete name"
         na = Name(name="Jimi Hendrix")
+        na.save()
         self.assertEqual(len(Name.get_all()), 1)
         na.delete()
         self.assertEqual(len(Name.get_all()), 0)
@@ -107,6 +111,7 @@ class TestPersistenceEmail(TestCase):
     def test_create_email(self):
         print "test_create_email"
         em = Email(email="jimi@gnu.org")
+        em.save()
         self.assertEqual(is_email(em), True)
         em = Email.get_by_id(1)
         self.assertEqual(em.get("email"), "jimi@gnu.org")
@@ -115,6 +120,7 @@ class TestPersistenceEmail(TestCase):
     def test_update_email(self):
         print "test update email"
         em = Email(email="jimi@gnu.org")
+        em.save()
         em.set(email="didley@gnu.org")
         em = Email.get_by_id(1)
         self.assertEqual(em.get("email"), "didley@gnu.org")
@@ -122,6 +128,7 @@ class TestPersistenceEmail(TestCase):
     def test_delete_email(self):
         print "test delete email"
         em = Email(email="jimi@gnu.org")
+        em.save()
         self.assertEqual(len(Email.get_all()), 1)
         em.delete()
         self.assertEqual(len(Email.get_all()), 0)
@@ -129,8 +136,10 @@ class TestPersistenceEmail(TestCase):
     def test_duplicate_email(self):
         print "test_duplicate_email"
         em1 = Email(email="jimi@gnu.org")
+        em1.save()
         with self.assertRaises(IntegrityError):
             em2 = Email(email="jimi@gnu.org")
+            em2.save()
 
 #+END_SRC
 
@@ -175,6 +184,7 @@ class TestPersistenceInstitute(TestCase):
     def test_create_institue(self):
         print "test_create_institute"
         inst = Institute(name="IIIT",address="Hyderabad")
+        inst.save()
         self.assertEqual(is_institute(inst), True)
         inst = Institute.get_by_id(1)
         self.assertEqual(inst.get("name"), "IIIT")
@@ -280,9 +290,6 @@ class TestNCTarget(TestCase):
         self.assertRaises(TypeError, NCTarget, usage="123")
 
 #+END_SRC
-
-
-
 
 * OCTarget   
 #+NAME: class_OCTarget
@@ -412,7 +419,7 @@ class TestPersistenceOC(TestCase):
         print "test_create_oc"
        
         inst = Institute(name="IIIT",address="Hyderabad")
-
+        inst.save()
         oc = OC(institute=Institute.get_by_id(1), spokes=[], oc_target = None)
         oc.save()
 
@@ -424,11 +431,11 @@ class TestPersistenceOC(TestCase):
         print "test_get_spokes_of_oc"
         
         inst1 = Institute(name="IIIT",address="Hyderabad")
-
+        inst1.save()
         inst2 = Institute(name="NIT",address="Suratkal")
-
+        inst2.save()
         inst3 = Institute(name="IIT",address="Hyderabad")
-
+        inst3.save()
         oc = OC(institute=Institute.get_by_id(1), spokes=[], oc_target = None)
         oc.save()
         self.assertEqual(is_oc(oc), True)
@@ -448,7 +455,6 @@ class TestPersistenceOC(TestCase):
         self.assertEqual(list[1].get("institute").get("name"), "IIT")
            
 #+END_SRC
-
 
 * NC
   =NC= is an entity that has an attribute =institute= of type =Institute= and =hub= of type =OC=.
@@ -490,9 +496,8 @@ class TestPersistenceNC(TestCase):
         print "test_create_nc"
 
         inst1 = Institute(name="NIT",address="Suratkal")
-
+        inst1.save()
         inst2 = Institute(name="IIIT",address="Hyderabad")
-
         inst2.save()
         
         octarget_check = OCTarget(usage = 4000, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nctargets = [])
@@ -550,6 +555,7 @@ class TestPersistenceRole(TestCase):
     def test_create_admin_role(self):
         print "test_create_role"
         ro = Role(name="admin",centre_oc=None, centre_nc=None)
+        ro.save()
         self.assertEqual(is_role(ro), True)
         ro = Role.get_by_id(1)
         self.assertEqual(ro.get("name"), "admin")
@@ -559,11 +565,12 @@ class TestPersistenceRole(TestCase):
         print "test_create_oc_role"
 
         inst = Institute(name="IIT",address="Hyderabad")
-
+        inst.save()
         oc = OC(institute=Institute.get_by_id(1), spokes=[], oc_target = None)
         oc.save()
 
         ro = Role(name="OC",centre_oc=OC.get_by_id(1), centre_nc=None)
+        ro.save()
         self.assertEqual(is_role(ro), True)
         ro = Role.get_by_id(1)
         self.assertEqual(ro.get("name"), "OC")
@@ -573,10 +580,10 @@ class TestPersistenceRole(TestCase):
         print "test_create_nc_role"
 
         inst1 = Institute(name="IIT",address="Hyderabad")
-        
+        inst1.save()
 
         inst2 = Institute(name="IIIT",address="Hyderabad")
-
+        inst2.save()
         oc = OC(institute=Institute.get_by_id(1), spokes=[], oc_target = None)
         oc.save()
 
@@ -584,6 +591,7 @@ class TestPersistenceRole(TestCase):
         nc.save()
 
         ro = Role(name="NC", centre_nc=NC.get_by_id(1), centre_oc=None)
+        ro.save()
         self.assertEqual(is_role(ro), True)
         
         ro = Role.get_by_id(1)
@@ -642,19 +650,19 @@ class TestPersistenceUser(TestCase):
     def test_create_user(self):
         print "test_create_user"
         na = Name(name="Jimi Hendrix")
-      
+        na.save()
         em = Email(email="jimi@gnu.org")
-      
+        em.save()
 
         ro1 = Role(name="user",centre_oc=None, centre_nc=None)
-      
+        ro1.save()
 
         ro2 = Role(name="guest",centre_oc=None, centre_nc=None)
-      
+        ro2.save()
 
         roles = [ro1, ro2] 
         usr = User(name=na, email=em, roles=roles, user_status="active")
-      
+        usr.save()
         self.assertEqual(is_user(usr), True)
         n_usr = User.get_by_id(1)
         self.assertEqual(n_usr.get("email").get('email'), "jimi@gnu.org")
