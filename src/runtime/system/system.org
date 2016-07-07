@@ -262,6 +262,13 @@ class TestSystemArityAndType(TestCase):
 #+end_src
 
 * =AddUser=
+AddUser operation takes in a =user= object and =session= object as parameter and
+adds the user to the user-set only if the following checks are true:
+1) auth_check : =session= object should be present in =session-set= and the role name corresponding
+to the session should be either admin, NOC or OCC
+Also there is a state_check to verify if the user is already present in the system.
+
+
 #+NAME: class_adduser
 #+begin_src python
 class AddUser():
@@ -271,6 +278,9 @@ class AddUser():
     @staticmethod
     def auth_check(args):
         session = args['session']
+        if not (session in System.session_set):
+            raise StateError("user not in session %s"
+                             % session.get("user").get("name").get("name"))
         if not (System.is_session_admin(session) or
                 System.is_session_OCC(session) or
                 System.is_session_noc(session)):
@@ -280,9 +290,7 @@ class AddUser():
     def state_check(args):
         user = args["user"]
         session = args["session"]
-        if not (session in System.session_set):
-            raise StateError("user not in session %s"
-                             % session.get("user").get("name").get("name"))
+
         if (user in System.user_set):
             raise StateError("user %s already in System"
                              % user.get("name").get("name"))
