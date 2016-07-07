@@ -1199,11 +1199,10 @@ class TestCreateWorkshop(TestCase):
         session = Session(user=login_user,role=Role.admin)
         System.session_set.append(session)
         ws_status = Status.pending
-        nc_user=User(name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),roles=[],user_status="active")
+        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = sess)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
         nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
-        System.do("add_user",user=nc_user,session=session)
         
         new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
         
@@ -1282,11 +1281,13 @@ class TestCancelWorkshop(TestCase):
         
         
         ws_status = Status.pending
-        nc_user=User(name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),roles=[],user_status="active")
+        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = session)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
         nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
-        System.do("add_user",user=nc_user,session=session)
+        
+
+        
         
         new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
         
@@ -1370,11 +1371,10 @@ class TestRescheduleWorkshop(TestCase):
         
         
         ws_status = Status.pending
-        nc_user=User(name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),roles=[],user_status="active")
+        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = session)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
         nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
-        System.do("add_user",user=nc_user,session=session)
         
         new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
         
@@ -1461,11 +1461,10 @@ class TestConductWorkshop(TestCase):
         
         
         ws_status = Status.pending
-        nc_user=User(name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),roles=[],user_status="active")
+        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = session)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
         nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
-        System.do("add_user",user=nc_user,session=session)
         
         new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
         
@@ -1554,11 +1553,10 @@ class TestUploadArtefact(TestCase):
         
         
         ws_status = Status.pending
-        nc_user=User(name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),roles=[],user_status="active")
+        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = session)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
         nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
-        System.do("add_user",user=nc_user,session=session)
         
         new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
         
@@ -1645,17 +1643,15 @@ class TestApproveWorkshop(TestCase):
         
         
         ws_status = Status.pending
-        nc_user=User(name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),roles=[],user_status="active")
+        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = session)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
         nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
-        System.do("add_user",user=nc_user,session=session)
-
-        oc_user=User(name=Name(name="ocuser"),email=Email(email="ocuser@gmail.com"),roles=[],user_status="active")
+        
+        oc_user = System.do("add_user",name=Name(name="ocuser"),email=Email(email="ocuser@gmail.com"),session = session)
         oc_user.set(roles=[Role(name = "OCC", centre_oc = oc, centre_nc = None)])
         oc_session = Session(user = oc_user, role = Role(name = "OCC", centre_oc = oc, centre_nc = None))
         System.session_set.append(oc_session)
-        System.do("add_user",user=oc_user,session=session)
         
         new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
         System.do("conduct_workshop", workshop = new_workshop, session = nc_session)
@@ -1740,17 +1736,15 @@ class TestRejectWorkshop(TestCase):
         
         
         ws_status = Status.pending
-        nc_user=User(name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),roles=[],user_status="active")
+        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = session)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
         nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
-        System.do("add_user",user=nc_user,session=session)
-
-        oc_user=User(name=Name(name="ocuser"),email=Email(email="ocuser@gmail.com"),roles=[],user_status="active")
+        
+        oc_user = System.do("add_user",name=Name(name="ocuser"),email=Email(email="ocuser@gmail.com"),session = session)
         oc_user.set(roles=[Role(name = "OCC", centre_oc = oc, centre_nc = None)])
         oc_session = Session(user = oc_user, role = Role(name = "OCC", centre_oc = oc, centre_nc = None))
         System.session_set.append(oc_session)
-        System.do("add_user",user=oc_user,session=session)
         
         new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
         System.do("conduct_workshop", workshop = new_workshop, session = nc_session)
@@ -1843,11 +1837,10 @@ class TestDeleteArtefact(TestCase):
         
         
         ws_status = Status.pending
-        nc_user=User(name=Name(name="ncusernew"),email=Email(email="ncusernew@gmail.com"),roles=[],user_status="active")
+        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = session)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
         nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
-        System.do("add_user",user=nc_user,session=session)
         
         new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
         
@@ -1969,7 +1962,7 @@ if __name__ == '__main__':
 <<test_arity_and_types>>
 <<test_adduser>>
 <<test_deleteuser>>
-'''
+
 <<test_login>>
 <<test_logout>>
 <<test_CreateInstitute>>
@@ -1985,6 +1978,6 @@ if __name__ == '__main__':
 <<test_ApproveWorkshop>>
 <<test_RejectWorkshop>>
 <<test_DeleteArtefact>>
-'''
+
 <<run_test_cases>>
 #+end_src

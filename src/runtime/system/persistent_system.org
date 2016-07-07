@@ -1359,7 +1359,6 @@ class UpdateInstitute():
         institute.set(address=address)
 
         
-ops_table = {'add_user' : AddUser,'login':login,'delete_user':DeleteUser,'logout':logout,'create_institute':CreateInstitute,'create_oc':CreateOC,'create_nc':CreateNC,'update_user':UpdateUser,'update_institute':UpdateInstitute,'add_role':AddRole}                        
 #+end_src
 ** Test update_institute
 #+NAME: test_UpdateInstitute
@@ -1412,6 +1411,34 @@ class TestUpdateInstitute(TestCase):
         self.assertEqual(institute.get("name"),"NITK")
 
 #+END_SRC
+
+* ops_table
+#+NAME: ops_table
+#+BEGIN_SRC python
+ops_table = {'add_user' : AddUser, 
+             'login': login, 
+             'delete_user': DeleteUser,
+             'logout': logout, 
+             'create_institute': CreateInstitute, 
+             'create_oc': CreateOC, 
+             'create_nc': CreateNC, 
+             'update_user': UpdateUser, 
+             'update_institute': UpdateInstitute, 
+             'add_role': AddRole
+             }
+'''
+             'create_workshop' : CreateWorkshop, 
+             'cancel_workshop' : CancelWorkshop, 
+             'reschedule_workshop' : RescheduleWorkshop, 
+             'conduct_workshop' : ConductWorkshop, 
+             'upload_artefact' : UploadArtefact,
+             'approve_workshop' : ApproveWorkshop,
+             'reject_workshop' : RejectWorkshop,
+             'delete_artefact' : DeleteArtefact
+             } 
+'''                       
+#+END_SRC
+
 
 * Infra                                                         :boilerplate:
 
@@ -1474,7 +1501,7 @@ if __name__ == '__main__':
 <<class_AddRole>>
 <<class_CreateNC>>
 <<class_UpdateInstitute>>
-
+<<ops_table>>
 #+end_src
 
 
