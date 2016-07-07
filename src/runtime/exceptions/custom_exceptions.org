@@ -69,7 +69,6 @@ class ArityError(Exception):
 
 #+END_SRC
 
-
 *** Auth Error
 #+name: class_AuthError
 #+BEGIN_SRC python
@@ -114,11 +113,6 @@ class Error(Exception):
 
 
 * Tangling                                        :boilerplate:
-** =__init__.py=
-#+BEGIN_SRC python :eval no :tangle __init__.py :eval no
-print "exceptions package"
-#+END_SRC
-
 ** =custom_exceptions.py=
 #+BEGIN_SRC python :tangle custom_exceptions.py :eval no :noweb yes
 <<class_AttributeRequired>>
