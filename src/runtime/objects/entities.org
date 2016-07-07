@@ -219,8 +219,9 @@ class TestOCTarget(TestCase):
 
 
 * OC
-  A =OC= entity has fields =name= of type =Name=,
-  institute of type =Institute=.
+  A =OC= entity has fields =institute= of type =is_institute=,
+  =spokes= of type =are_sokes= and =oc_target= of type =is_octarget=
+  Here spokes of an OC are all the nodal centers under it.
 
 #+NAME: class_OC
 #+BEGIN_SRC python
@@ -300,8 +301,11 @@ class TestOC(TestCase):
 
 
 * NC
-  A =NC= entity has fields =name= of type =Name=,
- institute of type =Institute=.
+  A =NC= entity has fields =institute= of type =Institute=,
+  =hub= of type =is_oc= , =nc_target= of type =is_nctarget= , =workshops= of
+  type =are_workshops=.
+  The hub of a NC is the OC which it is under.
+
 #+NAME: class_NC
 #+BEGIN_SRC python
 def are_workshops(wkshps):
@@ -362,7 +366,20 @@ class TestNC(TestCase):
 
 
 * Role
-   =Role= is an entity that has a field =name= which is an alphabetic string
+   =Role= is an entity that has a field =name= which is an alphabetic string,
+   =centre_oc= of type =is_centre_oc= , =centre_nc= of type =is_centre_nc=
+   centre_oc will hold an outreach center corresponding to the role name OCC
+   (Outreach-Center-Coordinator)
+   Similarly centre_nc will hold a nodal center corresponding to the role name NCC.
+   Other than OCC and NCC role names, for all the other role names centre_oc
+   and centre_nc will be None.
+
+   
+  is_centre_oc takes in a value and checks if that is an instance of OC class
+  and returns true, else it returns false.
+  
+  is_centre_nc takes in a value and checks if that is an instance of NC class
+  and returns true, else it returns false.
 
 #+NAME: class_Role
 #+BEGIN_SRC python
@@ -443,8 +460,11 @@ class TestRole(TestCase):
 
 
 * User
-  A =User= entity has fields =name= of type =Name=, =email= of type =Email= and
-  role of type =Role=.
+  A =User= entity has fields =name= of type =Name=, =email= of type =Email= ,
+  role of type =Role= and user_status of type =is_user_status=
+ 
+  is_user_status is a function that returns true only if the parameter passed
+  is either "active" or "inactive"
 
 #+NAME: class_User
 #+BEGIN_SRC python
@@ -473,7 +493,13 @@ User = ClassTemplate.mk_class("User",
 User.__eq__ = lambda self, other: \
                   isinstance(other, self.__class__) and \
                   self.get("email") == other.get("email")
+#+END_SRC
 
+append_role is a function that takes role as an input and appends it to the
+field roles, to the user that invoked this function. 
+
+#+NAME: class_User
+#+BEGIN_SRC python
 def append_role(self,role):
     if is_role(role):
         roles = self.get('roles')
@@ -533,7 +559,9 @@ class TestUser(TestCase):
 * Institute
 
 =Institute= is an entity that has two fields =name= which is an alphabetic
-string and =address= which is a string
+string and =address= which is a string.
+
+is_institute is a function that checks if the given parameter is an instance of Institute.
 
 #+NAME: class_Institute
 #+BEGIN_SRC python
@@ -715,9 +743,13 @@ class TestWorkshop(TestCase):
   
    
 * Session
-    A session stores the user information.  The session object defines the set
-    of operations allowed by the system.  
-
+   =Session= is an entity that has two fields =user= of type =is_user= and role
+   of type =is_role=
+   
+   is_user is a function that checks if the given input parameter is an
+   instance of User class.
+   is_role checks if the given input parameter is and instance of Role class.
+   
 #+NAME: class_Session
 #+BEGIN_SRC python
 Session = ClassTemplate.mk_class("Session", user=is_user, role=is_role)
