@@ -789,7 +789,7 @@ class TestUpdateUser(TestCase):
        
         noc_user=System.do("add_user", name=Name.get_by_id(3),email=Email.get_by_id(3), session=session)
         noc_user.save()
-        System.do("add_role",user=noc_user,role=Role.noc,session=session)
+        System.do("add_role",user=noc_user,role=Role.get_by_id(4),session=session)
         
 
         noc_session = Session(user=noc_user,role=Role.noc)
