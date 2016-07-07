@@ -262,13 +262,14 @@ class TestSystemArityAndType(TestCase):
 #+end_src
 
 * =AddUser=
-AddUser operation takes in a =user= object and =session= object as parameter and
-adds the user to the user-set only if the following checks are true:
-1) auth_check : =session= object should be present in =session-set= and the role name corresponding
-to the session should be either admin, NOC or OCC
-Also there is a state_check to verify if the user is already present in the system.
-
-
+  *AddUser* operation takes in a =user= object and =session= object as parameter and
+  adds the user to the =user-set= only if the following checks are true:
+  1) *auth_check* : =session= object should be present in =session-set= and 
+  the role name corresponding to the session should be either admin, NOC or OCC
+  2) *state_check* : This check verifies if the =user= is not present in the system.
+  If all the  above checks are passed then the following =action= s will be performed
+  1) Adds  the  user to the =user-set= and
+  2) Sets the default =Guest= role to that user.
 #+NAME: class_adduser
 #+begin_src python
 class AddUser():
@@ -392,6 +393,14 @@ class TestAddUser(TestCase):
 #+END_SRC
 
 * =DeleteUser=
+*DeleteUser* operation takes in a =user= object and =session= object as parameter and
+sets the =user_status= to =inactive= only if the following checks are true:
+1) *auth_check* : =session= object should be present in =session-set= and 
+the role name corresponding to the session should be either admin, NOC or OCC. 
+2) *state_check* : This check verifies if the =user= is already present in the system.
+If all the  above checks are passed then the following =action=  will be performed
+1) Sets the  =user_status= to =inactive=.
+
 #+NAME: class_deleteuser
 #+begin_src python
 class DeleteUser():
@@ -560,6 +569,19 @@ class TestDeleteUser(TestCase):
 
 #+END_SRC
 * =UpdateUser=
+*UpdateUser* operation takes in a =user= object, =session= object, =name=
+object and =email= objects as parameter and updates the =name= or =email= or
+both to the =user= only if the following checks are true:
+1) *auth_check* : =session= object should be present in =session-set= and 
+the role name corresponding to the session should be either admin, NOC or OCC. 
+2) *state_check* : This check verifies if the =user= is already present in the system.
+If all the  above checks are passed then the following =action=  will be performed
+1) updates the =name= or =email= or both to the =user=
+
+*Note:* Since this function takes in either name, email or both,
+=arity_and_type_checks_needed= variable is set to =False=
+  
+
 #+NAME: class_updateuser
 #+begin_src python
 class UpdateUser():
@@ -745,6 +767,25 @@ class TestUpdateUser(TestCase):
 
 #+END_SRC
 * =AddRole=
+  *AddRole* operation takes in a =user= object, =session= object and a =role=
+  object as parameter and adds the =role= to the =role-set= of the =user= only
+  if the following checks are true:
+  1) *auth_check* : =session= object should be present in =session-set= and 
+  the role name corresponding to the session should be either admin, NOC or OCC
+  2) *state_check* : This function verifies the following checks: 
+     1) If the role of the current session is admin, then this operation
+        is allowed and any role can be assigned to the given =user= only if
+        that role exists in the =role-set=
+     2) If the role of the current session is NOC, then this operation
+        is allowed only if the name of the role is =OCC= and also the role
+        should exists in the =role-set=.
+     3) If the role name of the current session is OCC, then this operation is
+        allowed only if the name of the role is =NCC= and the hub of
+        =centre_nc= is same as =centre_oc= (of current session role).
+        
+  If all the  above checks are passed then the following =action= will be performed
+  1) Adds  the role to the =role-set= of the =user= 
+
 #+NAME: class_AddRole
 #+begin_src python
 class AddRole():
@@ -753,19 +794,22 @@ class AddRole():
     @staticmethod
     def auth_check(args):
         session = args['session']
+
+        if not (session in System.session_set):
+            raise StateError("user not in session %s" %
+                             session.get('user').get('name').get('name'))
+
         if not (System.is_session_admin(session) or
                 System.is_session_OCC(session) or
                 System.is_session_noc(session)):
             raise AuthError("Role not Authorized to perform this action")
+
 
     @staticmethod
     def state_check(args):
         session = args["session"]
         user = args['user']
         role = args['role']
-        if not (session in System.session_set):
-            raise StateError("user not in session %s" %
-                             session.get('user').get('name').get('name'))
         if System.is_session_admin(session):
             if role not in System.role_set:
                 raise StateError("Invalid Role")
