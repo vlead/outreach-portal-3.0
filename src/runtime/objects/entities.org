@@ -103,7 +103,9 @@ class TestEmail(TestCase):
 * WSTarget
 #+NAME: class_WSTarget
 #+BEGIN_SRC python
-WSTarget = ClassTemplate.mk_class("WSTarget", usage = is_int, participants = is_int, experiments = is_int, date = is_date)
+WSTarget = ClassTemplate.mk_class("WSTarget", usage = is_int,
+                                   participants = is_int,
+                                   experiments = is_int, date = is_date)
 
 is_wst = is_inst(WSTarget)
 check_wstarget = check_pred(is_wst)
@@ -118,7 +120,9 @@ class TestWSTarget(TestCase):
 
     def test_instantiate_wstarget(self):
         print "test_instantiate_wstarget"
-        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
+        wstarget_check = WSTarget(usage = 4000, participants = 200,
+                                  experiments = 20,
+                                  date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
         self.assertEqual(is_wst(wstarget_check), True)
         self.assertEqual(wstarget_check.get("participants"), 200)
         self.assertRaises(TypeError, WSTarget, participants="123")
@@ -141,7 +145,8 @@ def are_wstargets(wstargets):
     return ret_val
 
 
-NCTarget = ClassTemplate.mk_class("NCTarget", usage = is_int, date = is_date, wstargets = are_wstargets )
+NCTarget = ClassTemplate.mk_class("NCTarget", usage = is_int, date = is_date,
+                                   wstargets = are_wstargets )
 is_nct = is_inst(NCTarget)
 check_nctarget = check_pred(is_nct)
 
@@ -157,7 +162,8 @@ class TestNCTarget(TestCase):
         print "test_instantiate_nctarget"
         date_check = "30-06-2016"
         date_format = "%d-%m-%Y"
-        nctarget_check = NCTarget(usage=300, wstargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
+        nctarget_check = NCTarget(usage=300, wstargets = [],
+                                  date = datetime.datetime.strptime(date_check, date_format).date())
         self.assertEqual(is_nct(nctarget_check), True)
         self.assertEqual(nctarget_check.get("usage"), 300)
         self.assertRaises(TypeError, NCTarget, usage = "abc")
@@ -182,7 +188,8 @@ def are_nctargets(nctargets):
 
     return ret_val
 
-OCTarget = ClassTemplate.mk_class("OCTarget", usage = is_int, date = is_date, nctargets = are_nctargets )
+OCTarget = ClassTemplate.mk_class("OCTarget", usage = is_int, date = is_date,
+                                   nctargets = are_nctargets )
 
 is_oct = is_inst(OCTarget)
 check_octarget = check_pred(is_oct)
@@ -199,7 +206,8 @@ class TestOCTarget(TestCase):
         print "test_instantiate_octarget"
         date_check = "30-06-2016"
         date_format = "%d-%m-%Y"
-        octarget_check = OCTarget(usage=300, nctargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
+        octarget_check = OCTarget(usage=300, nctargets = [],
+                                  date = datetime.datetime.strptime(date_check, date_format).date())
         self.assertEqual(is_oct(octarget_check), True)
         self.assertEqual(octarget_check.get("usage"), 300)
         self.assertRaises(TypeError, OCTarget, usage = "abc")
@@ -233,7 +241,8 @@ def is_octarget(value):
     else:
         return False
     
-OC= ClassTemplate.mk_class("OC",institute=is_institute,spokes=are_spokes, oc_target = is_octarget)
+OC= ClassTemplate.mk_class("OC",institute=is_institute,spokes=are_spokes, 
+                            oc_target = is_octarget)
 
 OC.__eq__ = lambda self,other: \
             isinstance(other, self.__class__) and \
@@ -267,21 +276,25 @@ class TestOC(TestCase):
 
     def test_instatiate_OC(self):
         print "test_instantiate_OC"
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
+        oc = OC(institute=Institute(name="IIITH", address="Hyderabad"),
+                spokes=[], oc_target = None)
 
         self.assertEqual(is_oc(oc), True)
 
 
     def test_sets_spokes_on_OC(self):
         print "test_sets_spokes_on_oc"
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
+        oc = OC(institute=Institute(name="IIITH", address="Hyderabad"),
+                spokes=[], oc_target = None)
 
-        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=oc, nc_target = None, workshops = [])
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"),
+                hub=oc, nc_target = None, workshops = [])
         self.assertEqual((nc.get("institute")).get("name"), "HCU")
 
         oc.set(spokes=[nc])
 
-        self.assertEqual(oc.get('spokes')[0].get("institute").get("name"), "HCU")
+        self.assertEqual(oc.get('spokes')[0].get("institute").get("name"),
+                         "HCU")
 #+END_SRC
 
 
@@ -310,7 +323,8 @@ def is_nctarget(value):
         return False
     
 
-NC= ClassTemplate.mk_class("NC", institute=is_institute, hub=is_oc, nc_target = is_nctarget, workshops = are_workshops)
+NC= ClassTemplate.mk_class("NC", institute=is_institute, hub=is_oc, 
+                            nc_target = is_nctarget, workshops = are_workshops)
 
 def add_nc_target( self, nc_target):
     if is_nctarget(nc_target):
@@ -338,7 +352,9 @@ class TestNC(TestCase):
 
     def test_instatiate_NC(self):
         print "test_instantiate_NC"
-        nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[], oc_target = None), nc_target = None, workshops = [])
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"),
+                hub=OC(institute=Institute(name="IIITH", address="Hyderabad"),
+                spokes=[], oc_target = None), nc_target = None, workshops = [])
 
         self.assertEqual(is_nc(nc), True)
 
@@ -400,10 +416,12 @@ class TestRole(TestCase):
 
     def test_instantiate_role(self):
         print "test_instantiate_role"
-        self.assertEqual(is_role(Role(name="admin", centre_oc=None,centre_nc=None)), True)
+        self.assertEqual(is_role(Role(name="admin", centre_oc=None,
+                         centre_nc=None)), True)
         a_role = Role(name="admin", centre_oc=None,centre_nc=None)
         self.assertEqual(check_role(a_role), a_role)
-        self.assertEqual(Role(name="admin", centre_oc=None,centre_nc=None).get("name"), "admin")
+        self.assertEqual(Role(name="admin", centre_oc=None,centre_nc=None).get("name"),
+                         "admin")
         self.assertRaises(TypeError, Role, name="admin123", centre=None)
 
     def test_set_and_get_role(self):
@@ -415,7 +433,8 @@ class TestRole(TestCase):
 
     def test_set_and_get_centre(self):
         print "test_set_and_get_centre"
-        oc = OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[], oc_target = None)
+        oc = OC(institute=Institute(name="IIITH", address="Hyderabad"),
+                spokes=[], oc_target = None)
         occ_role = Role(name="OCC", centre_oc=oc,centre_nc=None)
         self.assertEqual(occ_role.get("name"), "OCC")
         self.assertEqual(occ_role.get("centre_oc"), oc)
@@ -519,7 +538,8 @@ string and =address= which is a string
 #+NAME: class_Institute
 #+BEGIN_SRC python
 
-Institute = ClassTemplate.mk_class("Institute", name=is_alphabetic_str, address=is_str)
+Institute = ClassTemplate.mk_class("Institute", name=is_alphabetic_str,
+                                    address=is_str)
 is_institute = is_inst(Institute)
 check_institute = check_pred(is_institute)
 
@@ -533,7 +553,8 @@ class TestInstitute(TestCase):
 
     def test_instantiate_institute(self):
         print "test_instantiate_institute"
-        self.assertEqual(is_institute(Institute(name="IIIT",address="Hyderabad")), True)
+        self.assertEqual(is_institute(Institute(name="IIIT",address="Hyderabad")),
+                         True)
         institute_ex = Institute(name="IIIT",address="Hyderabad")
         self.assertEqual(check_institute(institute_ex), institute_ex)
         self.assertEqual(check_institute(institute_ex).get("name"), "IIIT")
@@ -644,7 +665,11 @@ def are_artefacts(artefacts):
     return ret_val
 
 
-Workshop = ClassTemplate.mk_class("Workshop", name=is_name, institute=is_institute, ws_target = is_wstarget, artefacts = are_artefacts, status = is_status)
+Workshop = ClassTemplate.mk_class("Workshop", name=is_name,
+                                   institute=is_institute,
+                                   ws_target = is_wstarget,
+                                   artefacts = are_artefacts,
+                                   status = is_status)
 
 is_wkshp = is_inst(Workshop)
 check_workshop = check_pred(is_wkshp)
@@ -679,11 +704,13 @@ class TestWorkshop(TestCase):
     def test_instatiate_Workshop(self):
         print "test_instantiate_workshop"
         status = Status(name = "pending")
-        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
-        workshop = Workshop(name=Name(name="Test workshop"), institute=Institute(name="IIITH",address="Hyderabad"), ws_target = wstarget_check, status = status, artefacts = [])
+        wstarget_check = WSTarget(usage = 4000, participants = 200,
+                                  experiments = 20,
+                                  date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date())
+        workshop = Workshop(name=Name(name="Test workshop"),
+                            institute=Institute(name="IIITH",address="Hyderabad"),
+                            ws_target = wstarget_check, status = status, artefacts = [])
         self.assertEqual(is_wkshp(workshop), True)
-    
-
 #+END_SRC
   
    
