@@ -1,4 +1,4 @@
-#+TITLE: Object Handler for the System
+`#+TITLE: Object Handler for the System
 #+AUTHOR: VLEAD
 #+DATE: [2016-07-07 Thu]
 #+SETUPFILE: ../../org-templates/level-2.org
@@ -49,7 +49,6 @@ class ObjectHandler():
 
 #+end_src
 
-
 *** initialize_user_set
 #+NAME: initialize_user_set
 #+begin_src python
@@ -63,7 +62,6 @@ class ObjectHandler():
         return self.user_set
 
 #+end_src
-
 
 *** Tests
 #+NAME: test_initialize_object_handler
@@ -263,7 +261,6 @@ class TestObjectHandler(TestCase):
          oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
          oc = self.obj_handler.add_oc(oc1)
          self.assertEqual(self.obj_handler.oc_exists(oc), True)
-
 #+END_SRC
 
 
@@ -345,6 +342,30 @@ class TestObjectHandler(TestCase):
 
 
 
+*** get_active_users
+    This function returns All the active users from the user_set.
+#+NAME: get_active_users
+#+BEGIN_SRC python
+    def get_active_users(self): 
+        active_user_set = filter(lambda x: x.get("user_status")=="active",
+                                self.user_set)
+        return active_user_set
+#+END_SRC
+**** Tests
+#+NAME: test_get_active_users
+#+BEGIN_SRC python
+    def test_get_active_users(self):
+         print "test_get_active_users"
+         user = User(name=Name(name="some user"),
+                          email=Email(email="tt@kk.com"),
+                          roles=[Role.admin], user_status="active")
+
+         self.obj_handler.add_user(user)
+         active_user_list = self.obj_handler.get_active_users()
+         self.assertEqual(len(active_user_list), 2)
+
+#+END_SRC
+
 * Infra                                                         :boilerplate:
 
 ** sources
@@ -397,6 +418,7 @@ if __name__ == '__main__':
 <<add_oc>>
 <<nc_exists>>
 <<add_nc>>
+<<get_active_users>>
 #+end_src
 
 
@@ -414,6 +436,7 @@ if __name__ == '__main__':
 <<test_add_oc>>
 <<test_nc_exists>>
 <<test_add_nc>>
+<<test_get_active_users>>
 <<run_test_cases>>
 #+end_src
 
