@@ -42,6 +42,9 @@ requirements of the application.
 Name = ClassTemplate.mk_class("Name", name=is_alphabetic_str)
 is_name = is_inst(Name)
 check_name = check_pred(is_name)
+Name.__eq__ = lambda self, other: \
+                  isinstance(other, self.__class__) and \
+                  self.get("name") == other.get("name")
 
 #+end_src
 
@@ -340,6 +343,10 @@ def are_workshops(wkshps):
 
 NC= ClassTemplate.mk_class("NC", institute=is_institute, hub=is_oc, nc_target = is_nctarget, workshops = are_workshops)
 
+NC.__eq__ = lambda self,other: \
+	    isinstance(other, self.__class__) and \
+	    self.get("institute") == other.get("institute")
+
 def add_nc_target( self, nc_target):
     if is_nctarget(nc_target):
         self.nc_target = nc_target
@@ -394,6 +401,11 @@ def is_centre_nc(value):
 Role = ClassTemplate.mk_class("Role", 
                               name=is_alphabetic_str,
                               centre_oc=is_centre_oc,centre_nc=is_centre_nc)
+Role.__eq__ = lambda self,other: \
+	    isinstance(other, self.__class__) and \
+	    self.get("name") == other.get("name") and \
+            self.get('centre_oc') == other.get('centre_oc') and \
+            self.get('centre_nc') == other.get('centre_nc')
 
 is_role = is_inst(Role)
 check_role = check_pred(is_role)
@@ -550,6 +562,12 @@ string and =address= which is a string
 Institute = ClassTemplate.mk_class("Institute", name=is_alphabetic_str, address=is_str)
 is_institute = is_inst(Institute)
 check_institute = check_pred(is_institute)
+
+Institute.__eq__ = lambda self, other: \
+                  isinstance(other, self.__class__) and \
+                  self.get("name") == other.get("name") and \
+                  self.get('address') == other.get("address")
+                  
 
 def to_client(self):
     return {
