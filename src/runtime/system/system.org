@@ -82,22 +82,14 @@ The class corresponding to each operation has five fields:
 #+NAME: class_system
 #+begin_src python
 class System ():
-    admin_user = User(name=Name(name=Config.admin_name), 
-                      email=Email(email="app-admin@vlabs.ac.in"), 
-                     roles=[Role.admin,Role.guest,Role.noc],user_status="active")
-    user_set = [admin_user]
-    active_user_set=[admin_user]
-    session_set = []
-    role_set = [Role.admin,Role.reviewer,Role.guest,Role.noc]
-    institute_set = []
-    oc_set = []
-    nc_set = []
-    workshop_set = []
-   
-            #     'del_user' : DelUser}
-
+    
     def __init__(self):
         raise Error('Can not instantiate')
+    
+    @staticmethod
+    def initialize_system(cls):
+        System.handler = cls()
+        System.session_set = []
 
     @staticmethod
     def is_session_admin(session):
