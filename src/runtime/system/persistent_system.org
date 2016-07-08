@@ -1513,8 +1513,6 @@ class TestCreateWorkshop(TestCase):
         workshop_institute = System.do("create_institute", name = "NITK", address = "Surathkal", session = sess)
         oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],session=sess, oc_target = None)
         nc = System.do("create_nc",institute= Institute.get_by_id(1),hub=oc,session=sess, nc_target = None, workshops = [])
-        oc.save()
-        nc.save()
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
         nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
@@ -1543,6 +1541,120 @@ class TestCreateWorkshop(TestCase):
   
 #+END_SRC
 
+* =cancel_workshop=
+#+NAME: class_CancelWorkshop
+#+begin_src python
+class CancelWorkshop():
+    arg_types = {"workshop":is_workshop, "session":is_session}
+    arity_and_type_checks_needed = True   
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        workshop = args['workshop']
+        
+        
+        if System.is_session_NCC(session):
+            role = session.get('role')
+            nc_centre = role.get('centre_nc')
+            if workshop in nc_centre.get('workshops'):
+                return True
+            
+        else:
+            raise AuthError("Role not Authorized to perform this action")
+
+    @staticmethod
+    def state_check(args):
+        workshop = args["workshop"]
+        session = args["session"]
+        workshop_status = workshop.get("status")
+        if not Status.is_pending(workshop_status):
+            raise StateError("cannot cancel workshop")
+        
+                    
+    @staticmethod
+    def action(args):
+        workshop = args["workshop"]
+        workshop.set(status = Status.cancelled)
+        
+        
+#+end_src
+** Test CancelWorkshop
+#+NAME: test_CancelWorkshop
+#+BEGIN_SRC python
+class TestCancelWorkshop(TestCase):
+    TESTING = True
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
+        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
+        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
+        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
+        Role_admin.save()
+        Role_reviewer.save()
+        Role_guest.save()
+        Role_noc.save()
+
+        name = Name(name="admin")
+        name.save()
+        email = Email(email="app-admin@vlabs.ac.in")
+        email.save()
+
+        admin_user = User(name=name,
+                          email=email,
+                          roles=[Role_admin,Role_guest,Role_noc],user_status="active")
+        admin_user.save()
+        System.role_set = Role.query.all()
+        System.user_set = User.query.all()
+
+    def tearDown(self):
+        System.session_set = []
+        db.session.remove()
+        db.drop_all()
+
+
+    def test_cancel_workshop(self):
+        print "test_cancel_workshop"
+        admin_user=User.get_by_id(1)
+        session = Session(user=admin_user,role=Role.admin)
+        System.session_set.append(session)
+        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=session)
+        workshop_institute = System.do("create_institute", name = "NITK", address = "Surathkal", session = session)
+        oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
+        nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
+        target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target)
+        oc_target.save()
+        nc_target.save()
+        wstarget.save()
+        ws_status = Status(name = "pending")
+        ws_status.save()
+        name=Name(name="ncuser")
+        email=Email(email="ncuser@gmail.com")
+        name.save()
+        email.save()
+                
+        nc_user = System.do("add_user",name = name, email = email, session = session)
+        System.do("add_role", user = nc_user, role = Role.get_by_id(6), session = session)
+        nc_session = Session(user = nc_user, role = Role.get_by_id(6))
+        System.session_set.append(nc_session)
+
+        name1 = Name(name = "Lab Workshop")
+        name1.save()
+        new_workshop = System.do("create_workshop", institute = workshop_institute, name  = name1, ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
+        
+        System.do("cancel_workshop", workshop = new_workshop, session = nc_session)
+        self.assertEqual(new_workshop.get("status").get("name"), Status.cancelled.get("name"))
+        self.assertEqual(nc.get("workshops")[0].get("status").get("name"), Status.cancelled.get("name"))
+        
+
+    #+END_SRC
+
 * ops_table
 #+NAME: ops_table
 #+BEGIN_SRC python
@@ -1556,10 +1668,10 @@ ops_table = {'add_user' : AddUser,
              'update_user': UpdateUser, 
              'update_institute': UpdateInstitute, 
              'add_role': AddRole,
-             'create_workshop' : CreateWorkshop, 
+             'create_workshop' : CreateWorkshop,
+             'cancel_workshop' : CancelWorkshop
 }
-'''
-             'cancel_workshop' : CancelWorkshop, 
+''' 
              'reschedule_workshop' : RescheduleWorkshop, 
              'conduct_workshop' : ConductWorkshop, 
              'upload_artefact' : UploadArtefact,
@@ -1633,6 +1745,7 @@ if __name__ == '__main__':
 <<class_CreateNC>>
 <<class_UpdateInstitute>>
 <<class_CreateWorkshop>>
+<<class_CancelWorkshop>>
 <<ops_table>>
 #+end_src
 
@@ -1652,6 +1765,7 @@ if __name__ == '__main__':
 <<test_AddRole>>
 <<test_UpdateInstitute>>
 <<test_CreateWorkshop>>
+<<test_CancelWorkshop>>
 <<run_test_cases>>
 
 #+end_src
