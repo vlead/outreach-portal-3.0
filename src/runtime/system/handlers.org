@@ -217,7 +217,7 @@ class TestObjectHandler(TestCase):
 #+END_SRC
 
 
-*** add_role
+*** add_institute
     Add an institute to the system
     This function adds an institute to the institute-set maintained by the system.
 #+NAME: add_institute
@@ -236,6 +236,110 @@ class TestObjectHandler(TestCase):
          ins = Institute(name='IIIT',address='Hyderabad')
          inst = self.obj_handler.add_institute(ins)
          self.assertEqual(self.obj_handler.institute_exists(inst), True)
+
+#+END_SRC
+
+
+
+*** oc_exists
+    Check if =oc= already exists
+    This function checks if an outreach-centre is already in the oc-set of the =System=.
+#+NAME: oc_exists
+#+BEGIN_SRC python
+    def oc_exists(self, oc):
+        if oc in self.oc_set:
+            return True
+        else:
+            return False
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_oc_exists
+#+BEGIN_SRC python
+    def test_oc_exists(self):
+         print "test_oc_exists"
+         ins = Institute(name='IIIT',address='Hyderabad')
+         oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
+         oc = self.obj_handler.add_oc(oc1)
+         self.assertEqual(self.obj_handler.oc_exists(oc), True)
+
+#+END_SRC
+
+
+*** add_oc
+    Add a oc to the system
+    This function adds an outreach centre to the oc-set maintained by the system.
+#+NAME: add_oc
+#+BEGIN_SRC python
+    def add_oc(self, oc):
+        self.oc_set.append(oc)
+        return oc
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_add_oc
+#+BEGIN_SRC python
+    def test_add_oc(self):
+         print "test_add_oc"
+         ins = Institute(name='IIIT',address='Hyderabad')
+         oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
+         oc = self.obj_handler.add_oc(oc1)
+         self.assertEqual(self.obj_handler.oc_exists(oc), True)
+
+#+END_SRC
+
+
+
+*** nc_exists
+    Check if =nc= already exists
+    This function checks if a nodal-centre is already in the nc-set of the =System=.
+#+NAME: nc_exists
+#+BEGIN_SRC python
+    def nc_exists(self, nc):
+        if nc in self.nc_set:
+            return True
+        else:
+            return False
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_nc_exists
+#+BEGIN_SRC python
+    def test_nc_exists(self):
+         print "test_nc_exists"
+         ins = Institute(name='IIIT',address='Hyderabad')
+         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+         nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+         nc = self.obj_handler.add_nc(nc1)
+         self.assertEqual(self.obj_handler.nc_exists(nc), True)
+
+#+END_SRC
+
+
+*** add_nc
+    Add a nc to the system
+    This function adds a nodal centre to the nc-set maintained by the system.
+#+NAME: add_nc
+#+BEGIN_SRC python
+    def add_nc(self, nc):
+        self.nc_set.append(nc)
+        return nc
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_add_nc
+#+BEGIN_SRC python
+    def test_add_nc(self):
+         print "test_add_nc"
+         ins = Institute(name='IIIT',address='Hyderabad')
+         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+         nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+         nc = self.obj_handler.add_nc(nc1)
+         self.assertEqual(self.obj_handler.nc_exists(nc), True)
 
 #+END_SRC
 
@@ -263,7 +367,7 @@ from runtime.exceptions.custom_exceptions import *
 import unittest
 from unittest import TestCase
 from handlers import *
-
+import datetime
 #+end_src
 
 *** Running tests
@@ -289,6 +393,10 @@ if __name__ == '__main__':
 <<add_role>>
 <<institute_exists>>
 <<add_institute>>
+<<oc_exists>>
+<<add_oc>>
+<<nc_exists>>
+<<add_nc>>
 #+end_src
 
 
@@ -302,6 +410,10 @@ if __name__ == '__main__':
 <<test_add_role>>
 <<test_institute_exists>>
 <<test_add_institute>>
+<<test_oc_exists>>
+<<test_add_oc>>
+<<test_nc_exists>>
+<<test_add_nc>>
 <<run_test_cases>>
 #+end_src
 
