@@ -366,6 +366,72 @@ class TestObjectHandler(TestCase):
 
 #+END_SRC
 
+
+*** workshop_exists
+    Check if =workshop= already exists
+    This function checks if a workshop is already in the workshop-set of the =System=.
+#+NAME: workshop_exists
+#+BEGIN_SRC python
+    def workshop_exists(self, workshop):
+        if workshop in self.workshop_set:
+            return True
+        else:
+            return False
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_nc_exists
+#+BEGIN_SRC python
+    def test_workshop_exists(self):
+        print "test_workshop_exists"
+        ins = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        workshop_name = Name(name = "New Workshop")
+        ws_status = Status(name = "pending")
+        workshop = Workshop(institute = ins, nc = nc1, artefacts = [], ws_target = wstarget, status = ws_status, name = workshop_name)
+        workshop = self.obj_handler.add_workshop(workshop)
+        self.assertEqual(self.obj_handler.workshop_exists(workshop), True)
+
+#+END_SRC
+
+*** add_workshop
+    Add a workshop to the system
+    This function adds a workshop to the workshop-set maintained by the system.
+#+NAME: add_workshop
+#+BEGIN_SRC python
+    def add_workshop(self, workshop):
+        self.workshop_set.append(workshop)
+        return workshop
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_add_workshop
+#+BEGIN_SRC python
+    def test_add_workshop(self):
+        print "test_add_workshop"
+        ins = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        workshop_name = Name(name = "New Workshop")
+        ws_status = Status(name = "pending")
+        workshop = Workshop(institute = ins, nc = nc1, artefacts = [], ws_target = wstarget, status = ws_status, name = workshop_name)
+        workshop = self.obj_handler.add_workshop(workshop)
+        self.assertEqual(self.obj_handler.workshop_exists(workshop), True)
+
+#+END_SRC
+
+
 * Infra                                                         :boilerplate:
 
 ** sources
@@ -376,7 +442,7 @@ class TestObjectHandler(TestCase):
 from runtime.objects.entities import *
 from runtime.config.config import Config
 from runtime.exceptions.custom_exceptions import *
-
+import datetime
 #+end_src
 
 
@@ -418,6 +484,8 @@ if __name__ == '__main__':
 <<add_oc>>
 <<nc_exists>>
 <<add_nc>>
+<<workshop_exists>>
+<<add_workshop>>
 <<get_active_users>>
 #+end_src
 
@@ -437,6 +505,8 @@ if __name__ == '__main__':
 <<test_nc_exists>>
 <<test_add_nc>>
 <<test_get_active_users>>
+<<test_workshop_exists>>
+<<test_add_workshop>>
 <<run_test_cases>>
 #+end_src
 

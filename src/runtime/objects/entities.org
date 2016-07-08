@@ -696,7 +696,7 @@ def are_artefacts(artefacts):
     return ret_val
 
 
-Workshop = ClassTemplate.mk_class("Workshop", name=is_name, institute=is_institute, ws_target = is_wstarget, artefacts = are_artefacts, status = is_status)
+Workshop = ClassTemplate.mk_class("Workshop", name=is_name, institute=is_institute, ws_target = is_wstarget, nc = is_nc, artefacts = are_artefacts, status = is_status)
 
 is_wkshp = is_inst(Workshop)
 check_workshop = check_pred(is_wkshp)
@@ -731,16 +731,18 @@ class TestWorkshop(TestCase):
     def test_instatiate_Workshop(self):
         print "test_instantiate_workshop"
         status = Status(name = "pending")
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), oc_target = None, spokes = [])
+        nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
         oc_target = OCTarget(usage = 400, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nctargets = [])
         nc_target = NCTarget(usage = 400, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), oc_target = oc_target, wstargets = [])
         wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nc_target = nc_target)
-        workshop = Workshop(name=Name(name="Test workshop"), institute=Institute(name="IIITH",address="Hyderabad"), ws_target = wstarget_check, status = status, artefacts = [])
+        workshop = Workshop(name=Name(name="Test workshop"), institute=Institute(name="IIITH",address="Hyderabad"), nc = nc1, ws_target = wstarget_check, status = status, artefacts = [])
         self.assertEqual(is_wkshp(workshop), True)
     
 
 #+END_SRC
   
-   
+
 * Session
     A session stores the user information.  The session object defines the set
     of operations allowed by the system.  
