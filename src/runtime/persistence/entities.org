@@ -472,12 +472,17 @@ class TestWorkshop(TestCase):
         oc_target = OCTarget(usage = 400, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nctargets = [])
         nc_target = NCTarget(usage = 400, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), oc_target = oc_target, wstargets = [])
         oc_target.save()
+        inst1 = Institute(name="IIIT",address="Hyderabad")
+        inst1.save()
+        inst2 = Institute(name="NIT",address="Suratkal")
+        inst2.save()
+        
         nc_target.save()
         wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nc_target = nc_target)
         wstarget_check.save()
-        oc = OC(institute=Institute.get_by_id(1), spokes=[], oc_target = oc_target)
+        oc = OC(institute = Institute.get_by_id(1), spokes = [], oc_target = None)
         oc.save()
-        nc = NC(institute=Institute.get_by_id(2), hub=OC.get_by_id(1), nc_target = nc_target, workshops = [])
+        nc = NC(institute = Institute.get_by_id(2), hub = OC.get_by_id(1), nc_target = None, workshops = [])
         nc.save()
 
         workshop = Workshop(name=Name(name="Test workshop"), 
