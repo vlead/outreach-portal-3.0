@@ -1188,6 +1188,7 @@ class CreateWorkshop():
         nc = args['nc']
         new_workshop = Workshop(institute = institute, name = name, ws_target = ws_target, artefacts = artefacts, status = status, nc = nc)
         print new_workshop.get("name").get("name")
+        #System.handler.add_workshop(new_workshop)
         System.workshop_set.append(new_workshop)
         nc.add_workshop_to_nc(new_workshop)        
         

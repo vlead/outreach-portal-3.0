@@ -1534,7 +1534,14 @@ class TestCreateWorkshop(TestCase):
         System.session_set.append(nc_session)
         role_check = Role.get_by_id(6)
                
-        new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = NC.get_by_id(1), session = nc_session) 
+        new_workshop = System.do("create_workshop", 
+                                 institute = workshop_institute, 
+                                 name = Name(name = "Lab Workshop"), 
+                                 ws_target = wstarget, 
+                                 status = ws_status, 
+                                 artefacts = [], 
+                                 nc = NC.get_by_id(1), 
+                                 session = nc_session) 
         
         self.assertEqual(new_workshop.get('institute'),workshop_institute)
         self.assertEqual(nc.get('workshops')[0],new_workshop)
