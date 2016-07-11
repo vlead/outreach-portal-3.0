@@ -22,15 +22,16 @@
 #+NAME: class_object_handler
 #+BEGIN_SRC python
 class ObjectHandler():
-    role_set = []
-    user_set = []
-    active_user_set=[]
-    institute_set = []
-    oc_set = []
-    nc_set = []
-    workshop_set = []
    
     def __init__(self):
+        role_set = []
+        user_set = []
+        self.active_user_set=[]
+        self.institute_set = []
+        self.oc_set = []
+        self.nc_set = []
+        self.workshop_set = []
+
         self.role_set = self.initialize_role_set()
         self.user_set = self.initialize_user_set()
 
