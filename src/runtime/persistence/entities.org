@@ -475,7 +475,17 @@ class TestWorkshop(TestCase):
         nc_target.save()
         wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nc_target = nc_target)
         wstarget_check.save()
-        workshop = Workshop(name=Name(name="Test workshop"), institute=Institute(name="IIITH",address="Hyderabad"), ws_target = wstarget_check, status = status, artefacts = [])
+        oc = OC(institute=Institute.get_by_id(1), spokes=[], oc_target = oc_target)
+        oc.save()
+        nc = NC(institute=Institute.get_by_id(2), hub=OC.get_by_id(1), nc_target = nc_target, workshops = [])
+        nc.save()
+
+        workshop = Workshop(name=Name(name="Test workshop"), 
+                            institute=Institute(name="IIITH",address="Hyderabad"), 
+                            ws_target = wstarget_check, 
+                            status = status, 
+                            artefacts = [], 
+                            nc = nc)
         workshop.save()
         self.assertEqual(is_wkshp(workshop), True)
         workshop = Workshop.get_by_id(1)
