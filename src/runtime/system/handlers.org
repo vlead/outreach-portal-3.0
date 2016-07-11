@@ -98,7 +98,8 @@ class TestObjectHandler(TestCase):
 #+NAME: user_exists
 #+BEGIN_SRC python
     def user_exists(self, user):
-        if user in self.user_set:
+        active_users = self.get_active_users()
+        if user in active_users:
             return True
         else:
             return False
