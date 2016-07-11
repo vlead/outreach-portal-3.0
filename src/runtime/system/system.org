@@ -287,7 +287,7 @@ class AddUser():
 class TestAddUser(TestCase):
     TESTING = True
     def setUp(self):
-        pass
+        System.initialize_system(ObjectHandler)
 
     def tearDown(self):
         admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in",
@@ -409,7 +409,7 @@ class DeleteUser():
 class TestDeleteUser(TestCase):
     TESTING = True
     def setUp(self):
-        pass
+        System.initialize_system(ObjectHandler)
 
     def tearDown(self):
         admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in",
@@ -582,7 +582,7 @@ class UpdateUser():
 class TestUpdateUser(TestCase):
     TESTING = True
     def setUp(self):
-        pass
+        System.initialize_system(ObjectHandler)
 
     def tearDown(self):
         admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in",
@@ -711,7 +711,7 @@ class AddRole():
         if not (session in System.session_set):
             raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
         if System.is_session_admin(session):
-            if not System.handler.check_role(role):
+            if not System.handler.role_exists(role):
                 raise StateError("Invalid Role")
         if System.is_session_noc(session):
             if role.get('name') != 'OCC':
@@ -738,7 +738,7 @@ class AddRole():
 class TestAddRole(TestCase):
     TESTING = True
     def setUp(self):
-        pass
+        System.initialize_system(ObjectHandler)
 
     def tearDown(self):
         System.session_set = []
@@ -751,8 +751,8 @@ class TestAddRole(TestCase):
         login_user=System.handler.user_set[0]
         login_role = System.handler.role_set[0]
         sess = System.do("login",user=login_user,role=login_role)
-        us = System.do("add_role",user=login_user,role=Role.reviewer,session=sess)
-        self.assertTrue(len(us.get('roles'))==4)
+        us = System.do("add_role",user=login_user,role=Role.noc,session=sess)
+        self.assertTrue(len(us.get('roles'))==3)
         
         
 #+END_SRC
@@ -891,7 +891,7 @@ class CreateInstitute():
         name = args["name"]
         address = args["address"]
         new_institute = Institute(name=name,address=address)
-        System.institute_set.append(new_institute)
+        System.handler.institute_set.append(new_institute)
         return new_institute
 #+end_src
 ** Test create_institute
@@ -953,9 +953,9 @@ class CreateOC():
         spokes=args["spokes"]
         oc_target = args['oc_target']
         new_oc = OC(institute=institute,spokes=spokes, oc_target = oc_target)
-        System.oc_set.append(new_oc)
+        System.handler.oc_set.append(new_oc)
         new_role = Role(name="OCC",centre_oc=new_oc,centre_nc=None)
-        System.role_set.append(new_role)
+        System.handler.role_set.append(new_role)
         return new_oc
 
 #+end_src
@@ -976,7 +976,7 @@ class TestCreateOC(TestCase):
     def test_create_oc(self):
         print "test_create_oc"
         login_user=System.handler.user_set[0]
-        login_role = System.role_set[3]
+        login_role = System.handler.role_set[3]
         sess = System.do("login",user=login_user,role=login_role)
         institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
         oc = System.do("create_oc",institute=institute,spokes=[],session=sess, oc_target = None)
@@ -1029,10 +1029,10 @@ class CreateNC():
         nc_target = args['nc_target']
         workshops = args["workshops"]
         new_nc = NC(institute=institute,hub=oc, nc_target = nc_target, workshops = workshops)
-        System.nc_set.append(new_nc)
+        System.handler.nc_set.append(new_nc)
         oc.append_spoke(new_nc)
         new_role = Role(name="NCC",centre_oc=None,centre_nc=new_nc)
-        System.role_set.append(new_role)
+        System.handler.role_set.append(new_role)
         return new_nc
 #+end_src
 ** Test CreateNC
@@ -1176,7 +1176,7 @@ class CreateWorkshop():
         nc = args['nc']
         new_workshop = Workshop(institute = institute, name = name, ws_target = ws_target, artefacts = artefacts, status = status, nc = nc)
         print new_workshop.get("name").get("name")
-        System.workshop_set.append(new_workshop)
+        System.handler.workshop_set.append(new_workshop)
         nc.add_workshop_to_nc(new_workshop)        
         
         return new_workshop
@@ -1454,7 +1454,7 @@ class TestConductWorkshop(TestCase):
 
     def tearDown(self):
         admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in", 
-                        System.handlr.user_set)
+                        System.handler.user_set)
         System.user_set = admin
         System.session_set = []
         System.handler.institute_set = []
