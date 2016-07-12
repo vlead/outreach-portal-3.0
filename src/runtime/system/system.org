@@ -1142,7 +1142,14 @@ class TestUpdateInstitute(TestCase):
 #+NAME: class_CreateWorkshop
 #+begin_src python
 class CreateWorkshop():
-    arg_types = {"institute":is_institute, "name" : is_name , "session":is_session, "ws_target" : is_wstarget, "artefacts": are_artefacts, "status" : is_status, "nc" : is_nc}
+    arg_types = {"institute":is_institute, 
+                 "name" : is_name , 
+                 "session":is_session, 
+                 "ws_target" : is_wstarget, 
+                 "artefacts": are_artefacts, 
+                 "status" : is_status, 
+                 "nc" : is_nc
+                 }
     arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):
@@ -1184,7 +1191,16 @@ class CreateWorkshop():
         artefacts = args["artefacts"]
         status = args["status"]
         nc = args['nc']
-        new_workshop = Workshop(institute = institute, name = name, ws_target = ws_target, artefacts = artefacts, status = status, nc = nc)
+        new_workshop = Workshop(institute = institute, 
+                                name = name, 
+                                ws_target = ws_target, 
+                                artefacts = artefacts, 
+                                status = status, 
+                                nc = nc,
+                                a_date = None,
+                                a_participants = 0,
+                                a_experiments = 0,
+                                a_usage = 0)
         print new_workshop.get("name").get("name")
         System.handler.workshop_set.append(new_workshop)
         nc.add_workshop_to_nc(new_workshop)        
@@ -1228,8 +1244,15 @@ class TestCreateWorkshop(TestCase):
         nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
         
-        new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
-        
+        new_workshop = System.do("create_workshop", 
+                                 institute = workshop_institute, 
+                                 name = Name(name = "Lab Workshop"), 
+                                 ws_target = wstarget, 
+                                 status = ws_status, 
+                                 artefacts = [], 
+                                 nc = nc,
+                                 session = nc_session)
+                                 
         self.assertEqual(new_workshop.get('institute'),workshop_institute)
         self.assertEqual(nc.get('workshops')[0],new_workshop)
   

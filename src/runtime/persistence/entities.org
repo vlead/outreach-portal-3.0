@@ -435,6 +435,10 @@ args = {"__tablename__": "workshops",
         "artefacts": db.relationship('Artefact', backref = 'workshop'),
         "status_id": db.Column(db.Integer, db.ForeignKey('status.id')),
         "nc_id": db.Column(db.Integer, db.ForeignKey('ncs.id')),
+        "a_date": db.Column(db.Date),
+        "a_participants": db.Column(db.Integer),
+        "a_experiments": db.Column(db.Integer),
+        "a_usage": db.Column(db.Integer)
         }
 
 Workshop = ClassPersistenceTemplate.mk_persistent(Workshop, **args)
@@ -490,7 +494,11 @@ class TestWorkshop(TestCase):
                             ws_target = wstarget_check, 
                             status = status, 
                             artefacts = [], 
-                            nc = nc)
+                            nc = nc,
+                            a_date = None,
+                            a_participants = 0,
+                            a_experiments = 0,
+                            a_usage = 0)
         workshop.save()
         self.assertEqual(is_wkshp(workshop), True)
         workshop = Workshop.get_by_id(1)
