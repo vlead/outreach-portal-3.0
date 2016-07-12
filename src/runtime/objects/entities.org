@@ -644,6 +644,53 @@ class TestStatus(TestCase):
 
 
 
+* Type
+   =Type= is an entity that has a field =name= which is an alphabetic string
+
+#+NAME: class_Type
+#+BEGIN_SRC python
+Type = ClassTemplate.mk_class("Type", name=is_alphabetic_str)
+
+Type.photo = Type(name="photo")
+Type.feedback = Type(name="feedback")
+Type.report = Type(name="report")
+Type.attendance = Type(name="attendance")
+'''
+Status.is_pending = lambda status: status.get('name') == 'pending'
+Status.is_cancelled = lambda status: status.get('name') == 'cancelled'
+Status.is_completed = lambda status: status.get('name') == 'completed'
+Status.is_pending_approval = lambda status: status.get('name') == 'pending for approval'
+Status.is_rejected = lambda status: status.get('name') == 'rejected'
+Status.is_approved = lambda status: status.get('name') == 'approved'
+'''
+is_type = is_inst(Type)
+check_type = check_pred(is_type)
+
+#+END_SRC
+
+** Test Type
+#+NAME: class_TestType
+#+BEGIN_SRC python
+class TestType(TestCase):
+    TESTING = True
+
+    def test_instantiate_type(self):
+        print "test_instantiate_type_objects_entities"
+        self.assertEqual(is_type(Type(name="photo")), True)
+        a_type = Type.photo
+        self.assertEqual(check_type(a_type), a_type)
+        self.assertRaises(TypeError, Type, name="invalid123")
+
+    def test_set_and_get_type(self):
+        print "test_sets_on_type"
+        u_type = Type(name="feedback")
+        self.assertEqual(u_type.get("name"), "feedback")
+        u_type.set(name="photo")
+        self.assertEqual(u_type.get("name"), "photo")
+    
+#+END_SRC
+
+
 * Artefact
 #+NAME: class_Artefact
 #+BEGIN_SRC python
@@ -662,7 +709,8 @@ class TestArtefact(TestCase):
 
     def test_instantiate_artefact(self):
         print "test_instantiate_artefact"
-        self.assertEqual(is_artefact(Artefact(name="attendance", path="/home")), True)
+        self.assertEqual(is_artefact(Artefact(name="attendance", path="/home"))
+                         , True)
         self.assertEqual(Artefact(name="attendance", path="/home").get("name"),
                          "attendance")
         self.assertRaises(TypeError, Artefact, name="123")
@@ -871,6 +919,7 @@ if __name__ == '__main__':
 <<class_User>>
 <<class_Session>>
 <<class_Status>>
+<<class_Type>>
 <<class_Artefact>>
 <<class_Workshop>>
 #+end_src
@@ -889,6 +938,7 @@ if __name__ == '__main__':
 <<class_TestSession>>
 <<class_TestWorkshop>>
 <<class_TestStatus>>
+<<class_TestType>>
 <<class_TestArtefact>>
 <<class_TestWSTarget>>
 <<class_TestNCTarget>>
