@@ -451,8 +451,9 @@ class TestObjectHandler(TestCase):
 class PersistenceHandler():
    
     def __init__(self):
-        self.role_set = self.initialize_role_set()
-        self.user_set = self.initialize_user_set()
+        #self.initialize_role_set()
+        #self.initialize_user_set()
+        pass
 
 #+END_SRC
 
@@ -460,15 +461,16 @@ class PersistenceHandler():
 #+NAME: initialize_persistent_role_set
 #+begin_src python
     def initialize_role_set(self):
-        Role_admin = Role(name="admin", centre_oc=None, centre_nc=None)
-        Role_guest = Role(name="guest", centre_oc=None, centre_nc=None)
-        Role_noc = Role(name="noc", centre_oc=None, centre_nc=None)
-        Role_reviewer = Role(name="reviewer", centre_oc=None, centre_nc=None)                
-        Role_admin.save()
-        Role_guest.save()
-        Role_noc.save()
-        Role_reviewer.save()
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
         return Role.query.all()
+
 
 #+end_src
 
@@ -481,13 +483,13 @@ class PersistenceHandler():
         admin_email = Email(email=Config.admin_email)
         admin_name.save()
         admin_email.save()
-        Role_admin = Role.get_by_id(1)
-        Role_guest = Role.get_by_id(2)
-        admin_user = User(name=admin_name,
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
                           email=admin_email,
-                          roles=[Role_admin, Role_guest], user_status="active")
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
         return User.query.all()
-
 #+end_src
 
 *** Tests
@@ -502,25 +504,87 @@ class TestPersistentHandler(TestCase):
 
     def setUp(self):
         db.create_all()
-        self.persistent_handler = PersistenceHandler()
-    
+        #self.persistent_handler = PersistenceHandler()
+
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-        self.persistent_handler = None
-   
+        #self.persistent_handler = None
+
     def test_initialize_object_handler(self):
          print "test_initialize_persistent_handler"
-         self.assertEqual(len(Role.query.all()), 4)
-         #self.assertEqual(self.obj_handler.role_set[0].get("name"), "admin")
-         #self.assertEqual(len(self.obj_handler.user_set), 1)
-         #self.assertEqual(self.obj_handler.user_set[0].get("roles")[0].get("name"),
-         #                 "admin")
-         #self.assertEqual(self.obj_handler.user_set[0].get("roles")[1].get("name"),
-         #                 "guest")
+         handler = PersistenceHandler()
+         handler.initialize_role_set()
+         handler.initialize_user_set()
+         self.assertEqual(len(Role.get_all()), 4)
+         self.assertEqual(Role.get_by_id(1).get("name"), "admin")
+         self.assertEqual(len(User.query.all()), 1)
+         self.assertEqual(User.get_by_id(1).get("roles")[0].get("name"),
+                          "admin")
+         self.assertEqual(User.get_by_id(1).get("roles")[1].get("name"),
+                         "guest")
 
 #+END_SRC
 
+
+** Other functions
+   Other functions that help =System= perform the operations.
+ 
+*** user_exists
+    Check if =user= already exists
+    This function checks if a user is already in the user-set of the =System=.
+#+NAME: persistent_user_exists
+#+BEGIN_SRC python
+    def user_exists(self, user):
+        active_users = User.query.filter_by(user_status='active')
+        if user in active_users:
+            return True
+        else:
+            return False
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_user_exists
+#+BEGIN_SRC python
+    def test_user_exists(self):
+         print "test_user_exists"
+         handler = PersistenceHandler()
+         handler.initialize_role_set()
+         handler.initialize_user_set()
+         user = User.get_by_id(1)
+         self.assertEqual(handler.user_exists(user), True)
+
+#+END_SRC
+
+
+*** add_user
+    Add a user to the system
+    This function adds a user to the user-set maintained by the system.
+#+NAME: add_persistent_user
+#+BEGIN_SRC python
+    def add_user(self, user):
+        user.save()
+        return user
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_add_persistent_user
+#+BEGIN_SRC python
+    def test_add_user(self):
+         print "test_add_user"
+         handler = PersistenceHandler()
+         handler.initialize_role_set()
+         handler.initialize_user_set()
+         user = User(name=Name(name="some user"),
+                          email=Email(email="tt@kk.com"),
+                          roles=[Role.admin], user_status="active")
+
+         user = handler.add_user(user)
+         self.assertEqual(handler.user_exists(user), True)
+
+#+END_SRC
 
 
 * Infra                                                         :boilerplate:
@@ -541,8 +605,7 @@ import datetime
 # -*- coding: utf-8 -*-
 from runtime.persistence.entities import *
 from runtime.config.config import Config
-from runtime.exceptions.custom_exceptions import *
-from runtime.utils.class_persistence_template import *
+#from runtime.exceptions.custom_exceptions import *
 #+end_src
 
 ** Tests
@@ -561,13 +624,9 @@ import datetime
 # -*- coding: utf-8 -*-
 import unittest
 from flask_testing import TestCase
-from runtime.utils.class_persistence_template import *
 from runtime.rest.app import create_app
-from sqlalchemy.exc import IntegrityError
 from persistent_handlers import *
-from runtime.persistence.entities import *
 
-from persistent_system import *
 
 config = {
          'SQLALCHEMY_DATABASE_URI': ''
@@ -612,7 +671,8 @@ if __name__ == '__main__':
 <<class_persistence_handler>>
 <<initialize_persistent_role_set>>
 <<initialize_persistent_user_set>>
-
+<<persistent_user_exists>>
+<<add_persistent_user>>
 #+end_src
 ** tests
 #+BEGIN_SRC python :tangle test_object_handlers.py :eval no :noweb yes
@@ -637,6 +697,8 @@ if __name__ == '__main__':
 #+BEGIN_SRC python :tangle test_persistent_handlers.py :eval no :noweb yes
 <<imports_for_tests_persistence>>
 <<test_initialize_persistent_handler>>
+<<test_persistent_user_exists>>
+
 <<run_test_cases>>
 #+end_src
 
