@@ -644,10 +644,60 @@ class TestStatus(TestCase):
 
 
 
+* Type
+   =Type= is an entity that has a field =name= which is an alphabetic string
+
+#+NAME: class_Type
+#+BEGIN_SRC python
+Type = ClassTemplate.mk_class("Type", name=is_alphabetic_str)
+
+Type.photo = Type(name="photo")
+Type.feedback = Type(name="feedback")
+Type.report = Type(name="report")
+Type.attendance = Type(name="attendance")
+'''
+Status.is_pending = lambda status: status.get('name') == 'pending'
+Status.is_cancelled = lambda status: status.get('name') == 'cancelled'
+Status.is_completed = lambda status: status.get('name') == 'completed'
+Status.is_pending_approval = lambda status: status.get('name') == 'pending for approval'
+Status.is_rejected = lambda status: status.get('name') == 'rejected'
+Status.is_approved = lambda status: status.get('name') == 'approved'
+'''
+is_type = is_inst(Type)
+check_type = check_pred(is_type)
+
+#+END_SRC
+
+** Test Type
+#+NAME: class_TestType
+#+BEGIN_SRC python
+class TestType(TestCase):
+    TESTING = True
+
+    def test_instantiate_type(self):
+        print "test_instantiate_type_objects_entities"
+        self.assertEqual(is_type(Type(name="photo")), True)
+        a_type = Type.photo
+        self.assertEqual(check_type(a_type), a_type)
+        self.assertRaises(TypeError, Type, name="invalid123")
+
+    def test_set_and_get_type(self):
+        print "test_sets_on_type"
+        u_type = Type(name="feedback")
+        self.assertEqual(u_type.get("name"), "feedback")
+        u_type.set(name="photo")
+        self.assertEqual(u_type.get("name"), "photo")
+    
+#+END_SRC
+
+
 * Artefact
 #+NAME: class_Artefact
 #+BEGIN_SRC python
-Artefact = ClassTemplate.mk_class("Artefact", name=is_alphabetic_str, path=is_string)
+Artefact = ClassTemplate.mk_class("Artefact", 
+                                  name = is_alphabetic_str, 
+                                  path = is_string,
+                                  a_type = is_type )
 
 is_artefact = is_inst(Artefact)
 check_artefact = check_pred(is_artefact)
@@ -662,8 +712,12 @@ class TestArtefact(TestCase):
 
     def test_instantiate_artefact(self):
         print "test_instantiate_artefact"
-        self.assertEqual(is_artefact(Artefact(name="attendance", path="/home")), True)
-        self.assertEqual(Artefact(name="attendance", path="/home").get("name"),
+        self.assertEqual(is_artefact(Artefact(name="attendance", 
+                         path="/home", a_type = Type(name = "attendance")))
+                         , True)
+        self.assertEqual(Artefact(name="attendance", 
+                                  path="/home", 
+                                  a_type = Type(name = "attendance")).get("a_type").get("name"),
                          "attendance")
         self.assertRaises(TypeError, Artefact, name="123")
 
@@ -696,7 +750,17 @@ def are_artefacts(artefacts):
     return ret_val
 
 
-Workshop = ClassTemplate.mk_class("Workshop", name=is_name, institute=is_institute, ws_target = is_wstarget, nc = is_nc, artefacts = are_artefacts, status = is_status)
+Workshop = ClassTemplate.mk_class("Workshop", 
+                                  name=is_name, 
+                                  institute=is_institute, 
+                                  ws_target = is_wstarget, 
+                                  nc = is_nc, 
+                                  artefacts = are_artefacts, 
+                                  status = is_status,
+                                  a_date = is_date,
+                                  a_usage = is_int,
+                                  a_participants = is_int,
+                                  a_experiments = is_int)
 
 is_wkshp = is_inst(Workshop)
 check_workshop = check_pred(is_wkshp)
@@ -736,7 +800,16 @@ class TestWorkshop(TestCase):
         oc_target = OCTarget(usage = 400, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nctargets = [])
         nc_target = NCTarget(usage = 400, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), oc_target = oc_target, wstargets = [])
         wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nc_target = nc_target)
-        workshop = Workshop(name=Name(name="Test workshop"), institute=Institute(name="IIITH",address="Hyderabad"), nc = nc1, ws_target = wstarget_check, status = status, artefacts = [])
+        workshop = Workshop(name=Name(name="Test workshop"), 
+                            institute=Institute(name="IIITH",address="Hyderabad"), 
+                            nc = nc1, 
+                            ws_target = wstarget_check, 
+                            status = status, 
+                            artefacts = [],
+                            a_date = None,
+                            a_participants = 0,
+                            a_experiments = 0,
+                            a_usage = 0)
         self.assertEqual(is_wkshp(workshop), True)
     
 
@@ -852,6 +925,7 @@ if __name__ == '__main__':
 <<class_User>>
 <<class_Session>>
 <<class_Status>>
+<<class_Type>>
 <<class_Artefact>>
 <<class_Workshop>>
 #+end_src
@@ -870,6 +944,7 @@ if __name__ == '__main__':
 <<class_TestSession>>
 <<class_TestWorkshop>>
 <<class_TestStatus>>
+<<class_TestType>>
 <<class_TestArtefact>>
 <<class_TestWSTarget>>
 <<class_TestNCTarget>>

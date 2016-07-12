@@ -396,7 +396,16 @@ class TestObjectHandler(TestCase):
         wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
         workshop_name = Name(name = "New Workshop")
         ws_status = Status(name = "pending")
-        workshop = Workshop(institute = ins, nc = nc1, artefacts = [], ws_target = wstarget, status = ws_status, name = workshop_name)
+        workshop = Workshop(institute = ins, 
+                            nc = nc1, 
+                            artefacts = [], 
+                            ws_target = wstarget, 
+                            status = ws_status, 
+                            name = workshop_name, 
+                            a_date = None,
+                            a_participants = 0,
+                            a_experiments = 0,
+                            a_usage = 0)
         workshop = self.obj_handler.add_workshop(workshop)
         self.assertEqual(self.obj_handler.workshop_exists(workshop), True)
 
@@ -427,7 +436,16 @@ class TestObjectHandler(TestCase):
         wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
         workshop_name = Name(name = "New Workshop")
         ws_status = Status(name = "pending")
-        workshop = Workshop(institute = ins, nc = nc1, artefacts = [], ws_target = wstarget, status = ws_status, name = workshop_name)
+        workshop = Workshop(institute = ins, 
+                            nc = nc1, 
+                            artefacts = [], 
+                            ws_target = wstarget, 
+                            status = ws_status, 
+                            name = workshop_name, 
+                            a_date = None,
+                            a_participants = 0,
+                            a_experiments = 0,
+                            a_usage = 0)
         workshop = self.obj_handler.add_workshop(workshop)
         self.assertEqual(self.obj_handler.workshop_exists(workshop), True)
 

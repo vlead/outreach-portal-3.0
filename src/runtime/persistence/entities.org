@@ -378,6 +378,49 @@ class TestStatus(TestCase):
 
 #+END_SRC
 
+* Type   
+#+NAME: class_Type
+#+BEGIN_SRC python
+args = {"__tablename__": "types",
+        "id": db.Column(db.Integer, primary_key = True),
+        "name": db.Column(db.String)
+        }
+
+Type = ClassPersistenceTemplate.mk_persistent(Type, **args)
+
+is_type = is_inst(Type)
+check_type = check_pred(is_type)
+#+END_SRC
+
+** Test Type
+#+NAME: class_TestType
+#+BEGIN_SRC python
+class TestType(TestCase):
+    TESTING = True
+
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
+    def test_instantiate_type(self):
+        print "test_instantiate_type"
+        type_check = Type(name = "photo")
+        type_check.save()
+        self.assertEqual(is_type(type_check), True)
+        typ_check = Type.get_by_id(1)
+        self.assertEqual(typ_check.get("name"), "photo")
+        self.assertRaises(TypeError, Type, name = 123)
+
+#+END_SRC
+
+
 * Artefact   
 #+NAME: class_Artefact
 #+BEGIN_SRC python
@@ -385,7 +428,8 @@ args = {"__tablename__": "artefacts",
         "id": db.Column(db.Integer, primary_key = True),
         "name": db.Column(db.String),
         "path": db.Column(db.String),
-        "workshop_id": db.Column(db.Integer, db.ForeignKey('workshops.id'))
+        "workshop_id": db.Column(db.Integer, db.ForeignKey('workshops.id')),
+        "a_type_id": db.Column(db.Integer, db.ForeignKey('types.id'))
         }
 
 Artefact = ClassPersistenceTemplate.mk_persistent(Artefact, **args)
@@ -413,7 +457,11 @@ class TestArtefact(TestCase):
 
     def test_instantiate_artefact(self):
         print "test_instantiate_artefact"
-        artefact_check = Artefact(name = "photo", path = "/main/photos")
+        a_type = Type(name = "photo")
+        a_type.save()
+        artefact_check = Artefact(name = "photo", 
+                                  path = "/main/photos", 
+                                  a_type = Type.get_by_id(1))
         artefact_check.save()
         self.assertEqual(is_artefact(artefact_check), True)
         art_check = Artefact.get_by_id(1)
@@ -435,6 +483,10 @@ args = {"__tablename__": "workshops",
         "artefacts": db.relationship('Artefact', backref = 'workshop'),
         "status_id": db.Column(db.Integer, db.ForeignKey('status.id')),
         "nc_id": db.Column(db.Integer, db.ForeignKey('ncs.id')),
+        "a_date": db.Column(db.Date),
+        "a_participants": db.Column(db.Integer),
+        "a_experiments": db.Column(db.Integer),
+        "a_usage": db.Column(db.Integer)
         }
 
 Workshop = ClassPersistenceTemplate.mk_persistent(Workshop, **args)
@@ -490,7 +542,11 @@ class TestWorkshop(TestCase):
                             ws_target = wstarget_check, 
                             status = status, 
                             artefacts = [], 
-                            nc = nc)
+                            nc = nc,
+                            a_date = None,
+                            a_participants = 0,
+                            a_experiments = 0,
+                            a_usage = 0)
         workshop.save()
         self.assertEqual(is_wkshp(workshop), True)
         workshop = Workshop.get_by_id(1)
@@ -507,7 +563,7 @@ args = {"__tablename__": "ocs",
 	"id": db.Column(db.Integer, primary_key=True),
         "institute_id": db.Column(db.Integer, db.ForeignKey('institutes.id')),
         "spokes": db.relationship('NC', backref='hub'),
-        "oc_target": db.Column(db.Integer, db.ForeignKey('octargets.id'))
+        "oc_target_id": db.Column(db.Integer, db.ForeignKey('octargets.id'))
 	}
 
 OC = ClassPersistenceTemplate.mk_persistent(OC, **args)
@@ -584,7 +640,7 @@ args = {"__tablename__": "ncs",
 	"id": db.Column(db.Integer, primary_key=True),
         "institute_id": db.Column(db.Integer, db.ForeignKey('institutes.id')),
         "hub_id": db.Column(db.Integer, db.ForeignKey('ocs.id')),
-        "nc_target": db.Column(db.Integer, db.ForeignKey('nctargets.id')),
+        "nc_target_id": db.Column(db.Integer, db.ForeignKey('nctargets.id')),
 	"workshops": db.relationship('Workshop', backref = 'nc')
         }
 
@@ -846,6 +902,7 @@ if __name__ == '__main__':
 <<class_OC>>
 <<class_NC>>
 <<class_Status>>
+<<class_Type>>
 <<class_Artefact>>
 <<class_Workshop>>
 <<class_Name>>
@@ -865,6 +922,7 @@ if __name__ == '__main__':
 <<class_TestOC>>
 <<class_TestNC>>
 <<class_TestStatus>>
+<<class_TestType>>
 <<class_TestArtefact>>
 <<class_TestWorkshop>>
 <<class_TestRole>>
