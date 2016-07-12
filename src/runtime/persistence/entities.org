@@ -378,6 +378,49 @@ class TestStatus(TestCase):
 
 #+END_SRC
 
+* Type   
+#+NAME: class_Type
+#+BEGIN_SRC python
+args = {"__tablename__": "types",
+        "id": db.Column(db.Integer, primary_key = True),
+        "name": db.Column(db.String)
+        }
+
+Type = ClassPersistenceTemplate.mk_persistent(Type, **args)
+
+is_type = is_inst(Type)
+check_type = check_pred(is_type)
+#+END_SRC
+
+** Test Type
+#+NAME: class_TestType
+#+BEGIN_SRC python
+class TestType(TestCase):
+    TESTING = True
+
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
+    def test_instantiate_type(self):
+        print "test_instantiate_type"
+        type_check = Type(name = "photo")
+        type_check.save()
+        self.assertEqual(is_type(type_check), True)
+        typ_check = Type.get_by_id(1)
+        self.assertEqual(typ_check.get("name"), "photo")
+        self.assertRaises(TypeError, Type, name = 123)
+
+#+END_SRC
+
+
 * Artefact   
 #+NAME: class_Artefact
 #+BEGIN_SRC python
@@ -385,7 +428,8 @@ args = {"__tablename__": "artefacts",
         "id": db.Column(db.Integer, primary_key = True),
         "name": db.Column(db.String),
         "path": db.Column(db.String),
-        "workshop_id": db.Column(db.Integer, db.ForeignKey('workshops.id'))
+        "workshop_id": db.Column(db.Integer, db.ForeignKey('workshops.id')),
+        "a_type_id": db.Column(db.Integer, db.ForeignKey('types.id'))
         }
 
 Artefact = ClassPersistenceTemplate.mk_persistent(Artefact, **args)
@@ -413,7 +457,11 @@ class TestArtefact(TestCase):
 
     def test_instantiate_artefact(self):
         print "test_instantiate_artefact"
-        artefact_check = Artefact(name = "photo", path = "/main/photos")
+        a_type = Type(name = "photo")
+        a_type.save()
+        artefact_check = Artefact(name = "photo", 
+                                  path = "/main/photos", 
+                                  a_type = Type.get_by_id(1))
         artefact_check.save()
         self.assertEqual(is_artefact(artefact_check), True)
         art_check = Artefact.get_by_id(1)
@@ -854,6 +902,7 @@ if __name__ == '__main__':
 <<class_OC>>
 <<class_NC>>
 <<class_Status>>
+<<class_Type>>
 <<class_Artefact>>
 <<class_Workshop>>
 <<class_Name>>
@@ -873,6 +922,7 @@ if __name__ == '__main__':
 <<class_TestOC>>
 <<class_TestNC>>
 <<class_TestStatus>>
+<<class_TestType>>
 <<class_TestArtefact>>
 <<class_TestWorkshop>>
 <<class_TestRole>>
