@@ -694,7 +694,10 @@ class TestType(TestCase):
 * Artefact
 #+NAME: class_Artefact
 #+BEGIN_SRC python
-Artefact = ClassTemplate.mk_class("Artefact", name=is_alphabetic_str, path=is_string)
+Artefact = ClassTemplate.mk_class("Artefact", 
+                                  name = is_alphabetic_str, 
+                                  path = is_string,
+                                  a_type = is_type )
 
 is_artefact = is_inst(Artefact)
 check_artefact = check_pred(is_artefact)
@@ -709,9 +712,12 @@ class TestArtefact(TestCase):
 
     def test_instantiate_artefact(self):
         print "test_instantiate_artefact"
-        self.assertEqual(is_artefact(Artefact(name="attendance", path="/home"))
+        self.assertEqual(is_artefact(Artefact(name="attendance", 
+                         path="/home", a_type = Type(name = "attendance")))
                          , True)
-        self.assertEqual(Artefact(name="attendance", path="/home").get("name"),
+        self.assertEqual(Artefact(name="attendance", 
+                                  path="/home", 
+                                  a_type = Type(name = "attendance")).get("a_type").get("name"),
                          "attendance")
         self.assertRaises(TypeError, Artefact, name="123")
 

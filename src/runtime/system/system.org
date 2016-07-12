@@ -1633,7 +1633,7 @@ class TestUploadArtefact(TestCase):
         System.do("conduct_workshop", workshop = new_workshop, session = nc_session)
         
 
-        new_artefact = Artefact(name = "Photo", path = "/main/photos")
+        new_artefact = Artefact(name = "Photo", path = "/main/photos", a_type = Type.photo)
 
         System.do("upload_artefact", workshop = new_workshop, session = nc_session, artefact = new_artefact)
         
@@ -1746,7 +1746,9 @@ class TestApproveWorkshop(TestCase):
                                  artefacts = [], nc = nc, session = nc_session) 
         System.do("conduct_workshop", workshop = new_workshop,
                   session = nc_session)
-        new_artefact = Artefact(name = "Photo", path = "/main/photos")
+        new_artefact = Artefact(name = "Photo", 
+                                path = "/main/photos", 
+                                a_type = Type.photo)
 
         System.do("upload_artefact", workshop = new_workshop,
                   session = nc_session, artefact = new_artefact)
@@ -1815,8 +1817,8 @@ class TestRejectWorkshop(TestCase):
         System.handler.nc_set = []
         System.handler.workshop_set = []
 
-    def test_approve_workshop(self):
-        print "test_approve_workshop"
+    def test_reject_workshop(self):
+        print "test_reject_workshop"
         admin_user=System.handler.user_set[0]
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
@@ -1843,7 +1845,7 @@ class TestRejectWorkshop(TestCase):
         
         new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
         System.do("conduct_workshop", workshop = new_workshop, session = nc_session)
-        new_artefact = Artefact(name = "Photo", path = "/main/photos")
+        new_artefact = Artefact(name = "Photo", path = "/main/photos", a_type = Type.photo)
 
         System.do("upload_artefact", workshop = new_workshop, session = nc_session, artefact = new_artefact)
         
@@ -1943,7 +1945,7 @@ class TestDeleteArtefact(TestCase):
         System.do("conduct_workshop", workshop = new_workshop, session = nc_session)
         
 
-        new_artefact = Artefact(name = "Photo", path = "/main/photos")
+        new_artefact = Artefact(name = "Photo", path = "/main/photos", a_type = Type.photo)
 
         System.do("upload_artefact", workshop = new_workshop, session = nc_session, artefact = new_artefact)
         
