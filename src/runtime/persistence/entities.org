@@ -563,7 +563,7 @@ args = {"__tablename__": "ocs",
 	"id": db.Column(db.Integer, primary_key=True),
         "institute_id": db.Column(db.Integer, db.ForeignKey('institutes.id')),
         "spokes": db.relationship('NC', backref='hub'),
-        "oc_target": db.Column(db.Integer, db.ForeignKey('octargets.id'))
+        "oc_target_id": db.Column(db.Integer, db.ForeignKey('octargets.id'))
 	}
 
 OC = ClassPersistenceTemplate.mk_persistent(OC, **args)
@@ -640,7 +640,7 @@ args = {"__tablename__": "ncs",
 	"id": db.Column(db.Integer, primary_key=True),
         "institute_id": db.Column(db.Integer, db.ForeignKey('institutes.id')),
         "hub_id": db.Column(db.Integer, db.ForeignKey('ocs.id')),
-        "nc_target": db.Column(db.Integer, db.ForeignKey('nctargets.id')),
+        "nc_target_id": db.Column(db.Integer, db.ForeignKey('nctargets.id')),
 	"workshops": db.relationship('Workshop', backref = 'nc')
         }
 
