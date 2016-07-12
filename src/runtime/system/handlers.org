@@ -38,7 +38,7 @@ class ObjectHandler():
 #+END_SRC
 
 *** initialize_role_set
-#+NAME: initialize_role_set
+#+NAME: initialize_object_role_set
 #+begin_src python
     def initialize_role_set(self):
         Role_admin = Role(name="admin", centre_oc=None, centre_nc=None)
@@ -51,7 +51,7 @@ class ObjectHandler():
 #+end_src
 
 *** initialize_user_set
-#+NAME: initialize_user_set
+#+NAME: initialize_object_user_set
 #+begin_src python
 
     def initialize_user_set(self):
@@ -457,7 +457,7 @@ class PersistenceHandler():
 #+END_SRC
 
 *** initialize_role_set
-#+NAME: initialize_role_set
+#+NAME: initialize_persistent_role_set
 #+begin_src python
     def initialize_role_set(self):
         Role_admin = Role(name="admin", centre_oc=None, centre_nc=None)
@@ -473,7 +473,7 @@ class PersistenceHandler():
 #+end_src
 
 *** initialize_user_set
-#+NAME: initialize_user_set
+#+NAME: initialize_persistent_user_set
 #+begin_src python
 
     def initialize_user_set(self):
@@ -491,371 +491,33 @@ class PersistenceHandler():
 #+end_src
 
 *** Tests
-#+NAME: test_initialize_object_handler
+#+NAME: test_initialize_persistent_handler
 #+BEGIN_SRC python
-class TestObjectHandler(TestCase):
+class TestPersistentHandler(TestCase):
     TESTING = True
     object_handler = None
-    
+    def create_app(self):
+        app = create_app(config)
+        return app
+
     def setUp(self):
-        self.obj_handler = ObjectHandler()
+        db.create_all()
+        self.persistent_handler = PersistenceHandler()
     
     def tearDown(self):
-        self.obj_handler = None
+        db.session.remove()
+        db.drop_all()
+        self.persistent_handler = None
    
     def test_initialize_object_handler(self):
-         print "test_initialize_object_handler"
-         self.assertEqual(len(self.obj_handler.role_set), 4)
-         self.assertEqual(self.obj_handler.role_set[0].get("name"), "admin")
-         self.assertEqual(len(self.obj_handler.user_set), 1)
-         self.assertEqual(self.obj_handler.user_set[0].get("roles")[0].get("name"),
-                          "admin")
-         self.assertEqual(self.obj_handler.user_set[0].get("roles")[1].get("name"),
-                          "guest")
-
-#+END_SRC
-
-
-** Other functions
-   Other functions that help =System= perform the operations. 
-
-*** user_exists
-    Check if =user= already exists
-    This function checks if a user is already in the user-set of the =System=.
-#+NAME: user_exists
-#+BEGIN_SRC python
-    def user_exists(self, user):
-        active_users = self.get_active_users()
-        if user in active_users:
-            return True
-        else:
-            return False
-
-#+END_SRC
-
-**** Tests
-#+NAME: test_user_exists
-#+BEGIN_SRC python
-    def test_user_exists(self):
-         print "test_user_exists"
-         user = self.obj_handler.user_set[0]
-         self.assertEqual(self.obj_handler.user_exists(user), True)
-
-#+END_SRC
-
-
-*** add_user
-    Add a user to the system
-    This function adds a user to the user-set maintained by the system.
-#+NAME: add_user
-#+BEGIN_SRC python
-    def add_user(self, user):
-        self.user_set.append(user)
-        return user
-
-#+END_SRC
-
-**** Tests
-#+NAME: test_add_user
-#+BEGIN_SRC python
-    def test_add_user(self):
-         print "test_add_user"
-         user = User(name=Name(name="some user"),
-                          email=Email(email="tt@kk.com"),
-                          roles=[Role.admin], user_status="active")
-
-         user = self.obj_handler.add_user(user)
-         self.assertEqual(self.obj_handler.user_exists(user), True)
-
-#+END_SRC
-
-
-*** role_exists
-    Check if =role= already exists
-    This function checks if a user is already in the role-set of the =System=.
-#+NAME: role_exists
-#+BEGIN_SRC python
-    def role_exists(self, role):
-        if role in self.role_set:
-            return True
-        else:
-            return False
-
-#+END_SRC
-
-**** Tests
-#+NAME: test_role_exists
-#+BEGIN_SRC python
-    def test_role_exists(self):
-         print "test_role_exists"
-         role = self.obj_handler.role_set[0]
-         self.assertEqual(self.obj_handler.role_exists(role), True)
-
-#+END_SRC
-
-
-*** add_role
-    Add a role to the system
-    This function adds a user to the role-set maintained by the system.
-#+NAME: add_role
-#+BEGIN_SRC python
-    def add_role(self, role):
-        self.role_set.append(role)
-        return role
-
-#+END_SRC
-
-**** Tests
-#+NAME: test_add_role
-#+BEGIN_SRC python
-    def test_add_role(self):
-         print "test_add_role"
-         role = Role(name='user',centre_oc=None,centre_nc=None)
-         role = self.obj_handler.add_role(role)
-         self.assertEqual(self.obj_handler.role_exists(role), True)
-
-#+END_SRC
-
-
-
-*** institute_exists
-    Check if =institute= already exists
-    This function checks if a user is already in the institute-set of the =System=.
-#+NAME: institute_exists
-#+BEGIN_SRC python
-    def institute_exists(self, institute):
-        if institute in self.institute_set:
-            return True
-        else:
-            return False
-
-#+END_SRC
-
-**** Tests
-#+NAME: test_institute_exists
-#+BEGIN_SRC python
-    def test_institute_exists(self):
-         print "test_institute_exists"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         inst = self.obj_handler.add_institute(ins)
-         self.assertEqual(self.obj_handler.institute_exists(inst), True)
-
-#+END_SRC
-
-
-*** add_institute
-    Add an institute to the system
-    This function adds an institute to the institute-set maintained by the system.
-#+NAME: add_institute
-#+BEGIN_SRC python
-    def add_institute(self, institute):
-        self.institute_set.append(institute)
-        return institute
-
-#+END_SRC
-
-**** Tests
-#+NAME: test_add_institute
-#+BEGIN_SRC python
-    def test_add_institute(self):
-         print "test_add_institute"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         inst = self.obj_handler.add_institute(ins)
-         self.assertEqual(self.obj_handler.institute_exists(inst), True)
-
-#+END_SRC
-
-
-
-*** oc_exists
-    Check if =oc= already exists
-    This function checks if an outreach-centre is already in the oc-set of the =System=.
-#+NAME: oc_exists
-#+BEGIN_SRC python
-    def oc_exists(self, oc):
-        if oc in self.oc_set:
-            return True
-        else:
-            return False
-
-#+END_SRC
-
-**** Tests
-#+NAME: test_oc_exists
-#+BEGIN_SRC python
-    def test_oc_exists(self):
-         print "test_oc_exists"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
-         oc = self.obj_handler.add_oc(oc1)
-         self.assertEqual(self.obj_handler.oc_exists(oc), True)
-#+END_SRC
-
-
-*** add_oc
-    Add a oc to the system
-    This function adds an outreach centre to the oc-set maintained by the system.
-#+NAME: add_oc
-#+BEGIN_SRC python
-    def add_oc(self, oc):
-        self.oc_set.append(oc)
-        return oc
-
-#+END_SRC
-
-**** Tests
-#+NAME: test_add_oc
-#+BEGIN_SRC python
-    def test_add_oc(self):
-         print "test_add_oc"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
-         oc = self.obj_handler.add_oc(oc1)
-         self.assertEqual(self.obj_handler.oc_exists(oc), True)
-
-#+END_SRC
-
-
-
-*** nc_exists
-    Check if =nc= already exists
-    This function checks if a nodal-centre is already in the nc-set of the =System=.
-#+NAME: nc_exists
-#+BEGIN_SRC python
-    def nc_exists(self, nc):
-        if nc in self.nc_set:
-            return True
-        else:
-            return False
-
-#+END_SRC
-
-**** Tests
-#+NAME: test_nc_exists
-#+BEGIN_SRC python
-    def test_nc_exists(self):
-         print "test_nc_exists"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-         nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-         nc = self.obj_handler.add_nc(nc1)
-         self.assertEqual(self.obj_handler.nc_exists(nc), True)
-
-#+END_SRC
-
-
-*** add_nc
-    Add a nc to the system
-    This function adds a nodal centre to the nc-set maintained by the system.
-#+NAME: add_nc
-#+BEGIN_SRC python
-    def add_nc(self, nc):
-        self.nc_set.append(nc)
-        return nc
-
-#+END_SRC
-
-**** Tests
-#+NAME: test_add_nc
-#+BEGIN_SRC python
-    def test_add_nc(self):
-         print "test_add_nc"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-         nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-         nc = self.obj_handler.add_nc(nc1)
-         self.assertEqual(self.obj_handler.nc_exists(nc), True)
-
-#+END_SRC
-
-
-
-*** get_active_users
-    This function returns All the active users from the user_set.
-#+NAME: get_active_users
-#+BEGIN_SRC python
-    def get_active_users(self): 
-        active_user_set = filter(lambda x: x.get("user_status")=="active",
-                                self.user_set)
-        return active_user_set
-#+END_SRC
-**** Tests
-#+NAME: test_get_active_users
-#+BEGIN_SRC python
-    def test_get_active_users(self):
-         print "test_get_active_users"
-         user = User(name=Name(name="some user"),
-                          email=Email(email="tt@kk.com"),
-                          roles=[Role.admin], user_status="active")
-
-         self.obj_handler.add_user(user)
-         active_user_list = self.obj_handler.get_active_users()
-         self.assertEqual(len(active_user_list), 2)
-
-#+END_SRC
-
-
-*** workshop_exists
-    Check if =workshop= already exists
-    This function checks if a workshop is already in the workshop-set of the =System=.
-#+NAME: workshop_exists
-#+BEGIN_SRC python
-    def workshop_exists(self, workshop):
-        if workshop in self.workshop_set:
-            return True
-        else:
-            return False
-
-#+END_SRC
-
-**** Tests
-#+NAME: test_nc_exists
-#+BEGIN_SRC python
-    def test_workshop_exists(self):
-        print "test_workshop_exists"
-        ins = Institute(name='IIIT',address='Hyderabad')
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-        nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
-        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
-        workshop_name = Name(name = "New Workshop")
-        ws_status = Status(name = "pending")
-        workshop = Workshop(institute = ins, nc = nc1, artefacts = [], ws_target = wstarget, status = ws_status, name = workshop_name)
-        workshop = self.obj_handler.add_workshop(workshop)
-        self.assertEqual(self.obj_handler.workshop_exists(workshop), True)
-
-#+END_SRC
-
-*** add_workshop
-    Add a workshop to the system
-    This function adds a workshop to the workshop-set maintained by the system.
-#+NAME: add_workshop
-#+BEGIN_SRC python
-    def add_workshop(self, workshop):
-        self.workshop_set.append(workshop)
-        return workshop
-
-#+END_SRC
-
-**** Tests
-#+NAME: test_add_workshop
-#+BEGIN_SRC python
-    def test_add_workshop(self):
-        print "test_add_workshop"
-        ins = Institute(name='IIIT',address='Hyderabad')
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-        nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
-        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
-        workshop_name = Name(name = "New Workshop")
-        ws_status = Status(name = "pending")
-        workshop = Workshop(institute = ins, nc = nc1, artefacts = [], ws_target = wstarget, status = ws_status, name = workshop_name)
-        workshop = self.obj_handler.add_workshop(workshop)
-        self.assertEqual(self.obj_handler.workshop_exists(workshop), True)
+         print "test_initialize_persistent_handler"
+         self.assertEqual(len(Role.query.all()), 4)
+         #self.assertEqual(self.obj_handler.role_set[0].get("name"), "admin")
+         #self.assertEqual(len(self.obj_handler.user_set), 1)
+         #self.assertEqual(self.obj_handler.user_set[0].get("roles")[0].get("name"),
+         #                 "admin")
+         #self.assertEqual(self.obj_handler.user_set[0].get("roles")[1].get("name"),
+         #                 "guest")
 
 #+END_SRC
 
@@ -890,7 +552,7 @@ from runtime.utils.class_persistence_template import *
 # -*- coding: utf-8 -*-
 import unittest
 from unittest import TestCase
-from handlers import *
+from object_handlers import *
 import datetime
 #+end_src
 
@@ -902,6 +564,7 @@ from flask_testing import TestCase
 from runtime.utils.class_persistence_template import *
 from runtime.rest.app import create_app
 from sqlalchemy.exc import IntegrityError
+from persistent_handlers import *
 from runtime.persistence.entities import *
 
 from persistent_system import *
@@ -926,8 +589,8 @@ if __name__ == '__main__':
 #+BEGIN_SRC python :tangle object_handlers.py :eval no :noweb yes
 <<imports_for_object_handlers>>
 <<class_object_handler>>
-<<initialize_role_set>>
-<<initialize_user_set>>
+<<initialize_object_role_set>>
+<<initialize_object_user_set>>
 <<user_exists>>
 <<add_user>>
 <<role_exists>>
@@ -944,9 +607,11 @@ if __name__ == '__main__':
 #+end_src
 
 
-#+BEGIN_SRC python :tangle test_persistent_handlers.py :eval no :noweb yes
+#+BEGIN_SRC python :tangle persistent_handlers.py :eval no :noweb yes
 <<imports_for_persistent_handlers>>
-<<class_persistent_handler>>
+<<class_persistence_handler>>
+<<initialize_persistent_role_set>>
+<<initialize_persistent_user_set>>
 
 #+end_src
 ** tests
@@ -970,10 +635,9 @@ if __name__ == '__main__':
 #+end_src
 
 #+BEGIN_SRC python :tangle test_persistent_handlers.py :eval no :noweb yes
-<<imports_for_tests_persistent>>
+<<imports_for_tests_persistence>>
 <<test_initialize_persistent_handler>>
-<<initialize_role_set>>
-<<initialize_user_set>>
+<<run_test_cases>>
 #+end_src
 
 
