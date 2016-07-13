@@ -595,10 +595,13 @@ class TestPersistentHandler(TestCase):
          handler = PersistenceHandler()
          handler.initialize_role_set()
          handler.initialize_user_set()
-         user = User(name=Name(name="some user"),
-                          email=Email(email="tt@kk.com"),
-                          roles=[Role.admin], user_status="active")
-
+         name = Name(name="some user")
+         name.save()
+         email = Email(email="tt@kk.com")
+         email.save()
+         user = User(name=name,
+                     email=email,
+                     roles=[Role.get_by_id(1)], user_status="active")
          user = handler.add_user(user)
          self.assertEqual(handler.user_exists(user), True)
 
@@ -716,7 +719,7 @@ if __name__ == '__main__':
 <<imports_for_tests_persistence>>
 <<test_initialize_persistent_handler>>
 <<test_persistent_user_exists>>
-
+<<test_add_persistent_user>>
 <<run_test_cases>>
 #+end_src
 
