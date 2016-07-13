@@ -833,6 +833,117 @@ class TestPersistentHandler(TestCase):
 
 #+END_SRC
 
+*** role_exists
+    Check if =role= already exists
+    This function checks if a user is already in the role-set of the =System=.
+#+NAME: persistent_role_exists
+#+BEGIN_SRC python
+    def role_exists(self, role):
+        if role in Role.get_all():
+            return True
+        else:
+            return False
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_role_exists
+#+BEGIN_SRC python
+    def test_role_exists(self):
+         print "test_role_exists"
+         handler = PersistenceHandler()
+         handler.initialize_role_set()
+         handler.initialize_user_set()
+         role = Role.get_by_id(1)
+         self.assertEqual(handler.role_exists(role), True)
+
+#+END_SRC
+
+
+*** add_role
+    Add a role to the system
+    This function adds a user to the role-set maintained by the system.
+#+NAME: add_persistent_role
+#+BEGIN_SRC python
+    def add_role(self, role):
+        role.save()
+        return role
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_add_persistent_role
+#+BEGIN_SRC python
+    def test_add_role(self):
+         print "test_add_role"
+         handler = PersistenceHandler()
+         handler.initialize_role_set()
+         handler.initialize_user_set()
+         role = Role(name='user',centre_oc=None,centre_nc=None)
+         role = handler.add_role(role)
+         self.assertEqual(handler.role_exists(role), True)
+
+#+END_SRC
+
+
+
+
+*** institute_exists
+    Check if =institute= already exists
+    This function checks if a user is already in the institute-set of the =System=.
+#+NAME: persistent_institute_exists
+#+BEGIN_SRC python
+    def institute_exists(self, institute):
+        if institute in Institute.get_all():
+            return True
+        else:
+            return False
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_institute_exists
+#+BEGIN_SRC python
+    def test_institute_exists(self):
+         print "test_institute_exists"
+         handler = PersistenceHandler()
+         handler.initialize_role_set()
+         handler.initialize_user_set()
+         ins = Institute(name='IIIT',address='Hyderabad')
+         inst = handler.add_institute(ins)
+         self.assertEqual(handler.institute_exists(inst), True)
+
+#+END_SRC
+
+
+*** add_institute
+    Add an institute to the system
+    This function adds an institute to the institute-set maintained by the system.
+#+NAME: add_persistent_institute
+#+BEGIN_SRC python
+    def add_institute(self, institute):
+        institute.save()
+        return institute
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_add_persistent_institute
+#+BEGIN_SRC python
+    def test_add_institute(self):
+         print "test_add_institute"
+         handler = PersistenceHandler()
+         handler.initialize_role_set()
+         handler.initialize_user_set()
+         ins = Institute(name='IIIT',address='Hyderabad')
+         inst = handler.add_institute(ins)
+         self.assertEqual(handler.institute_exists(inst), True)
+
+#+END_SRC
+
+
+
+
 * Infra                                                         :boilerplate:
 
 ** sources
@@ -926,6 +1037,10 @@ if __name__ == '__main__':
 <<persistent_add_nc>>
 <<persistent_add_workshop>>
 <<persistent_workshop_exists>>
+<<persistent_role_exists>>
+<<add_persistent_role>>
+<<persistent_institute_exists>>
+<<add_persistent_institute>>
 #+end_src
 ** tests
 #+BEGIN_SRC python :tangle test_object_handlers.py :eval no :noweb yes
@@ -959,6 +1074,10 @@ if __name__ == '__main__':
 <<test_persistent_nc_exists>>
 <<test_persistent_add_workshop>>
 <<test_persistent_workshop_exists>>
+<<test_persistent_role_exists>>
+<<test_add_persistent_role>>
+<<test_persistent_institute_exists>>
+<<test_add_persistent_institute>>
 <<run_test_cases>>
 #+end_src
 
