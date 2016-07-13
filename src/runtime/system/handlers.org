@@ -469,10 +469,9 @@ class TestObjectHandler(TestCase):
 class PersistenceHandler():
    
     def __init__(self):
-        #self.initialize_role_set()
-        #self.initialize_user_set()
-        pass
-
+        self.initialize_role_set()
+        self.initialize_user_set()
+        
 #+END_SRC
 
 *** initialize_role_set
@@ -522,18 +521,15 @@ class TestPersistentHandler(TestCase):
 
     def setUp(self):
         db.create_all()
-        #self.persistent_handler = PersistenceHandler()
+        self.persistent_handler = PersistenceHandler()
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-        #self.persistent_handler = None
+        self.persistent_handler = None
 
     def test_initialize_object_handler(self):
          print "test_initialize_persistent_handler"
-         handler = PersistenceHandler()
-         handler.initialize_role_set()
-         handler.initialize_user_set()
          self.assertEqual(len(Role.get_all()), 4)
          self.assertEqual(Role.get_by_id(1).get("name"), "admin")
          self.assertEqual(len(User.query.all()), 1)
@@ -567,11 +563,8 @@ class TestPersistentHandler(TestCase):
 #+BEGIN_SRC python
     def test_user_exists(self):
          print "test_user_exists"
-         handler = PersistenceHandler()
-         handler.initialize_role_set()
-         handler.initialize_user_set()
          user = User.get_by_id(1)
-         self.assertEqual(handler.user_exists(user), True)
+         self.assertEqual(self.persistent_handler.user_exists(user), True)
 
 #+END_SRC
 
@@ -591,9 +584,6 @@ class TestPersistentHandler(TestCase):
 #+BEGIN_SRC python
     def test_add_user(self):
          print "test_add_user"
-         handler = PersistenceHandler()
-         handler.initialize_role_set()
-         handler.initialize_user_set()
          name = Name(name="some user")
          name.save()
          email = Email(email="tt@kk.com")
@@ -601,10 +591,11 @@ class TestPersistentHandler(TestCase):
          user = User(name=name,
                      email=email,
                      roles=[Role.get_by_id(1)], user_status="active")
-         user = handler.add_user(user)
-         self.assertEqual(handler.user_exists(user), True)
+         user = self.persistent_handler.add_user(user)
+         self.assertEqual(self.persistent_handler.user_exists(user), True)
 
 #+END_SRC
+
 
 *** oc_exists
     Check if =oc= already exists
@@ -612,8 +603,7 @@ class TestPersistentHandler(TestCase):
 #+NAME: persistent_oc_exists
 #+BEGIN_SRC python
     def oc_exists(self, oc):
-        self.oc_list = OC.get_all()
-        if oc in self.oc_list:
+        if oc in OC.get_all():
             return True
         else:
             return False
@@ -625,15 +615,12 @@ class TestPersistentHandler(TestCase):
 #+BEGIN_SRC python
     def test_oc_exists(self):
          print "test_oc_exists"
-         handler = PersistenceHandler()
-         handler.initialize_role_set()
-         handler.initialize_user_set()
          ins = Institute(name='IIIT',address='Hyderabad')
          ins.save()
          oc1 = OC(institute=ins.get_by_id(1), spokes=[], oc_target = None)
          oc1.save()
 #         oc = handler.add_oc(oc1)
-         self.assertEqual(handler.oc_exists(oc1), True)
+         self.assertEqual(self.persistent_handler.oc_exists(oc1), True)
 #+END_SRC
 
 *** add_oc
@@ -651,18 +638,14 @@ class TestPersistentHandler(TestCase):
 #+BEGIN_SRC python
     def test_add_oc(self):
          print "test_persistent_add_oc"
-         handler = PersistenceHandler()
-         handler.initialize_role_set()
-         handler.initialize_user_set()
-
          ins = Institute(name='IIIT',address='Hyderabad')
          ins.save()
          oc1 = OC(institute=ins.get_by_id(1),spokes=[], oc_target = None)
-         oc1.save()
-         oc = handler.add_oc(oc1)
-         self.assertEqual(handler.oc_exists(oc), True)
+         oc = self.persistent_handler.add_oc(oc1)
+         self.assertEqual(self.persistent_handler.oc_exists(oc), True)
 
 #+END_SRC
+
 
 *** nc_exists
     Check if =nc= already exists
@@ -670,8 +653,7 @@ class TestPersistentHandler(TestCase):
 #+NAME: persistent_nc_exists
 #+BEGIN_SRC python
     def nc_exists(self, nc):
-        self.nc_list = NC.get_all()
-        if nc in self.nc_list:
+        if nc in NC.get_all():
             return True
         else:
             return False
@@ -682,21 +664,13 @@ class TestPersistentHandler(TestCase):
 #+BEGIN_SRC python
     def test_nc_exists(self):
          print "test_persistent_nc_exists"
-
-         handler = PersistenceHandler()
-         handler.initialize_role_set()
-         handler.initialize_user_set()
-
          ins = Institute(name='IIIT',address='Hyderabad')
          ins.save()
          oc = OC(institute=ins, spokes=[], oc_target = None)
          oc.save()
-
-         nc1 = NC(institute=ins, hub=oc, nc_target = None, workshops=None)
-         print nc1   
+         nc1 = NC(institute=ins, hub=oc, nc_target = None, workshops=[])
          nc1.save()
-#         nc = self.obj_handler.add_nc(nc)
-         self.assertEqual(handler.nc_exists(nc1), True)
+         self.assertEqual(self.persistent_handler.nc_exists(nc1), True)
 
 #+END_SRC
 
@@ -706,7 +680,6 @@ class TestPersistentHandler(TestCase):
 #+NAME: persistent_add_nc
 #+BEGIN_SRC python
     def add_nc(self, nc):
-        print "asdf"    
         nc.save() 
         return nc
 
@@ -717,23 +690,16 @@ class TestPersistentHandler(TestCase):
 #+BEGIN_SRC python
     def test_add_nc(self):
          print "test_add_nc"
-         handler = PersistenceHandler()
-         handler.initialize_role_set()
-         handler.initialize_user_set()
-
          ins = Institute(name='IIIT',address='Hyderabad')
          ins.save()
          oc = OC(institute=ins, spokes=[], oc_target = None)
          oc.save()   
-         nc1 = NC(institute=ins, hub=oc, nc_target = None, workshops=None)
-         print nc1
-         #nc1.save() 
-         nc = handler.add_nc(nc1)
-         print "after adding"
-         print nc
-         self.assertEqual(handler.nc_exists(nc), True)
+         nc1 = NC(institute=ins, hub=oc, nc_target = None, workshops=[])
+         nc = self.persistent_handler.add_nc(nc1)
+         self.assertEqual(self.persistent_handler.nc_exists(nc), True)
 
 #+END_SRC
+
 
 *** add_workshop
     Add a workshop to the system
@@ -751,15 +717,11 @@ class TestPersistentHandler(TestCase):
 #+BEGIN_SRC python
     def test_add_workshop(self):
         print "test_add_workshop"
-        handler = PersistenceHandler()
-        handler.initialize_role_set()
-        handler.initialize_user_set()
-
         ins = Institute(name='IIIT',address='Hyderabad')
         ins.save()
         oc = OC(institute=ins.get_by_id(1), spokes=[], oc_target = None)
         oc.save()
-        nc1 = NC(institute=ins.get_by_id(1), hub=oc, nc_target = None, workshops=None)
+        nc1 = NC(institute=ins.get_by_id(1), hub=oc, nc_target = None, workshops=[])
         nc1.save()
         target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
@@ -770,10 +732,20 @@ class TestPersistentHandler(TestCase):
         wstarget.save()
         workshop_name = Name(name = "New Workshop")
         ws_status = Status(name = "pending")
-        workshop = Workshop(institute = ins, nc = nc1, artefacts = [], ws_target = wstarget, status = ws_status, name = workshop_name)
+        workshop = Workshop(institute = ins, 
+                            nc = nc1, 
+                            artefacts = [], 
+                            ws_target = wstarget, 
+                            status = ws_status, 
+                            name = workshop_name, 
+                            a_date = None,
+                            a_participants = 0,
+                            a_experiments = 0,
+                            a_usage = 0)
+        #workshop = Workshop(institute = ins, nc = nc1, artefacts = [], ws_target = wstarget, status = ws_status, name = workshop_name)
         workshop.save()
-        workshop = handler.add_workshop(workshop)
-        self.assertEqual(handler.workshop_exists(workshop), True)
+        workshop = self.persistent_handler.add_workshop(workshop)
+        self.assertEqual(self.persistent_handler.workshop_exists(workshop), True)
 
 #+END_SRC
 
@@ -783,8 +755,7 @@ class TestPersistentHandler(TestCase):
 #+NAME: persistent_workshop_exists
 #+BEGIN_SRC python
     def workshop_exists(self, workshop):
-        workshop_list = Workshop.get_all()
-        if workshop in self.workshop_list:
+        if workshop in Workshop.get_all():
             return True
         else:
             return False
@@ -796,15 +767,11 @@ class TestPersistentHandler(TestCase):
 #+BEGIN_SRC python
     def test_workshop_exists(self):
         print "test_workshop_exists"
-        handler = PersistenceHandler()
-        handler.initialize_role_set()
-        handler.initialize_user_set()
-
         ins = Institute(name='IIIT',address='Hyderabad')
         ins.save()
         oc = OC(institute=ins, spokes=[], oc_target = None)
         oc.save()   
-        nc1 = NC(institute=ins, hub=oc, nc_target = None, workshops=None)
+        nc1 = NC(institute=ins, hub=oc, nc_target = None, workshops=[])
         nc1.save() 
         target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
@@ -828,10 +795,11 @@ class TestPersistentHandler(TestCase):
                             a_experiments = 0,
                             a_usage = 0)
         workshop.save()
-        workshop = handler.add_workshop(workshop)
-        self.assertEqual(handler.workshop_exists(workshop), True)
+        workshop = self.persistent_handler.add_workshop(workshop)
+        self.assertEqual(self.persistent_handler.workshop_exists(workshop), True)
 
 #+END_SRC
+
 
 *** role_exists
     Check if =role= already exists
@@ -851,14 +819,10 @@ class TestPersistentHandler(TestCase):
 #+BEGIN_SRC python
     def test_role_exists(self):
          print "test_role_exists"
-         handler = PersistenceHandler()
-         handler.initialize_role_set()
-         handler.initialize_user_set()
          role = Role.get_by_id(1)
-         self.assertEqual(handler.role_exists(role), True)
+         self.assertEqual(self.persistent_handler.role_exists(role), True)
 
 #+END_SRC
-
 
 *** add_role
     Add a role to the system
@@ -876,12 +840,9 @@ class TestPersistentHandler(TestCase):
 #+BEGIN_SRC python
     def test_add_role(self):
          print "test_add_role"
-         handler = PersistenceHandler()
-         handler.initialize_role_set()
-         handler.initialize_user_set()
          role = Role(name='user',centre_oc=None,centre_nc=None)
-         role = handler.add_role(role)
-         self.assertEqual(handler.role_exists(role), True)
+         role = self.persistent_handler.add_role(role)
+         self.assertEqual(self.persistent_handler.role_exists(role), True)
 
 #+END_SRC
 
@@ -906,15 +867,11 @@ class TestPersistentHandler(TestCase):
 #+BEGIN_SRC python
     def test_institute_exists(self):
          print "test_institute_exists"
-         handler = PersistenceHandler()
-         handler.initialize_role_set()
-         handler.initialize_user_set()
          ins = Institute(name='IIIT',address='Hyderabad')
-         inst = handler.add_institute(ins)
-         self.assertEqual(handler.institute_exists(inst), True)
+         inst = self.persistent_handler.add_institute(ins)
+         self.assertEqual(self.persistent_handler.institute_exists(inst), True)
 
 #+END_SRC
-
 
 *** add_institute
     Add an institute to the system
@@ -932,12 +889,9 @@ class TestPersistentHandler(TestCase):
 #+BEGIN_SRC python
     def test_add_institute(self):
          print "test_add_institute"
-         handler = PersistenceHandler()
-         handler.initialize_role_set()
-         handler.initialize_user_set()
          ins = Institute(name='IIIT',address='Hyderabad')
-         inst = handler.add_institute(ins)
-         self.assertEqual(handler.institute_exists(inst), True)
+         inst = self.persistent_handler.add_institute(ins)
+         self.assertEqual(self.persistent_handler.institute_exists(inst), True)
 
 #+END_SRC
 
