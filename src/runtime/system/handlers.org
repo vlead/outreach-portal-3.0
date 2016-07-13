@@ -1,4 +1,4 @@
-`#+TITLE: Object Handler for the System
+#+TITLE: Object Handler for the System
 #+AUTHOR: VLEAD
 #+DATE: [2016-07-07 Thu]
 #+SETUPFILE: ../../org-templates/level-2.org
