@@ -16,27 +16,27 @@ Virtual Labs are captured here.
   whose type is =User=.  The interaction of a user with the system is defined
   by the requirements below.
 
-** Req 1
+** Composition
    The system has users.
-** Req 2
+** User Identification
    Each user has an email address (string that corresponds to a
    valid email addr).  
-** Req 3
+** Uniqueness of a User
    Email identifies a user.  Two users with the same email
    are the same users. 
-** Req 4
+** Name Attribute
    Each user has a Name (string).
-** Req 5
+** Role(s) of a User
    Each user has atleast one role, and by default when a user is created, the
    role that is associated with the newly created user is guest.
 
    
 * Role
   Different privileges for accessing the system is maintained by roles.  A role
-  whose type =Role= defines a set of privileges i.e. what is accessible and
-  what is not accessible in the system. 
+  whose type is =Role= defines a set of privileges i.e. what is accessible and
+  what is not accessible in the system.
 
-** Req 1 
+** Types of Roles
    There are 6 kinds of roles: =admin=, =guest=, =reviewer=, =noc= =occ(oc)=,
    =ncc(nc)=.  Each role determines what data access privileges are available
    to the user.
@@ -47,11 +47,12 @@ Virtual Labs are captured here.
    =nc= - Nodal Center
    =ncc= - Nodal Center Coordinator
 
-** Req 2
+** Role Mapping to a User
    Each user is mapped to at least one role meaning a user can have one or more
    roles.  In any given session, a user is mapped to a single role.
 
-** Req 3
+** Role Privileges
+   
    1. A user with role admin has the ability to:
 
       1. Create a new user, Read and Update information of all users, and
@@ -64,6 +65,8 @@ Virtual Labs are captured here.
    3. A user with role =reviewer= has the ability to:
 
       1. View all the information of the Outreach Portal.
+
+      2. Should the reviewer have the ability to leave his review notes on the portal?
 
    4. A user with role =noc= has the ability to:
 
@@ -90,93 +93,136 @@ Virtual Labs are captured here.
 
       1. Manage the nodal center =nc=.
 
+** User with =admin= role
+   There is atleast one user with role =admin= in the system.
+
 
 * Outreach Center
-  Outreach activity is 
+  Coordination and delegation of outreach activity is carried by the Outreach
+  Centers.  Each outreach center is a hub for outreach activity. 
   
-** Req 1
+** Host of Outreach Center
    An outreach center (=OC=) is hosted in an institute. 
-** Req 2
+** Target of an Outreach Center
    The target usage for an =OC= is set by user while donning the role =admin=
-** Req 3
-   =OC= monitors and coordinates outreach activity for a region.  This is
-   achieved by creating one or more nodal centers that are associated with an
-   =OC= to carry out outreach activity to meet the targets for an =OC=.
-** Req 4
-   Each =OC= has zero or more coordinators associated with it.
-** Req 5
+** Spokes of an Outreach Center
+   =OC= monitors and coordinates outreach activity that is designated to it.
+   This is achieved by creating one or more nodal centers that are associated
+   with an =OC= to carry out outreach activity to meet the targets for an =OC=.
+** Coordinators of an Outreach Center
+   Each =OC= has zero or more coordinators (Outreach Center Coordinator =OCC=)
+   associated with it.
+** Activity Approval
    =OCC= of an =OC= reviews activities of all the nodal centers associated with
    it and upon review, either approves or rejects the activities.
-** Req 6
+** Creation of an Outreach Center
    An =OC= is created by user while donning the role =admin=
 
 
 * Nodal Center
-** Req 1
+  A nodal center is one of the spokes of an outreach center (hub) that carries
+  out the activity related to the outreach of Virtual Labs.
+** Host of a Nodal Center
    An nodal center (=NC=) is hosted in an institute.
-** Req 2
+** Hub of a Nodal Center
    Each =NC= is associated with a unique outreach center.
-** Req 3
+** Target of a Nodal Center
    The target for a =NC= is set by the Outreach Center Coordinator (=OCC=) of
    the =OC= with which this =NC= is associated with.
-** Req 4
-   Each =NC= has zero or more users whose role is ncc(nc)  associated with it.
-** Req 5
+** Coordinators of an Outreach Center
+   Each =NC= has zero or more coordinators (Nodal Center Coordinator =NCC=)
+   associated with it.
+** Perform Activities
    A Nodal Center Coordinator (=NCC=) conducts activities to meet the target of
    =NC=.
-** Req 6
+** Upload Artifacts
    A =NCC= submits all the artifacts associated with an activity for approval
    by an =OCC=.
 
 
 * Activities
-** Req 1
+  Activities define the ways of how outreach of Virtual Labs is carried out.
+** A type of Activity - Workshop
    A Workshop is an activity and a workshop is conducted at an Institute.
-** Req 3
+** Participants of a Workshop
    A workshop has participants - students and a nodal center coordinator. 
-** Req 3
+** Usage of a Workshop
    Each workshop has a target and actual usage of Virtual Labs measured in
    terms of experiments performed by the participants. 
-** Req 4
+** Types of Artifacts
    There are different types of artifacts associated with each workshop -
    attendance sheet, photos, feedback and report. 
 
 
 * Institute
-** Req 1
+  An institute is the host of either an outreach center or a nodal center or an
+  outreach activity.
+** Composition
    The system has institutes.
-** Req 2
+** Host of an Outreach Center
    Each outreach center is associated to exactly one institute
 
-** Req 3
+** Host of a Nodal Center
    Each nodal center is associated to exactly one institute
-** Req 4
+** Host of both an Outreach Center and a Nodal Center
    The hosting institute of an outreach center and a nodal center can be the
    same.
-** Req 5
+** Host of a Workshop
    A workshop is conducted at an institute
 
 
 * Sessions
-** Req 1
+  A session defines the set of actions that a user is allowed to perform. 
+** Login is Mandatory
    Users are required to login into the system.
 
-** Req 2
+** A logged user and a session
    Each user once logged in is associated with a session.
 
-** Req 3
-   Operations are permitted only if the user is logged in into the system.
+** Privileges
+   Operations are permitted only if the user is logged into the system.
 
-** Req 4
+** Constraints
    Users can have more than one session at a given time but no two sessions of
    a user can have the same role.
 
+
+* Audit Trail
+  Every action that changes the state of the system is captured to enable an
+  audit of the system. 
+
+** Log each action
+   All actions that change the state of the system are logged in such a way
+   that by playing these recorded logs, the system can be constructed to any of
+   the states it had been before.
+
+** Commit Messages
+   When an action - creation, updation or deletion - is performed, the user
+   also provides a commit message, a reason for performing an action.
+
+* Usage   
+  Usage of Virtual Labs is defined as the number of experiments performed. 
+  
+** Capture the usage for each nodal center
+   The exact usage of Virtual Labs generated by the outreach activity at a
+   nodal center is captured. 
+
+** Usage from online forms
+   Usage of Virtual Labs is also calculated from the online feedback forms
+   submitted as part of a workshop. 
+   
+** Number of Attendees
+   Number of attendees of a workshop is provided by the portal.
+
+** Usage from Cloud
+   Virtual Labs usage generated by users performing experiments as not part of
+   workshops is also made available by the portal. 
 
 * COMMENT Views
 ** Admin
    
 
-* Questions/scenarios
+* Questions/Scenarios
   1. What is the information that a user when logged in with role =guest= is
      presented with?
      
@@ -186,7 +232,14 @@ Virtual Labs are captured here.
   2. When a user is logged in with role =reviewer=, most of the information
      available with the portal should be presented.  The information is targets
      and actual usage, outreach centers, nodal centers, workshops conducted,
-     workshops planned. 
+     workshops planned.
+
+  3. Should the reviewer have the ability to leave his review notes on the
+     portal?
+
+  4. There is only soft delete, meaning, an entity is not deleted permanently
+     from the database, instead when deleted, that entity is marked as
+     inactive.
 
 
 
