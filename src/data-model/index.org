@@ -94,6 +94,7 @@ TYPE Status (pending + cancelled + completed + pending approval + approved + rej
 TYPE OCTarget
 TYPE NCTarget
 TYPE WSTarget (Workshop is abbreviated to WS here)
+TYPE Type (This is an entity used to denote the type of artefact being uploaded)
 TYPE Artefact 
 TYPE AuditEntry
 TYPE Operation
@@ -131,6 +132,7 @@ For each relation, we define its inverse next to it.
 [attendance, workshop] : Workshop    >    Artefact !
 [status, workshop]     : Workshop    >    Status !         
 [owner, workshop]      : Workshop    >    Role !
+[artefact, type]       : Type !      >    Artefact
 Note: if s1.user = s2.user -> 
          s1.role != s2.role, where s1 and s2 belong to session-set
 
