@@ -559,6 +559,47 @@ class TestObjectHandler(TestCase):
 
 #+END_SRC
 
+*** get_workshops
+
+    This return the workshop_set maintained by the system.
+#+NAME: get_workshops
+#+BEGIN_SRC python
+    def get_workshops(self):
+        return self.workshop_set
+
+#+END_SRC
+
+#+NAME: test_get_workshops
+#+BEGIN_SRC python
+    def test_get_workshops(self):
+         print "test_get_workshops"
+         ins = Institute(name='IIIT',address='Hyderabad')
+         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+         nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+         target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+         nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+         wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+         workshop_name = Name(name = "New Workshop")
+         ws_status = Status(name = "pending")
+         workshop = Workshop(institute = ins, 
+                            nc = nc1, 
+                            artefacts = [], 
+                            ws_target = wstarget, 
+                            status = ws_status, 
+                            name = workshop_name, 
+                            a_date = None,
+                            a_participants = 0,
+                            a_experiments = 0,
+                            a_usage = 0)
+         workshop = self.obj_handler.add_workshop(workshop)
+         self.assertEqual(len(self.obj_handler.get_workshops()), 1)
+
+#+END_SRC
+
+
+
+
 
 * Persistence Handler
   Persistence Handler encapsulates a set of functions where each function performs a
@@ -1086,6 +1127,7 @@ if __name__ == '__main__':
 <<get_ncs>>
 <<workshop_exists>>
 <<add_workshop>>
+<<get_workshops>>
 <<get_active_users>>
 
 #+end_src
@@ -1131,6 +1173,7 @@ if __name__ == '__main__':
 <<test_get_active_users>>
 <<test_workshop_exists>>
 <<test_add_workshop>>
+<<test_get_workshops>>
 
 <<run_test_cases>>
 #+end_src
