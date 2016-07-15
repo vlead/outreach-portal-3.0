@@ -79,23 +79,17 @@ The class corresponding to each operation has five fields:
    The constructor ensures that the system ensures the presence of at least one
    user with role =admin=.
 
-#+NAME: class_system
+#+NAME: class_persistent_system
 #+begin_src python
 class System ():
     
-    user_set = []
-    active_user_set=[]
-    session_set = []
-    role_set = []
-    institute_set = []
-    oc_set = []
-    nc_set = []
-    workshop_set = []
-   
-            #     'del_user' : DelUser}
-
     def __init__(self):
         raise Error('Can not instantiate')
+
+    @staticmethod
+    def initialize_system(cls):
+        System.handler = cls()
+        System.session_set = []
 
     @staticmethod
     def is_session_admin(session):
@@ -119,12 +113,12 @@ class System ():
 
     @staticmethod    
     def is_session_noc(session):
-        return session.get("role").get('name')== "NOC"
+        return session.get("role").get('name')== "noc"
 
 #+end_src
 
 *** Test Constructor
-#+NAME: test_system_constructor
+#+NAME: test_persistent_system_constructor
 #+BEGIN_SRC python
 class TestSystemConstructor(TestCase):
     TESTING = True
@@ -134,82 +128,68 @@ class TestSystemConstructor(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-                
-        admin_user = User(name=name,
-                          email=email,
-                          roles=[Role_admin,Role_guest,Role_noc],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
-        System.session_set = []
+        System.handler.session_set = []
         db.session.remove()
         db.drop_all()
 
-
-   
     def test_system_constructor(self):
         print "test_system_constructor"
-        self.assertEqual(System.user_set[0].get("name").get("name"), 
+        self.assertEqual(User.get_by_id(1).get("name").get("name"),
                          Config.admin_name)
-        self.assertEqual(System.user_set[0].get("email").get("email"), 
+        self.assertEqual(User.get_by_id(1).get("email").get("email"),
                          "app-admin@vlabs.ac.in")
-        self.assertEqual(System.user_set[0].get('roles')[0].get('name'), 
+        self.assertEqual(User.get_by_id(1).get('roles')[0].get('name'),
                          "admin")
 
     def test_is_session_admin(self):
         print "test_is_session_admin"
-        admin_user=System.user_set[0]
-        session = Session(user=admin_user,role=Role.admin)
+        admin_user=User.get_by_id(1)
+        session = Session(user=admin_user,role=Role.get_by_id(1))
         System.session_set.append(session)
         self.assertEqual(System.is_session_admin(session), True)
-    
+
     def test_is_session_OC(self):
         print "test_is_session_OCC"
-        admin_user=System.user_set[0]
-        session = Session(user=admin_user,role=Role(name="OCC",centre_oc=None,centre_nc=None))
+        admin_user=User.get_by_id(1)
+        role = Role(name="OCC",centre_oc=None,centre_nc=None)
+        role.save()
+        role_occ = Role.get_by_id(5)
+        session = Session(user=admin_user,role=role_occ)
         System.session_set.append(session)
         self.assertEqual(System.is_session_OCC(session), True)
-    
-    def test_is_session_NCC(self):
-        print "test_is_session_NCC"
-        admin_user=System.user_set[0]
-        session = Session(user=admin_user,role=Role(name="NCC",centre_oc=None,centre_nc=None))
-        System.session_set.append(session)
-        self.assertEqual(System.is_session_NCC(session), True)
 
     def test_is_session_reviewer(self):
         print "test_is_session_reviewer"
-        admin_user=System.user_set[0]
-        session = Session(user=admin_user,role=Role.reviewer)
+        admin_user = User.get_by_id(1)
+        reviewer_role = Role.get_by_id(3)
+        session = Session(user=admin_user,role=reviewer_role)
         System.session_set.append(session)
         self.assertEqual(System.is_session_reviewer(session), True)
-    
+
+    def test_is_session_NCC(self):
+        print "test_is_session_NCC"
+        admin_user = User.get_by_id(1)
+        role = Role(name="NCC",centre_oc=None,centre_nc=None)
+        role.save()
+        role_ncc = Role.get_by_id(5)
+        session = Session(user=admin_user,role=role_ncc)
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_NCC(session), True)
+
     def test_is_session_guest(self):
         print "test_is_session_guest"
-        admin_user=System.user_set[0]
-        session = Session(user=admin_user,role=Role.guest)
+        admin_user = User.get_by_id(1)
+        session = Session(user=admin_user,role=Role.get_by_id(2))
         System.session_set.append(session)
         self.assertEqual(System.is_session_guest(session), True)
 
     def test_is_session_noc(self):
         print "test_is_session_noc"
-        admin_user=System.user_set[0]
-        session = Session(user=admin_user,role=Role.noc)
+        admin_user= User.get_by_id(1)
+        session = Session(user=admin_user,role=Role.get_by_id(4))
         System.session_set.append(session)
         self.assertEqual(System.is_session_noc(session), True)
 
@@ -1686,8 +1666,6 @@ ops_table = {'add_user' : AddUser,
              'add_role': AddRole,
              'create_workshop' : CreateWorkshop,
              'cancel_workshop' : CancelWorkshop
-}
-''' 
              'reschedule_workshop' : RescheduleWorkshop, 
              'conduct_workshop' : ConductWorkshop, 
              'upload_artefact' : UploadArtefact,
@@ -1695,7 +1673,6 @@ ops_table = {'add_user' : AddUser,
              'reject_workshop' : RejectWorkshop,
              'delete_artefact' : DeleteArtefact
              } 
-'''                       
 #+END_SRC
 
 
@@ -1710,6 +1687,7 @@ from runtime.persistence.entities import *
 from runtime.config.config import Config
 from runtime.exceptions.custom_exceptions import *
 from runtime.utils.class_persistence_template import *
+from runtime.system.persistent_handlers import *
 #+end_src
 
 
@@ -1745,11 +1723,10 @@ if __name__ == '__main__':
 ** sources
 #+BEGIN_SRC python :tangle persistent_system.py :eval no :noweb yes
 <<imports_for_sources>>
-<<class_system>>
+<<class_persistent_system>>
 <<do_function>>
-
 <<arity_type_checks>>
-
+'''
 <<class_adduser>>
 <<class_updateuser>>
 <<class_deleteuser>>
@@ -1763,14 +1740,16 @@ if __name__ == '__main__':
 <<class_CreateWorkshop>>
 <<class_CancelWorkshop>>
 <<ops_table>>
+'''
 #+end_src
 
 
 ** tests
 #+BEGIN_SRC python :tangle test_persistent_system.py :eval no :noweb yes
 <<imports_for_tests>>
-<<test_system_constructor>>
+<<test_persistent_system_constructor>>
 <<test_arity_and_types>>
+'''
 <<test_adduser>>
 <<test_updateuser>>
 <<test_login>>
@@ -1782,6 +1761,7 @@ if __name__ == '__main__':
 <<test_UpdateInstitute>>
 <<test_CreateWorkshop>>
 <<test_CancelWorkshop>>
+'''
 <<run_test_cases>>
 
 #+end_src
