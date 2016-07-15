@@ -241,6 +241,27 @@ class TestObjectHandler(TestCase):
 
 
 
+*** get_institutes
+    This return the institute_set maintained by the system.
+#+NAME: get_institutes
+#+BEGIN_SRC python
+    def get_institutes(self):
+        return self.institute_set
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_get_institutes
+#+BEGIN_SRC python
+    def test_get_institutes(self):
+         print "test_get_institutes"
+         ins = Institute(name='IIIT',address='Hyderabad')
+         inst = self.obj_handler.add_institute(ins)
+         self.assertEqual(len(self.obj_handler.get_institutes()), 1)
+
+#+END_SRC
+
+
 *** oc_exists
     Check if =oc= already exists
     This function checks if an outreach-centre is already in the oc-set of the =System=.
@@ -967,6 +988,7 @@ if __name__ == '__main__':
 <<add_role>>
 <<institute_exists>>
 <<add_institute>>
+<<get_institutes>>
 <<oc_exists>>
 <<add_oc>>
 <<nc_exists>>
@@ -1006,6 +1028,7 @@ if __name__ == '__main__':
 <<test_add_role>>
 <<test_institute_exists>>
 <<test_add_institute>>
+<<test_get_institutes>>
 <<test_oc_exists>>
 <<test_add_oc>>
 <<test_nc_exists>>

@@ -890,7 +890,7 @@ class CreateInstitute():
         address = args['address']
         if not (session in System.session_set):
             raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
-        for inst in System.handler.institute_set:
+        for inst in System.handler.get_institutes():
             if inst.get('name') == name and inst.get('address') == address:
                 raise StateError("institute %s already in System" % inst.get('name'))
 
