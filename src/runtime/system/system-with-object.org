@@ -949,10 +949,10 @@ class CreateOC():
             raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
         if not System.handler.institute_exists(institute):
             raise StateError("institute %s not in System" % institute.get('name'))
-        for oc in System.handler.oc_set:
+        for oc in System.handler.get_ocs():
             if oc.get('institute') == institute:
                 raise StateError("institute %s already has an oc associated with it" %oc)
-        for nc in System.handler.nc_set:
+        for nc in System.handler.get_ncs():
             if nc.get('institute') == institute:
                 raise StateError("institute %s already has an nc associated with it" %nc)
 
@@ -1023,10 +1023,10 @@ class CreateNC():
             raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
         if not System.handler.institute_exists(institute):
             raise StateError("institute %s not in System" % institute.get('name'))
-        for nc in System.handler.nc_set:
+        for nc in System.handler.get_ncs():
             if nc.get('institute') == institute:
                 raise StateError("institute %s already has an nc associated with it" %nc)
-        for oc1 in System.handler.oc_set:
+        for oc1 in System.handler.get_ocs():
             if oc1.get('institute') == institute:
                 if oc != oc1:
                     raise StateError("institute %s already has an oc associated with it,the new nc's hub should be same" %oc1)
