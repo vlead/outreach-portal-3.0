@@ -277,7 +277,7 @@ class TestSystemArityAndType(TestCase):
 #+end_src
 
 * =AddUser=
-#+NAME: class_adduser
+#+NAME: class_persistent_adduser
 #+begin_src python
 class AddUser():
     arg_types = {"name":is_name,"email":is_email, "session":is_session}
@@ -306,13 +306,12 @@ class AddUser():
         rl = Role.query.filter_by(name='guest').first()
         user = User(name=user_name , email=user_email , roles=[rl] ,user_status="active")
         user.save()
-        System.user_set = User.query.all()
+#        System.user_set = User.query.all()
         return user
 #+end_src
 *** Test AddUser
-#+NAME: test_adduser
+#+NAME: test_persistent_adduser
 #+BEGIN_SRC python
-
 class TestAddUser(TestCase):
     TESTING = True
     def create_app(self):
@@ -321,50 +320,33 @@ class TestAddUser(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        admin_user = User(name=name,
-                          email=email,
-                          roles=[Role_admin,Role_guest,Role_noc],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
         db.session.remove()
         db.drop_all()
-    
+
     def test_add_user_by_admin(self):
         print "test_add_user_by_admin"
-        admin_user=System.user_set[0]
-        session = Session(user=admin_user,role=Role.admin)
+        admin_user=User.get_by_id(1)
+        session = Session(user=admin_user,role=Role.get_by_id(1))
         System.session_set.append(session)
         name = Name(name="me")
         name.save()
         email = Email(email="abc@gmail.com")
         email.save()
         user = System.do("add_user",name=name,email=email,session=session)
-        
-        u=System.user_set[1]
+
+        u=User.get_by_id(2)
         self.assertEqual(u.get("name").get("name"),"me")
 
     def test_add_user_noc_by_admin(self):
         print "test_add_user_by_noc"
-        admin_user=System.user_set[0]
-        session = Session(user=admin_user,role=Role.admin)
+        admin_user=User.get_by_id(1)
+        session = Session(user=admin_user,role=Role.get_by_id(1))
         System.session_set.append(session)
-        
+
         name = Name(name="nocuser")
         name.save()
         email = Email(email="abc@gmail.com")
@@ -374,8 +356,9 @@ class TestAddUser(TestCase):
         session_noc = Session(user=noc_user,role=Role.noc)
         System.session_set.append(session_noc)
 
-        u=System.user_set[1]
+        u=User.get_by_id(2)
         self.assertEqual(u.get("name").get("name"),"nocuser")
+'''
 
     def test_add_user_by_noc(self):
         print "test_add_user_by_noc"
@@ -407,6 +390,7 @@ class TestAddUser(TestCase):
         
         u=System.user_set[2]
         self.assertEqual(u.get("name").get("name"),"ocuser")
+'''
 #+END_SRC
 
 * =DeleteUser=
@@ -872,7 +856,7 @@ class TestAddRole(TestCase):
 
 #+END_SRC
 * =login=
-#+NAME: class_login
+#+NAME: class_persistent_login
 #+begin_src python
 class login():
     arg_types = {"user":is_user, "role":is_role}
@@ -910,7 +894,7 @@ class login():
 
 #+end_src
 ** Test login
-#+NAME: test_login
+#+NAME: test_persistent_login
 #+BEGIN_SRC python
 class Testlogin(TestCase):
     TESTING = True
@@ -920,32 +904,13 @@ class Testlogin(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-
-        admin_user = User(name=name,
-                          email=email,
-                          roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
         db.session.remove()
         db.drop_all()
-   
+
     def test_login(self):
         print "test_login"
         login_user=User.get_by_id(1)
@@ -958,7 +923,7 @@ class Testlogin(TestCase):
 #+END_SRC
 
 * =logout=
-#+NAME: class_logout
+#+NAME: class_persistent_logout
 #+begin_src python
 class logout():
     arg_types = {"session":is_session}
@@ -981,8 +946,7 @@ class logout():
 
 #+end_src
 ** Test logout
-#+NAME: test_logout
-#+BEGIN_SRC python
+#+NAME: test_persistent_logout
 class Testlogout(TestCase):
     TESTING = True
     def create_app(self):
@@ -991,33 +955,13 @@ class Testlogout(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-
-        admin_user = User(name=name,
-                          email=email,
-                          roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
-                          
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
         db.session.remove()
         db.drop_all()
-   
+
     def test_logout(self):
         print "test_logout"
         login_user= User.get_by_id(1)
@@ -1026,6 +970,8 @@ class Testlogout(TestCase):
         self.assertEqual(len(System.session_set),1)
         System.do("logout",session=sess)
         self.assertEqual(System.session_set,[])
+
+#+BEGIN_SRC python
 #+END_SRC
 * =create institute=
 #+NAME: class_CreateInstitute
@@ -1654,10 +1600,15 @@ class TestCancelWorkshop(TestCase):
 * ops_table
 #+NAME: ops_table
 #+BEGIN_SRC python
-ops_table = {'add_user' : AddUser, 
-             'login': login, 
+ops_table = {'add_user' : AddUser,
+             'create_institute': CreateInstitute,
+             'login': login,
+             'logout': logout
+}
+'''
+
              'delete_user': DeleteUser,
-             'logout': logout, 
+
              'create_institute': CreateInstitute, 
              'create_oc': CreateOC, 
              'create_nc': CreateNC, 
@@ -1673,6 +1624,7 @@ ops_table = {'add_user' : AddUser,
              'reject_workshop' : RejectWorkshop,
              'delete_artefact' : DeleteArtefact
              } 
+'''
 #+END_SRC
 
 
@@ -1726,12 +1678,13 @@ if __name__ == '__main__':
 <<class_persistent_system>>
 <<do_function>>
 <<arity_type_checks>>
+<<class_persistent_adduser>>
+<<class_persistent_login>>
+<<class_persistent_logout>>
+
 '''
-<<class_adduser>>
 <<class_updateuser>>
 <<class_deleteuser>>
-<<class_login>>
-<<class_logout>>
 <<class_CreateInstitute>>
 <<class_CreateOC>>
 <<class_AddRole>>
@@ -1739,8 +1692,9 @@ if __name__ == '__main__':
 <<class_UpdateInstitute>>
 <<class_CreateWorkshop>>
 <<class_CancelWorkshop>>
-<<ops_table>>
 '''
+<<ops_table>>
+
 #+end_src
 
 
@@ -1749,11 +1703,12 @@ if __name__ == '__main__':
 <<imports_for_tests>>
 <<test_persistent_system_constructor>>
 <<test_arity_and_types>>
+<<test_persistent_adduser>>
+<<test_persistent_login>>
+<<test_persistent_logout>>
+
 '''
-<<test_adduser>>
 <<test_updateuser>>
-<<test_login>>
-<<test_logout>>
 <<test_CreateInstitute>>
 <<test_CreateOC>>
 <<test_CreateNC>>
