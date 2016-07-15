@@ -24,8 +24,8 @@
 class ObjectHandler():
    
     def __init__(self):
-        role_set = []
-        user_set = []
+        self.role_set = []
+        self.user_set = []
         self.active_user_set=[]
         self.institute_set = []
         self.oc_set = []
@@ -144,6 +144,26 @@ class TestObjectHandler(TestCase):
 #+END_SRC
 
 
+*** get_users
+
+    This return the user_set maintained by the system.
+#+NAME: get_users
+#+BEGIN_SRC python
+    def get_users(self):
+        
+        return self.get_active_users()
+
+#+END_SRC
+
+#+NAME: test_get_users
+#+BEGIN_SRC python
+    def test_get_users(self):
+         print "test_get_users"
+         self.assertEqual(len(self.obj_handler.get_users()), 1)
+
+#+END_SRC
+
+
 *** role_exists
     Check if =role= already exists
     This function checks if a user is already in the role-set of the =System=.
@@ -190,6 +210,25 @@ class TestObjectHandler(TestCase):
 
 #+END_SRC
 
+
+
+*** get_roles
+
+    This return the role_set maintained by the system.
+#+NAME: get_roles
+#+BEGIN_SRC python
+    def get_roles(self):
+        return self.role_set
+
+#+END_SRC
+
+#+NAME: test_get_roles
+#+BEGIN_SRC python
+    def test_get_roles(self):
+         print "test_get_roles"
+         self.assertEqual(len(self.obj_handler.get_roles()), 4)
+
+#+END_SRC
 
 
 *** institute_exists
@@ -241,6 +280,27 @@ class TestObjectHandler(TestCase):
 
 
 
+*** get_institutes
+    This return the institute_set maintained by the system.
+#+NAME: get_institutes
+#+BEGIN_SRC python
+    def get_institutes(self):
+        return self.institute_set
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_get_institutes
+#+BEGIN_SRC python
+    def test_get_institutes(self):
+         print "test_get_institutes"
+         ins = Institute(name='IIIT',address='Hyderabad')
+         inst = self.obj_handler.add_institute(ins)
+         self.assertEqual(len(self.obj_handler.get_institutes()), 1)
+
+#+END_SRC
+
+
 *** oc_exists
     Check if =oc= already exists
     This function checks if an outreach-centre is already in the oc-set of the =System=.
@@ -286,6 +346,29 @@ class TestObjectHandler(TestCase):
          oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
          oc = self.obj_handler.add_oc(oc1)
          self.assertEqual(self.obj_handler.oc_exists(oc), True)
+
+#+END_SRC
+
+
+
+*** get_ocs
+
+    This return the oc_set maintained by the system.
+#+NAME: get_ocs
+#+BEGIN_SRC python
+    def get_ocs(self):
+        return self.oc_set
+
+#+END_SRC
+
+#+NAME: test_get_ocs
+#+BEGIN_SRC python
+    def test_get_ocs(self):
+         print "test_get_ocs"
+         ins = Institute(name='IIIT',address='Hyderabad')
+         oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
+         oc = self.obj_handler.add_oc(oc1)
+         self.assertEqual(len(self.obj_handler.get_ocs()), 1)
 
 #+END_SRC
 
@@ -341,6 +424,31 @@ class TestObjectHandler(TestCase):
          self.assertEqual(self.obj_handler.nc_exists(nc), True)
 
 #+END_SRC
+
+
+
+*** get_ncs
+
+    This return the nc_set maintained by the system.
+#+NAME: get_ncs
+#+BEGIN_SRC python
+    def get_ncs(self):
+        return self.nc_set
+
+#+END_SRC
+
+#+NAME: test_get_ncs
+#+BEGIN_SRC python
+    def test_get_ncs(self):
+         print "test_get_ncs"
+         ins = Institute(name='IIIT',address='Hyderabad')
+         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+         nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+         nc = self.obj_handler.add_nc(nc1)
+         self.assertEqual(len(self.obj_handler.get_ncs()), 1)
+
+#+END_SRC
+
 
 
 
@@ -450,6 +558,47 @@ class TestObjectHandler(TestCase):
         self.assertEqual(self.obj_handler.workshop_exists(workshop), True)
 
 #+END_SRC
+
+*** get_workshops
+
+    This return the workshop_set maintained by the system.
+#+NAME: get_workshops
+#+BEGIN_SRC python
+    def get_workshops(self):
+        return self.workshop_set
+
+#+END_SRC
+
+#+NAME: test_get_workshops
+#+BEGIN_SRC python
+    def test_get_workshops(self):
+         print "test_get_workshops"
+         ins = Institute(name='IIIT',address='Hyderabad')
+         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+         nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+         target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+         nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+         wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+         workshop_name = Name(name = "New Workshop")
+         ws_status = Status(name = "pending")
+         workshop = Workshop(institute = ins, 
+                            nc = nc1, 
+                            artefacts = [], 
+                            ws_target = wstarget, 
+                            status = ws_status, 
+                            name = workshop_name, 
+                            a_date = None,
+                            a_participants = 0,
+                            a_experiments = 0,
+                            a_usage = 0)
+         workshop = self.obj_handler.add_workshop(workshop)
+         self.assertEqual(len(self.obj_handler.get_workshops()), 1)
+
+#+END_SRC
+
+
+
 
 
 * Persistence Handler
@@ -963,16 +1112,22 @@ if __name__ == '__main__':
 <<initialize_object_user_set>>
 <<user_exists>>
 <<add_user>>
+<<get_users>>
 <<role_exists>>
 <<add_role>>
+<<get_roles>>
 <<institute_exists>>
 <<add_institute>>
+<<get_institutes>>
 <<oc_exists>>
 <<add_oc>>
+<<get_ocs>>
 <<nc_exists>>
 <<add_nc>>
+<<get_ncs>>
 <<workshop_exists>>
 <<add_workshop>>
+<<get_workshops>>
 <<get_active_users>>
 
 #+end_src
@@ -1002,17 +1157,23 @@ if __name__ == '__main__':
 <<test_initialize_object_handler>>
 <<test_user_exists>>
 <<test_add_user>>
+<<test_get_users>>
 <<test_role_exists>>
 <<test_add_role>>
+<<test_get_roles>>
 <<test_institute_exists>>
 <<test_add_institute>>
+<<test_get_institutes>>
 <<test_oc_exists>>
 <<test_add_oc>>
+<<test_get_ocs>>
 <<test_nc_exists>>
 <<test_add_nc>>
+<<test_get_ncs>>
 <<test_get_active_users>>
 <<test_workshop_exists>>
 <<test_add_workshop>>
+<<test_get_workshops>>
 
 <<run_test_cases>>
 #+end_src
