@@ -786,11 +786,11 @@ class login():
     def state_check(args):
         user = args["user"]
         role = args["role"]
-        if role not in System.handler.role_set:
+        if not System.handler.user_exists(user):
             raise StateError("role %s not in System " % role.get('name'))
-        active_user_set = System.handler.get_active_users()
+        """active_user_set = System.handler.get_active_users()
         if (user not in active_user_set):
-            raise StateError("user %s not in System" % user.get('name').get('name'))
+            raise StateError("user %s not in System" % user.get('name').get('name'))"""
 
     @staticmethod        
     def action(args):
