@@ -1177,9 +1177,9 @@ class CreateWorkshop():
         nc = args["nc"]
         if not (session in System.session_set):
             raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
-        if institute not in System.handler.institute_set:
+        if not System.handler.institute_exists(institute):
             raise StateError("institute %s not in System" % institute.get('name'))
-        if nc not in System.handler.nc_set:
+        if not System.handler.nc_exists(nc):
             raise StateError("nc %s not in System" % nc.get('name'))
         
     @staticmethod        
