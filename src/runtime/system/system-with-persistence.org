@@ -321,24 +321,7 @@ class TestAddUser(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        admin_user = User(name=name,
-                          email=email,
-                          roles=[Role_admin,Role_guest,Role_noc],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
@@ -347,7 +330,7 @@ class TestAddUser(TestCase):
     
     def test_add_user_by_admin(self):
         print "test_add_user_by_admin"
-        admin_user=System.user_set[0]
+        admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         name = Name(name="me")
@@ -356,12 +339,12 @@ class TestAddUser(TestCase):
         email.save()
         user = System.do("add_user",name=name,email=email,session=session)
         
-        u=System.user_set[1]
+        u=User.get_by_id(2)
         self.assertEqual(u.get("name").get("name"),"me")
 
     def test_add_user_noc_by_admin(self):
         print "test_add_user_by_noc"
-        admin_user=System.user_set[0]
+        admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         
@@ -374,9 +357,9 @@ class TestAddUser(TestCase):
         session_noc = Session(user=noc_user,role=Role.noc)
         System.session_set.append(session_noc)
 
-        u=System.user_set[1]
+        u=User.get_by_id(2)
         self.assertEqual(u.get("name").get("name"),"nocuser")
-
+'''
     def test_add_user_by_noc(self):
         print "test_add_user_by_noc"
         admin_user=System.user_set[0]
@@ -407,6 +390,7 @@ class TestAddUser(TestCase):
         
         u=System.user_set[2]
         self.assertEqual(u.get("name").get("name"),"ocuser")
+'''
 #+END_SRC
 
 * =DeleteUser=
@@ -459,25 +443,7 @@ class TestDeleteUser(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        email = Email(email="app-admin@vlabs.ac.in")
-        name.save()
-        email.save()
-        admin_user = User(name=name,
-                          email=email,
-                          roles=[Role_admin,Role_guest,Role_noc],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
@@ -520,7 +486,7 @@ class TestDeleteUser(TestCase):
         oc_user= System.do("add_user",name=Name.get_by_id(2),email=Email.get_by_id(2), session=session)
         
           
-        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") == institute.get("name"), System.role_set)
+        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") == institute.get("name"), Role.get_all())
         if oc_role:
             oc_user.append_role(oc_role[0])
 
@@ -564,7 +530,7 @@ class TestDeleteUser(TestCase):
         oc_user= System.do("add_user", name=Name.get_by_id(2),email=Email.get_by_id(2), session=session)
         oc_user.save()
         
-        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") == institute.get("name"), System.role_set)
+        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") == institute.get("name"), Role.get_all())
         if oc_role:
             oc_user.append_role(oc_role[0])
 
@@ -652,25 +618,7 @@ class TestUpdateUser(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-        admin_user = User(name=name,
-                          email=email,
-                          roles=[Role_admin,Role_guest,Role_noc],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
@@ -711,7 +659,7 @@ class TestUpdateUser(TestCase):
         email.save()
         oc_user=System.do("add_user", name=name, email=email, session=session)
         oc_user.save()
-        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") ==institute.get("name"), System.role_set)
+        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") ==institute.get("name"), Role.get_all())
         if oc_role:
             oc_user.append_role(oc_role[0])
         #create nc
@@ -735,14 +683,14 @@ class TestUpdateUser(TestCase):
         name4= Name(name="jack")
         name4.save()
         System.do("update_user", name=Name.get_by_id(4), user=nc_user,session=oc_session)
-        new_length = len(System.user_set)
+        new_length = len(User.get_all())
 
         self.assertEqual(nc_user.get("name").get("name"), "jack")       
 
 
     def test_update_user_by_noc(self):
         print "test_update_user_by_noc"
-        admin_user=System.user_set[0]
+        admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
 
@@ -758,7 +706,7 @@ class TestUpdateUser(TestCase):
         email.save()
         oc_user= System.do("add_user", name=Name.get_by_id(2), email=Email.get_by_id(2), session=session)
         oc_user.save()
-        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") ==institute.get("name"), System.role_set)
+        oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") ==institute.get("name"), Role.get_all())
         if oc_role:
             oc_user.append_role(oc_role[0])
 
@@ -775,13 +723,14 @@ class TestUpdateUser(TestCase):
         noc_session = Session(user=noc_user,role=Role.noc)
         System.session_set.append(noc_session)
 
-        length = len(System.user_set)
+        length = len(User.get_all())
         name4 = Name(name="jack")
         name4.save()
         System.do("update_user", name=Name.get_by_id(4), user=oc_user,session=noc_session)
-        new_length = len(System.user_set)
+        new_length = len(User.get_all())
 
         self.assertEqual(oc_user.get("name").get("name"), "jack")       
+
 #+END_SRC
 * =AddRole=
 #+NAME: class_AddRole
@@ -836,26 +785,7 @@ class TestAddRole(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-
-        admin_user = User(name=name,
-                          email=email,
-                          roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
@@ -868,8 +798,7 @@ class TestAddRole(TestCase):
         login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
         System.do("add_role",user=login_user,role=Role.get_by_id(2),session=sess)
-        self.assertEqual(len(User.get_by_id(1).get('roles')),4)
-
+        self.assertEqual(len(User.get_by_id(1).get('roles')),3)
 #+END_SRC
 * =login=
 #+NAME: class_login
@@ -920,26 +849,7 @@ class Testlogin(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-
-        admin_user = User(name=name,
-                          email=email,
-                          roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
@@ -991,27 +901,7 @@ class Testlogout(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-
-        admin_user = User(name=name,
-                          email=email,
-                          roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
-                          
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
@@ -1056,7 +946,7 @@ class CreateInstitute():
         address = args["address"]
         new_institute = Institute(name=name,address=address)
         new_institute.save()
-        System.institute_set = Institute.query.all()
+
         return new_institute
 #+end_src
 ** Test create_institute
@@ -1070,27 +960,7 @@ class TestCreateInstitute(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-
-        admin_user = User(name=name,
-                              email=email,
-                              roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
-
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
@@ -1103,6 +973,7 @@ class TestCreateInstitute(TestCase):
         login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
         institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
+        institute.save()
         self.assertEqual(Institute.get_by_id(1).get('name'),'IIIT')
 
 #+END_SRC
@@ -1144,8 +1015,6 @@ class CreateOC():
         new_oc.save()
         new_role.save()
 
-        System.role_set = Role.query.all()
-        System.oc_role = OC.query.all()
         return new_oc
 
 #+end_src
@@ -1160,26 +1029,7 @@ class TestCreateOC(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-
-        admin_user = User(name=name,
-                              email=email,
-                              roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
@@ -1245,9 +1095,6 @@ class CreateNC():
         oc.append_spoke(new_nc)
         new_role = Role(name="NCC",centre_oc=None,centre_nc=new_nc)
         new_role.save()
-        System.nc_set = NC.query.all
-        System.role_set = Role.query.all()
-        System.oc_set = OC.query.all()
         return new_nc
 #+end_src
 ** Test CreateNC
@@ -1261,26 +1108,7 @@ class TestCreateNC(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-
-        admin_user = User(name=name,
-                              email=email,
-                              roles=[Role_admin,Role_guest,Role_noc,],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
@@ -1289,8 +1117,8 @@ class TestCreateNC(TestCase):
 
     def test_create_nc(self):
         print "test_create_nc"
-        login_user=System.user_set[0]
-        login_role = System.role_set[0]
+        login_user= User.get_by_id(1)
+        login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
         institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
         oc = System.do("create_oc",institute=institute,spokes=[],session=sess, oc_target = None)
@@ -1300,7 +1128,6 @@ class TestCreateNC(TestCase):
         nc.save()
         self.assertEqual(NC.get_by_id(1).get('institute'),institute)
         self.assertEqual(OC.get_by_id(1).get('spokes')[0],nc)
-  
 #+END_SRC
 * =update institute=
 #+NAME: class_UpdateInstitute
@@ -1351,26 +1178,7 @@ class TestUpdateInstitute(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-
-        admin_user = User(name=name,
-                          email=email,
-                          roles=[Role_admin,Role_guest,Role_noc],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
@@ -1379,9 +1187,9 @@ class TestUpdateInstitute(TestCase):
     
     def test_update_institute(self):
         print "test_update_institute"
-        login_user = System.user_set[0]
-        login_role = System.role_set[0]
-        admin_user=System.user_set[0]
+        login_user = User.get_by_id(1)
+        login_role = Role.get_by_id(1)
+        admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         
@@ -1466,26 +1274,7 @@ class TestCreateWorkshop(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-
-        admin_user = User(name=name,
-                          email=email,
-                          roles=[Role_admin,Role_guest,Role_noc],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
@@ -1534,7 +1323,6 @@ class TestCreateWorkshop(TestCase):
         
         self.assertEqual(new_workshop.get('institute'),workshop_institute)
         self.assertEqual(nc.get('workshops')[0],new_workshop)
-  
 #+END_SRC
 
 * =cancel_workshop=
@@ -1570,9 +1358,7 @@ class CancelWorkshop():
     @staticmethod
     def action(args):
         workshop = args["workshop"]
-        workshop.set(status = Status.cancelled)
-        
-        
+        workshop.set(status = Status.cancelled)        
 #+end_src
 ** Test CancelWorkshop
 #+NAME: test_CancelWorkshop
@@ -1585,26 +1371,7 @@ class TestCancelWorkshop(TestCase):
 
     def setUp(self):
         db.create_all()
-        Role_admin = Role(name="admin",centre_oc=None,centre_nc=None)
-        Role_reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
-        Role_guest = Role(name="guest",centre_oc=None,centre_nc=None)
-        Role_noc = Role(name="NOC",centre_oc=None,centre_nc=None)
-        Role_admin.save()
-        Role_reviewer.save()
-        Role_guest.save()
-        Role_noc.save()
-
-        name = Name(name="admin")
-        name.save()
-        email = Email(email="app-admin@vlabs.ac.in")
-        email.save()
-
-        admin_user = User(name=name,
-                          email=email,
-                          roles=[Role_admin,Role_guest,Role_noc],user_status="active")
-        admin_user.save()
-        System.role_set = Role.query.all()
-        System.user_set = User.query.all()
+        System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
         System.session_set = []
@@ -1648,7 +1415,6 @@ class TestCancelWorkshop(TestCase):
         self.assertEqual(new_workshop.get("status").get("name"), Status.cancelled.get("name"))
         self.assertEqual(nc.get("workshops")[0].get("status").get("name"), Status.cancelled.get("name"))
         
-
     #+END_SRC
 
 * ops_table
@@ -1656,23 +1422,23 @@ class TestCancelWorkshop(TestCase):
 #+BEGIN_SRC python
 ops_table = {'add_user' : AddUser, 
              'login': login, 
-             'delete_user': DeleteUser,
-             'logout': logout, 
+             'logout': logout,
              'create_institute': CreateInstitute, 
+             'delete_user': DeleteUser,
              'create_oc': CreateOC, 
              'create_nc': CreateNC, 
              'update_user': UpdateUser, 
              'update_institute': UpdateInstitute, 
              'add_role': AddRole,
              'create_workshop' : CreateWorkshop,
-             'cancel_workshop' : CancelWorkshop
-             'reschedule_workshop' : RescheduleWorkshop, 
-             'conduct_workshop' : ConductWorkshop, 
-             'upload_artefact' : UploadArtefact,
-             'approve_workshop' : ApproveWorkshop,
-             'reject_workshop' : RejectWorkshop,
-             'delete_artefact' : DeleteArtefact
-             } 
+             'cancel_workshop' : CancelWorkshop,
+#             'reschedule_workshop' : RescheduleWorkshop, 
+#             'conduct_workshop' : ConductWorkshop, 
+#             'upload_artefact' : UploadArtefact,
+#             'approve_workshop' : ApproveWorkshop,
+#             'reject_workshop' : RejectWorkshop,
+#             'delete_artefact' : DeleteArtefact
+}
 #+END_SRC
 
 
@@ -1726,12 +1492,11 @@ if __name__ == '__main__':
 <<class_persistent_system>>
 <<do_function>>
 <<arity_type_checks>>
-'''
 <<class_adduser>>
-<<class_updateuser>>
-<<class_deleteuser>>
 <<class_login>>
 <<class_logout>>
+<<class_updateuser>>
+<<class_deleteuser>>
 <<class_CreateInstitute>>
 <<class_CreateOC>>
 <<class_AddRole>>
@@ -1740,7 +1505,6 @@ if __name__ == '__main__':
 <<class_CreateWorkshop>>
 <<class_CancelWorkshop>>
 <<ops_table>>
-'''
 #+end_src
 
 
@@ -1749,11 +1513,10 @@ if __name__ == '__main__':
 <<imports_for_tests>>
 <<test_persistent_system_constructor>>
 <<test_arity_and_types>>
-'''
 <<test_adduser>>
-<<test_updateuser>>
 <<test_login>>
 <<test_logout>>
+<<test_updateuser>>
 <<test_CreateInstitute>>
 <<test_CreateOC>>
 <<test_CreateNC>>
@@ -1761,7 +1524,6 @@ if __name__ == '__main__':
 <<test_UpdateInstitute>>
 <<test_CreateWorkshop>>
 <<test_CancelWorkshop>>
-'''
 <<run_test_cases>>
 
 #+end_src
