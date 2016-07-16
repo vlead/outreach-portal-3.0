@@ -1201,7 +1201,6 @@ class CreateWorkshop():
                                 a_participants = 0,
                                 a_experiments = 0,
                                 a_usage = 0)
-        print new_workshop.get("name").get("name")
         System.handler.workshop_set.append(new_workshop)
         nc.add_workshop_to_nc(new_workshop)        
         
