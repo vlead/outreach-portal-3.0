@@ -151,14 +151,16 @@ class TestSystemConstructor(TestCase):
     def test_is_session_OC(self):
         print "test_is_session_OCC"
         admin_user=System.handler.user_set[0]
-        session = Session(user=admin_user,role=Role(name="OCC",centre_oc=None,centre_nc=None))
+        session = Session(user=admin_user,
+                          role=Role(name="OCC",centre_oc=None,centre_nc=None))
         System.session_set.append(session)
         self.assertEqual(System.is_session_OCC(session), True)
     
     def test_is_session_NCC(self):
         print "test_is_session_NCC"
         admin_user=System.handler.user_set[0]
-        session = Session(user=admin_user,role=Role(name="NCC",centre_oc=None,centre_nc=None))
+        session = Session(user=admin_user,
+                          role=Role(name="NCC",centre_oc=None,centre_nc=None))
         System.session_set.append(session)
         self.assertEqual(System.is_session_NCC(session), True)
 
@@ -269,7 +271,9 @@ class AddUser():
     @staticmethod
     def auth_check(args):
         session = args['session']
-        if not (System.is_session_admin(session) or System.is_session_OCC(session) or System.is_session_noc(session)):
+        if not (System.is_session_admin(session) or
+                System.is_session_OCC(session) or
+                System.is_session_noc(session)):
             raise AuthError("Role not Authorized to perform this action")
 
     @staticmethod
@@ -277,7 +281,8 @@ class AddUser():
         
         session = args["session"]
         if not (session in System.session_set):
-            raise StateError("user not in session %s" % session.get("user").get("name").get("name"))
+            raise StateError("user not in session %s"
+                             % session.get("user").get("name").get("name"))
 
     
     @staticmethod
@@ -285,7 +290,8 @@ class AddUser():
         user_name = args["name"]
         user_email = args["email"]
         session = args["session"]
-        user = User(name=user_name, email= user_email, roles= [Role.guest], user_status="active")
+        user = User(name=user_name, email= user_email, roles= [Role.guest],
+                    user_status="active")
         System.handler.add_user(user)
         return user
 #+end_src
@@ -298,7 +304,8 @@ class TestAddUser(TestCase):
         System.initialize_system(ObjectHandler)
 
     def tearDown(self):
-        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in",
+        admin = filter( lambda x: x.get("email").get("email") ==
+                        "app-admin@vlabs.ac.in",
                         System.handler.user_set)
         System.user_set = admin
         System.session_set = []
@@ -329,8 +336,8 @@ class TestAddUser(TestCase):
         name=Name(name="nocuser")
         email=Email(email="abc@gmail.com")
 
-        noc_user= System.do("add_user", name=name, email=email, session=session)
-        
+        noc_user= System.do("add_user", name=name, email=email,
+                            session=session)
 
         session_noc = Session(user=noc_user,role=Role.noc)
         System.session_set.append(session_noc)
@@ -352,13 +359,16 @@ class TestAddUser(TestCase):
         session_noc = Session(user=noc_user, role=Role.noc)
         System.session_set.append(session_noc)
     
-        institute = System.do("create_institute", name="IIT", address="Delhi", session=session)
-        oc = System.do("create_oc",institute=institute, session=session, spokes=[], oc_target = None)
+        institute = System.do("create_institute", name="IIT", address="Delhi",
+                               session=session)
+        oc = System.do("create_oc",institute=institute, session=session,
+                        spokes=[], oc_target = None)
 
         name1 = Name(name="ocuser")
         email1 = Email(email="mary@gmail.com")       
 
-        oc_user = System.do("add_user", name=name1, email=email1, session=session_noc)
+        oc_user = System.do("add_user", name=name1, email=email1,
+                             session=session_noc)
         
         oc_role = filter(lambda x:x.get('name') == "OCC" and
                          x.get('centre_oc').get("institute").get("name") ==
@@ -383,7 +393,10 @@ class DeleteUser():
         if System.is_session_admin(session):
             return True 
         elif System.is_session_OCC(session):
-            role = filter (lambda x: x.get('name') == "NCC" and x.get('centre_nc').get("hub") == session.get("role").get('centre_oc'), user.get('roles'))
+            role = filter (lambda x: x.get('name') == "NCC" and
+                            x.get('centre_nc').get("hub") ==
+                            session.get("role").get('centre_oc'),
+                            user.get('roles'))
             if role:
                 return True
         elif System.is_session_noc(session):
@@ -400,7 +413,8 @@ class DeleteUser():
         session = args["session"]
         for s in System.session_set:
             if(s.get("user")==user):
-              raise StateError("cannot delete user, user is in session %s" % s.get("user").get("name"))
+              raise StateError("cannot delete user, user is in session %s"
+                                % s.get("user").get("name"))
 
             
     @staticmethod
@@ -420,7 +434,8 @@ class TestDeleteUser(TestCase):
         System.initialize_system(ObjectHandler)
 
     def tearDown(self):
-        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in",
+        admin = filter( lambda x: x.get("email").get("email") ==
+                        "app-admin@vlabs.ac.in",
                         System.handler.user_set)
         System.user_set = admin
         System.handler.session_set = []
@@ -437,7 +452,8 @@ class TestDeleteUser(TestCase):
         name=Name(name="me")
         email=Email(email="abc@gmail.com")
 
-        other_admin_user= System.do("add_user", name=name, email=email, session=session)
+        other_admin_user= System.do("add_user", name=name, email=email,
+                                    session=session)
 
         other_admin_user.append_role(Role.admin)
         length = len(System.handler.user_set)
@@ -453,8 +469,10 @@ class TestDeleteUser(TestCase):
         System.session_set.append(session)
 
        
-        institute = System.do("create_institute",name="IIT",address="Delhi",session=session)
-        oc = System.do("create_oc",institute=institute,session=session,spokes=[], oc_target = None)
+        institute = System.do("create_institute",name="IIT",address="Delhi",
+                               session=session)
+        oc = System.do("create_oc",institute=institute,session=session,
+                        spokes=[], oc_target = None)
        
         name = Name(name="maryoc")
         email = Email(email="mary@gmail.com")
@@ -467,12 +485,14 @@ class TestDeleteUser(TestCase):
         if oc_role:
             oc_user.append_role(oc_role[0])
 
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
+        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+                        nc_target = None, workshops = [])
 
         name1 = Name(name="xyznc")
         email1 = Email(email="xyz@gmail.com")
 
-        nc_user = System.do("add_user", name=name1, email=email1, session=session)
+        nc_user = System.do("add_user", name=name1, email=email1,
+                             session=session)
 
         nc_role = filter(lambda x:x.get('name') == "NCC" and
                          x.get('centre_nc').get("institute").get("name") ==
@@ -496,9 +516,11 @@ class TestDeleteUser(TestCase):
         System.session_set.append(session)
 
        
-        institute = System.do("create_institute",name="IIT",address="Delhi",session=session)
+        institute = System.do("create_institute",name="IIT",address="Delhi",
+                               session=session)
 
-        oc = System.do("create_oc",institute=institute,session=session,spokes=[], oc_target = None)
+        oc = System.do("create_oc",institute=institute,session=session,
+                        spokes=[], oc_target = None)
        
         name = Name(name="maryoc")
         email = Email(email="mary@gmail.com")
@@ -515,7 +537,8 @@ class TestDeleteUser(TestCase):
         name1=Name(name="xyznc")
         email1=Email(email="xyz@gmail.com")
 
-        noc_user = System.do("add_user", name=name1, email=email1, session=session)
+        noc_user = System.do("add_user", name=name1, email=email1,
+                              session=session)
 
         noc_user.append_role(Role.noc)
 
@@ -533,7 +556,8 @@ class TestDeleteUser(TestCase):
 #+NAME: class_updateuser
 #+begin_src python
 class UpdateUser():
-    arg_types = {"name": is_name, "email": is_email, "user":is_user, "session":is_session}
+    arg_types = {"name": is_name, "email": is_email, "user":is_user,
+                 "session":is_session}
     arity_and_type_checks_needed = False
 
     @staticmethod
@@ -547,7 +571,9 @@ class UpdateUser():
             if role:
                return True            
         elif System.is_session_OCC(session):
-            role = filter (lambda x: x.get("name") == "NCC" and x.get('centre_nc').get("hub") == session.get("role").centre_oc, user.get('roles'))
+            role = filter (lambda x: x.get("name") == "NCC" and
+                           x.get('centre_nc').get("hub") ==
+                           session.get("role").centre_oc, user.get('roles'))
             if role:
                 return True
         else:
@@ -559,12 +585,15 @@ class UpdateUser():
         session = args["session"]
         for s in System.session_set:
             if(s.get("user")==user):
-              raise StateError("cannot update user, user is in session %s" % s.get("user").get("name"))
+              raise StateError("cannot update user, user is in session %s"
+                                % s.get("user").get("name"))
 
         if not (session in System.session_set):
-            raise StateError("You are not in session set %s" % session.get("user").get("name"))
+            raise StateError("You are not in session set %s"
+                            % session.get("user").get("name"))
         if not (user in System.handler.user_set):
-            raise StateError("user %s not in System" % user.get("name").get("name"))
+            raise StateError("user %s not in System"
+                             % user.get("name").get("name"))
 
     @staticmethod
     def action(args):
@@ -593,7 +622,8 @@ class TestUpdateUser(TestCase):
         System.initialize_system(ObjectHandler)
 
     def tearDown(self):
-        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in",
+        admin = filter( lambda x: x.get("email").get("email") ==
+                        "app-admin@vlabs.ac.in",
                         System.handler.user_set)
         System.user_set = admin
         System.handler.session_set = []
@@ -610,9 +640,11 @@ class TestUpdateUser(TestCase):
         name = Name(name="me")
         email = Email(email="abc@gmail.com") 
 
-        other_user= System.do("add_user", name=name, email=email, session=session)
+        other_user= System.do("add_user", name=name, email=email,
+                               session=session)
 
-        System.do("update_user",name=Name(name="john"), user=other_user,session=session)
+        System.do("update_user",name=Name(name="john"), user=other_user,
+                   session=session)
        
         self.assertEqual(other_user.get("name").get("name"), "john")
 
@@ -623,8 +655,10 @@ class TestUpdateUser(TestCase):
         System.session_set.append(session)
 
        
-        institute = System.do("create_institute",name="IIT",address="Madras",session=session)
-        oc = System.do("create_oc",institute=institute,session=session,spokes=[], oc_target = None)
+        institute = System.do("create_institute",name="IIT",address="Madras",
+                               session=session)
+        oc = System.do("create_oc",institute=institute,session=session,
+                        spokes=[], oc_target = None)
 
         name=Name(name="useroc")
         email=Email(email="useroc@gmail.com")       
@@ -637,12 +671,14 @@ class TestUpdateUser(TestCase):
         if oc_role:
             oc_user.append_role(oc_role[0])
         #create nc
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
+        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+                        nc_target = None, workshops = [])
 
         name1=Name(name="usernc")
         email1=Email(email="usernc@gmail.com")
 
-        nc_user= System.do("add_user", name=name1, email=email1, session=session)
+        nc_user= System.do("add_user", name=name1, email=email1,
+                            session=session)
 
         nc_role = filter(lambda x:x.get('name') == "NCC" and
                          x.get('centre_nc').get("institute").get("name") ==
@@ -655,7 +691,8 @@ class TestUpdateUser(TestCase):
         System.session_set.append(oc_session)
 
         length = len(System.handler.user_set)
-        System.do("update_user", name=Name(name="jack"), user=nc_user,session=oc_session)
+        System.do("update_user", name=Name(name="jack"), user=nc_user,
+                   session=oc_session)
         new_length = len(System.handler.user_set)
 
         self.assertEqual(nc_user.get("name").get("name"), "jack")       
@@ -667,8 +704,10 @@ class TestUpdateUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
        
-        institute = System.do("create_institute",name="IIT",address="Madras",session=session)
-        oc = System.do("create_oc",institute = institute, session = session, spokes = [], oc_target = None)
+        institute = System.do("create_institute",name="IIT",address="Madras",
+                               session=session)
+        oc = System.do("create_oc",institute = institute, session = session,
+                        spokes = [], oc_target = None)
        
         name=Name(name="useroc")
         email=Email(email="useroc@gmail.com")
@@ -684,7 +723,8 @@ class TestUpdateUser(TestCase):
         name1=Name(name="usernoc")
         email1=Email(email="usernoc@gmail.com")
 
-        noc_user=System.do("add_user", name=name1, email=email1, session=session)
+        noc_user=System.do("add_user", name=name1, email=email1,
+                            session=session)
 
         noc_user.append_role(Role.noc)
        
@@ -693,7 +733,8 @@ class TestUpdateUser(TestCase):
         System.session_set.append(noc_session)
 
         length = len(System.handler.user_set)
-        System.do("update_user", name=Name(name="jack"), user=oc_user,session=noc_session)
+        System.do("update_user", name=Name(name="jack"), user=oc_user,
+                   session=noc_session)
         new_length = len(System.handler.user_set)
 
         self.assertEqual(oc_user.get("name").get("name"), "jack")       
@@ -708,7 +749,9 @@ class AddRole():
     @staticmethod
     def auth_check(args):
         session = args['session']
-        if not (System.is_session_admin(session) or System.is_session_OCC(session) or System.is_session_noc(session)):
+        if not (System.is_session_admin(session) or
+                System.is_session_OCC(session) or
+                System.is_session_noc(session)):
             raise AuthError("Role not Authorized to perform this action")
 
     @staticmethod
@@ -717,7 +760,8 @@ class AddRole():
         user = args['user']
         role = args['role']
         if not (session in System.session_set):
-            raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
+            raise StateError("user not in session %s"
+                              % session.get('user').get('name').get('name'))
         if System.is_session_admin(session):
             if not System.handler.role_exists(role):
                 raise StateError("Invalid Role")
@@ -728,8 +772,10 @@ class AddRole():
             if role.get('name') != 'NCC':
                 raise StateError("AddRole %s not allowed" %role.get('name'))
             else:
-                if not (session.get('role').get('centre_oc') == role.get('centre_nc').get('hub')):
-                    raise StateError("AddRole %s not allowed" %role.get('name'))
+                if not (session.get('role').get('centre_oc') ==
+                        role.get('centre_nc').get('hub')):
+                    raise StateError("AddRole %s not allowed"
+                                      %role.get('name'))
 
     @staticmethod
     def action(args):
@@ -821,8 +867,8 @@ class Testlogin(TestCase):
         System.do("login",user=login_user,role=login_role)
         session=System.session_set[0]
         self.assertEqual(session.get("user").get("name").get("name"),"admin")
-        self.assertEqual(session.get("user").get('roles')[0].get('name'),"admin")
-        #self.assertRaises(AuthError,System.do,"login",user=login_user,role=login_role)
+        self.assertEqual(session.get("user").get('roles')[0].get('name'),
+                         "admin")
 #+END_SRC
 
 * =logout=
@@ -875,7 +921,8 @@ class Testlogout(TestCase):
 #+NAME: class_CreateInstitute
 #+begin_src python
 class CreateInstitute():
-    arg_types = {"name":is_alphabetic_str, "address":is_str,"session":is_session}
+    arg_types = {"name":is_alphabetic_str, "address":is_str,
+                 "session":is_session}
     arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):
@@ -889,10 +936,12 @@ class CreateInstitute():
         name = args['name']
         address = args['address']
         if not (session in System.session_set):
-            raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
+            raise StateError("user not in session %s"
+                              % session.get('user').get('name').get('name'))
         for inst in System.handler.get_institutes():
             if inst.get('name') == name and inst.get('address') == address:
-                raise StateError("institute %s already in System" % inst.get('name'))
+                raise StateError("institute %s already in System"
+                                  % inst.get('name'))
 
     @staticmethod
     def action(args):
@@ -921,7 +970,8 @@ class TestCreateInstitute(TestCase):
         login_user=System.handler.user_set[0]
         login_role = System.handler.role_set[0]
         sess = System.do("login",user=login_user,role=login_role)
-        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
+        institute = System.do("create_institute",name="IIIT",
+                               address="Hyderabad",session=sess)
         self.assertEqual(institute,System.handler.institute_set[0])
 
 
@@ -930,14 +980,16 @@ class TestCreateInstitute(TestCase):
 #+NAME: class_CreateOC
 #+begin_src python
 class CreateOC():
-    arg_types = {"institute":is_institute,"spokes":are_spokes, "session":is_session, "oc_target":is_octarget}
+    arg_types = {"institute":is_institute,"spokes":are_spokes,
+                  "session":is_session, "oc_target":is_octarget}
     arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):
         session = args['session']
         institute = args['institute']
         oc_target = args['oc_target']
-        if not (System.is_session_admin(session) or System.is_session_noc(session)):
+        if not (System.is_session_admin(session) or
+                System.is_session_noc(session)):
             raise AuthError("Role not Authorized to perform this action")
 
     @staticmethod
@@ -946,9 +998,11 @@ class CreateOC():
         institute = args['institute']
         oc_target = args['oc_target']
         if not (session in System.session_set):
-            raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
+            raise StateError("user not in session %s"
+                              % session.get('user').get('name').get('name'))
         if not System.handler.institute_exists(institute):
-            raise StateError("institute %s not in System" % institute.get('name'))
+            raise StateError("institute %s not in System"
+                             % institute.get('name'))
         for oc in System.handler.get_ocs():
             if oc.get('institute') == institute:
                 raise StateError("institute %s already has an oc associated with it" %oc)
@@ -986,8 +1040,10 @@ class TestCreateOC(TestCase):
         login_user=System.handler.user_set[0]
         login_role = System.handler.role_set[0]
         sess = System.do("login",user=login_user,role=login_role)
-        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
-        oc = System.do("create_oc",institute=institute,spokes=[],session=sess, oc_target = None)
+        institute = System.do("create_institute",name="IIIT",
+                               address="Hyderabad",session=sess)
+        oc = System.do("create_oc",institute=institute,spokes=[],
+                        session=sess, oc_target = None)
         self.assertEqual(oc.get('institute'),institute)
         #self.assertRaises(StateError,System.do,"create_oc",institute=institute,session=sess)
 
@@ -997,7 +1053,8 @@ class TestCreateOC(TestCase):
 #+NAME: class_CreateNC
 #+begin_src python
 class CreateNC():
-    arg_types = {"institute":is_institute,"hub":is_oc,"session":is_session, "nc_target" : is_nctarget, "workshops": are_workshops}
+    arg_types = {"institute":is_institute,"hub":is_oc,"session":is_session,
+                  "nc_target" : is_nctarget, "workshops": are_workshops}
     arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):
@@ -1006,7 +1063,8 @@ class CreateNC():
         oc = args['hub']
         nc_target = args['nc_target']
         workshops = args["workshops"]
-        if not (System.is_session_admin(session) or System.is_session_OCC(session)):
+        if not (System.is_session_admin(session) or
+                System.is_session_OCC(session)):
             raise AuthError("Role not Authorized to perform this action")
         if System.is_session_OCC(session):
             if oc != session.get('role').get('centre_oc'):
@@ -1020,9 +1078,11 @@ class CreateNC():
         nc_target = args['nc_target']
         workshops = args["workshops"]
         if not (session in System.session_set):
-            raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
+            raise StateError("user not in session %s"
+                              % session.get('user').get('name').get('name'))
         if not System.handler.institute_exists(institute):
-            raise StateError("institute %s not in System" % institute.get('name'))
+            raise StateError("institute %s not in System"
+                             % institute.get('name'))
         for nc in System.handler.get_ncs():
             if nc.get('institute') == institute:
                 raise StateError("institute %s already has an nc associated with it" %nc)
@@ -1037,7 +1097,8 @@ class CreateNC():
         oc = args['hub']
         nc_target = args['nc_target']
         workshops = args["workshops"]
-        new_nc = NC(institute=institute,hub=oc, nc_target = nc_target, workshops = workshops)
+        new_nc = NC(institute=institute,hub=oc, nc_target = nc_target,
+                    workshops = workshops)
         System.handler.add_nc(new_nc)
         oc.append_spoke(new_nc)
         new_role = Role(name="NCC",centre_oc=None,centre_nc=new_nc)
@@ -1064,9 +1125,12 @@ class TestCreateNC(TestCase):
         login_user=System.handler.user_set[0]
         login_role = System.handler.role_set[0]
         sess = System.do("login",user=login_user,role=login_role)
-        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
-        oc = System.do("create_oc",institute=institute,spokes=[],session=sess, oc_target = None)
-        nc = System.do("create_nc",institute=institute,hub=oc,session=sess, nc_target = None, workshops = [])
+        institute = System.do("create_institute",name="IIIT",
+                               address="Hyderabad",session=sess)
+        oc = System.do("create_oc",institute=institute,spokes=[],session=sess,
+                        oc_target = None)
+        nc = System.do("create_nc",institute=institute,hub=oc,session=sess,
+                        nc_target = None, workshops = [])
         self.assertEqual(nc.get('institute'),institute)
         self.assertEqual(oc.get('spokes')[0],nc)
 
@@ -1076,7 +1140,8 @@ class TestCreateNC(TestCase):
 #+NAME: class_UpdateInstitute
 #+begin_src python
 class UpdateInstitute():
-    arg_types = {"name":is_alphabetic_str, "address":is_str,"institute":is_institute,"session":is_session}
+    arg_types = {"name":is_alphabetic_str, "address":is_str,
+                 "institute":is_institute,"session":is_session}
     arity_and_type_checks_needed = False
     @staticmethod
     def auth_check(args):
@@ -1090,7 +1155,8 @@ class UpdateInstitute():
         institute = args["institute"]
             
         if not (session in System.session_set):
-            raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
+            raise StateError("user not in session %s"
+                             % session.get('user').get('name').get('name'))
 
     @staticmethod        
     def action(args):
@@ -1132,8 +1198,10 @@ class TestUpdateInstitute(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         
-        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=session)
-        System.do("update_institute",name="NITK",institute=institute,session=session)
+        institute = System.do("create_institute",name="IIIT",
+                              address="Hyderabad",session=session)
+        System.do("update_institute",name="NITK",institute=institute,
+                   session=session)
         self.assertEqual(institute.get("name"),"NITK")
 
 #+END_SRC
@@ -1176,9 +1244,11 @@ class CreateWorkshop():
         status = args["status"]
         nc = args["nc"]
         if not (session in System.session_set):
-            raise StateError("user not in session %s" % session.get('user').get('name').get('name'))
+            raise StateError("user not in session %s"
+                             % session.get('user').get('name').get('name'))
         if not System.handler.institute_exists(institute):
-            raise StateError("institute %s not in System" % institute.get('name'))
+            raise StateError("institute %s not in System"
+                             % institute.get('name'))
         if not System.handler.nc_exists(nc):
             raise StateError("nc %s not in System" % nc.get('name'))
         
@@ -1227,20 +1297,29 @@ class TestCreateWorkshop(TestCase):
         login_user = System.handler.user_set[0]
         login_role = System.handler.role_set[0]
         sess = System.do("login",user=login_user,role=login_role)
-        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
-        workshop_institute = System.do("create_institute", name = "NITK", address = "Surathkal", session = sess)
-        oc = System.do("create_oc",institute=institute,spokes=[],session=sess, oc_target = None)
-        nc = System.do("create_nc",institute=institute,hub=oc,session=sess, nc_target = None, workshops = [])
+        institute = System.do("create_institute",name="IIIT",
+                               address="Hyderabad",session=sess)
+        workshop_institute = System.do("create_institute", name = "NITK",
+                                        address = "Surathkal", session = sess)
+        oc = System.do("create_oc",institute=institute,spokes=[],session=sess,
+                        oc_target = None)
+        nc = System.do("create_nc",institute=institute,hub=oc,session=sess,
+                        nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        nc_target = NCTarget(usage = 200, date = target_date,
+                             oc_target = oc_target, wstargets = [])
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
+                            date = target_date, nc_target = nc_target )
         session = Session(user=login_user,role=Role.admin)
         System.session_set.append(session)
         ws_status = Status.pending
-        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = sess)
+        nc_user = System.do("add_user",name=Name(name="ncuser"),
+                             email=Email(email="ncuser@gmail.com"),
+                             session = sess)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
-        nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
+        nc_session = Session(user = nc_user,
+                             role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
         
         new_workshop = System.do("create_workshop", 
@@ -1303,7 +1382,8 @@ class TestCancelWorkshop(TestCase):
         System.initialize_system(ObjectHandler)
 
     def tearDown(self):
-        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in",
+        admin = filter( lambda x: x.get("email").get("email") ==
+                        "app-admin@vlabs.ac.in",
                         System.handler.user_set)
         System.user_set = admin
         System.session_set = []
@@ -1317,39 +1397,53 @@ class TestCancelWorkshop(TestCase):
         admin_user=System.handler.user_set[0]
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=session)
-        workshop_institute = System.do("create_institute", name = "NITK", address = "Surathkal", session = session)
-        oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
+        institute = System.do("create_institute",name="IIIT",
+                               address="Hyderabad",session=session)
+        workshop_institute = System.do("create_institute", name = "NITK",
+                                        address = "Surathkal",
+                                        session = session)
+        oc = System.do("create_oc",institute=institute,spokes=[],
+                        session=session, oc_target = None)
+        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+                        nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target)
+        nc_target = NCTarget(usage = 200, date = target_date,
+                             oc_target = oc_target, wstargets = [])
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
+                            date = target_date, nc_target = nc_target)
         
         
         ws_status = Status.pending
-        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = session)
+        nc_user = System.do("add_user",name=Name(name="ncuser"),
+                            email=Email(email="ncuser@gmail.com"),
+                            session = session)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
-        nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
+        nc_session = Session(user = nc_user,
+                             role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
         
-
+        new_workshop = System.do("create_workshop",
+                                 institute = workshop_institute,
+                                 name = Name(name = "Lab Workshop"),
+                                 ws_target = wstarget, status = ws_status,
+                                 artefacts = [], nc = nc, session = nc_session) 
         
+        System.do("cancel_workshop", workshop = new_workshop,
+                  session = nc_session)
+        self.assertEqual(new_workshop.get("status").get("name"),
+                         Status.cancelled.get("name"))
+        self.assertEqual(nc.get("workshops")[0].get("status").get("name"),
+                         Status.cancelled.get("name"))
         
-        new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
-        
-        System.do("cancel_workshop", workshop = new_workshop, session = nc_session)
-        self.assertEqual(new_workshop.get("status").get("name"), Status.cancelled.get("name"))
-        self.assertEqual(nc.get("workshops")[0].get("status").get("name"), Status.cancelled.get("name"))
-        
-
-    #+END_SRC
+ #+END_SRC
 
 * =reschedule_workshop=
 #+NAME: class_RescheduleWorkshop
 #+begin_src python
 class RescheduleWorkshop():
-    arg_types = {"workshop":is_workshop, "session":is_session, "wstarget" : is_wst}
+    arg_types = {"workshop":is_workshop, "session":is_session,
+                 "wstarget" : is_wst}
     arity_and_type_checks_needed = True   
     @staticmethod
     def auth_check(args):
@@ -1393,7 +1487,8 @@ class TestRescheduleWorkshop(TestCase):
         System.initialize_system(ObjectHandler)
 
     def tearDown(self):
-        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in",
+        admin = filter( lambda x: x.get("email").get("email") ==
+                        "app-admin@vlabs.ac.in",
                         System.handler.user_set)
         System.user_set = admin
         System.session_set = []
@@ -1407,35 +1502,54 @@ class TestRescheduleWorkshop(TestCase):
         admin_user=System.handler.user_set[0]
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=session)
-        workshop_institute = System.do("create_institute", name = "NITK", address = "Surathkal", session = session)
-        oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
+        institute = System.do("create_institute",name="IIIT",
+                              address="Hyderabad",session=session)
+        workshop_institute = System.do("create_institute", name = "NITK",
+                                        address = "Surathkal",
+                                        session = session)
+        oc = System.do("create_oc",institute=institute,spokes=[],
+                        session=session, oc_target = None)
+        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+                        nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date,
+                             oc_target = oc_target, wstargets = [])
         
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target)
-        
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
+                            date = target_date, nc_target = nc_target)
         
         ws_status = Status.pending
-        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = session)
+        nc_user = System.do("add_user",name=Name(name="ncuser"),
+                             email=Email(email="ncuser@gmail.com"),
+                             session = session)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
-        nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
+        nc_session = Session(user = nc_user,
+                             role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
         
-        new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
+        new_workshop = System.do("create_workshop",
+                                 institute = workshop_institute,
+                                 name = Name(name = "Lab Workshop"),
+                                 ws_target = wstarget, status = ws_status,
+                                 artefacts = [], nc = nc, session = nc_session) 
         
-        System.do("cancel_workshop", workshop = new_workshop, session = nc_session)
+        System.do("cancel_workshop", workshop = new_workshop,
+                   session = nc_session)
         
         new_target_date = datetime.datetime.strptime("05-07-2016", "%d-%m-%Y").date()
-        new_wstarget = WSTarget(usage = 3000, participants = 200, experiments = 20, date = new_target_date, nc_target = nc_target)
+        new_wstarget = WSTarget(usage = 3000, participants = 200, experiments = 20,
+                                date = new_target_date, nc_target = nc_target)
 
-        System.do("reschedule_workshop", workshop = new_workshop, session = nc_session, wstarget = new_wstarget)
+        System.do("reschedule_workshop", workshop = new_workshop,
+                   session = nc_session, wstarget = new_wstarget)
 
-        self.assertEqual(new_workshop.get("status").get("name"), Status.pending.get("name"))
-        self.assertEqual(nc.get("workshops")[0].get("status").get("name"), Status.pending.get("name"))
-        self.assertEqual(new_workshop.get("ws_target").get("date"), new_target_date)
+        self.assertEqual(new_workshop.get("status").get("name"),
+                         Status.pending.get("name"))
+        self.assertEqual(nc.get("workshops")[0].get("status").get("name"),
+                         Status.pending.get("name"))
+        self.assertEqual(new_workshop.get("ws_target").get("date"),
+                         new_target_date)
         
     #+END_SRC
 
@@ -1485,7 +1599,8 @@ class TestConductWorkshop(TestCase):
         System.initialize_system(ObjectHandler)
 
     def tearDown(self):
-        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in", 
+        admin = filter( lambda x: x.get("email").get("email") ==
+                        "app-admin@vlabs.ac.in", 
                         System.handler.user_set)
         System.user_set = admin
         System.session_set = []
@@ -1547,7 +1662,8 @@ class TestConductWorkshop(TestCase):
 #+NAME: class_UploadArtefact
 #+begin_src python
 class UploadArtefact():
-    arg_types = {"workshop":is_workshop, "session":is_session, "artefact" : is_artefact}
+    arg_types = {"workshop":is_workshop, "session":is_session,
+                 "artefact" : is_artefact}
     arity_and_type_checks_needed = True   
     @staticmethod
     def auth_check(args):
@@ -1569,7 +1685,10 @@ class UploadArtefact():
         workshop = args["workshop"]
         session = args["session"]
         workshop_status = workshop.get("status")
-        if not (Status.is_completed(workshop_status) or Status.is_pending_approval(workshop_status) or Status.is_rejected(workshop_status) or Status.is_approved(workshop_status)):
+        if not (Status.is_completed(workshop_status) or
+                Status.is_pending_approval(workshop_status) or
+                Status.is_rejected(workshop_status) or
+                Status.is_approved(workshop_status)):
             raise StateError("cannot upload artefact")
         
                     
@@ -1595,7 +1714,8 @@ class TestUploadArtefact(TestCase):
         System.initialize_system(ObjectHandler)
 
     def tearDown(self):
-        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in",
+        admin = filter( lambda x: x.get("email").get("email") ==
+                        "app-admin@vlabs.ac.in",
                         System.handler.user_set)
         System.user_set = admin
         System.session_set = []
@@ -1609,35 +1729,55 @@ class TestUploadArtefact(TestCase):
         admin_user=System.handler.user_set[0]
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=session)
-        workshop_institute = System.do("create_institute", name = "NITK", address = "Surathkal", session = session)
-        oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
+        institute = System.do("create_institute",name="IIIT",
+                              address="Hyderabad",session=session)
+        workshop_institute = System.do("create_institute", name = "NITK",
+                                        address = "Surathkal",
+                                        session = session)
+        oc = System.do("create_oc",institute=institute,spokes=[],
+                        session=session, oc_target = None)
+        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+                        nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, wstargets = [], oc_target = oc_target)
+        nc_target = NCTarget(usage = 200, date = target_date, wstargets = [],
+                             oc_target = oc_target)
         
         
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target)
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
+                            date = target_date, nc_target = nc_target)
         
         
         ws_status = Status.pending
-        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = session)
+        nc_user = System.do("add_user",name=Name(name="ncuser"),
+                            email=Email(email="ncuser@gmail.com"),
+                            session = session)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
-        nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
+        nc_session = Session(user = nc_user,
+                             role = Role(name = "NCC", centre_oc = oc,
+                             centre_nc = nc))
         System.session_set.append(nc_session)
         
-        new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
+        new_workshop = System.do("create_workshop",
+                                 institute = workshop_institute,
+                                 name = Name(name = "Lab Workshop"),
+                                 ws_target = wstarget, status = ws_status,
+                                 artefacts = [], nc = nc, session = nc_session) 
         
-        System.do("conduct_workshop", workshop = new_workshop, session = nc_session)
+        System.do("conduct_workshop", workshop = new_workshop,
+                   session = nc_session)
         
 
-        new_artefact = Artefact(name = "Photo", path = "/main/photos", a_type = Type.photo)
+        new_artefact = Artefact(name = "Photo", path = "/main/photos",
+                                a_type = Type.photo)
 
-        System.do("upload_artefact", workshop = new_workshop, session = nc_session, artefact = new_artefact)
+        System.do("upload_artefact", workshop = new_workshop,
+                  session = nc_session, artefact = new_artefact)
         
-        self.assertEqual(new_workshop.get("artefacts")[0].get("name"), new_artefact.get("name"))
-        self.assertEqual(new_workshop.get("status").get("name") , Status.pending_approval.get("name"))
+        self.assertEqual(new_workshop.get("artefacts")[0].get("name"),
+                         new_artefact.get("name"))
+        self.assertEqual(new_workshop.get("status").get("name") ,
+                         Status.pending_approval.get("name"))
         
 
     #+END_SRC
@@ -1688,7 +1828,8 @@ class TestApproveWorkshop(TestCase):
         System.initialize_system(ObjectHandler)
 
     def tearDown(self):
-        admin = filter(lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in",
+        admin = filter(lambda x: x.get("email").get("email") ==
+                       "app-admin@vlabs.ac.in",
                        System.handler.user_set)
         System.user_set = admin
         System.session_set = []
@@ -1807,7 +1948,8 @@ class TestRejectWorkshop(TestCase):
         System.initialize_system(ObjectHandler)
 
     def tearDown(self):
-        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in",
+        admin = filter( lambda x: x.get("email").get("email") ==
+                        "app-admin@vlabs.ac.in",
                         System.handler.user_set)
         System.user_set = admin
         System.session_set = []
@@ -1821,35 +1963,58 @@ class TestRejectWorkshop(TestCase):
         admin_user=System.handler.user_set[0]
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=session)
-        workshop_institute = System.do("create_institute", name = "NITK", address = "Surathkal", session = session)
-        oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
+        institute = System.do("create_institute",name="IIIT",
+                              address="Hyderabad",session=session)
+        workshop_institute = System.do("create_institute", name = "NITK",
+                                        address = "Surathkal",
+                                        session = session)
+        oc = System.do("create_oc",institute=institute,spokes=[],
+                        session=session, oc_target = None)
+        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+                        nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target)
+        nc_target = NCTarget(usage = 200, date = target_date,
+                             oc_target = oc_target, wstargets = [])
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
+                            date = target_date, nc_target = nc_target)
         
         
         ws_status = Status.pending
-        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = session)
+        nc_user = System.do("add_user",name=Name(name="ncuser"),
+                             email=Email(email="ncuser@gmail.com"),
+                             session = session)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
-        nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
+        nc_session = Session(user = nc_user,
+                             role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
         
-        oc_user = System.do("add_user",name=Name(name="ocuser"),email=Email(email="ocuser@gmail.com"),session = session)
+        oc_user = System.do("add_user",name=Name(name="ocuser"),
+                             email=Email(email="ocuser@gmail.com"),
+                             session = session)
         oc_user.set(roles=[Role(name = "OCC", centre_oc = oc, centre_nc = None)])
-        oc_session = Session(user = oc_user, role = Role(name = "OCC", centre_oc = oc, centre_nc = None))
+        oc_session = Session(user = oc_user,
+                             role = Role(name = "OCC", centre_oc = oc, centre_nc = None))
         System.session_set.append(oc_session)
         
-        new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
-        System.do("conduct_workshop", workshop = new_workshop, session = nc_session)
-        new_artefact = Artefact(name = "Photo", path = "/main/photos", a_type = Type.photo)
+        new_workshop = System.do("create_workshop",
+                                  institute = workshop_institute,
+                                  name = Name(name = "Lab Workshop"),
+                                  ws_target = wstarget, status = ws_status,
+                                  artefacts = [], nc = nc,
+                                  session = nc_session) 
+        System.do("conduct_workshop", workshop = new_workshop,
+                   session = nc_session)
+        new_artefact = Artefact(name = "Photo", path = "/main/photos",
+                                a_type = Type.photo)
 
-        System.do("upload_artefact", workshop = new_workshop, session = nc_session, artefact = new_artefact)
+        System.do("upload_artefact", workshop = new_workshop,
+                   session = nc_session, artefact = new_artefact)
         
-        System.do("reject_workshop", workshop = new_workshop, session = oc_session)
-        self.assertEqual(new_workshop.get("status").get("name"), Status.rejected.get("name"))
+        System.do("reject_workshop", workshop = new_workshop,
+                   session = oc_session)
+        self.assertEqual(new_workshop.get("status").get("name"),
+                         Status.rejected.get("name"))
         
         
 
@@ -1859,7 +2024,8 @@ class TestRejectWorkshop(TestCase):
 #+NAME: class_DeleteArtefact
 #+begin_src python
 class DeleteArtefact():
-    arg_types = {"workshop":is_workshop, "session":is_session, "artefact" : is_artefact}
+    arg_types = {"workshop":is_workshop, "session":is_session,
+                 "artefact" : is_artefact}
     arity_and_type_checks_needed = True   
     @staticmethod
     def auth_check(args):
@@ -1881,7 +2047,10 @@ class DeleteArtefact():
         workshop = args["workshop"]
         session = args["session"]
         workshop_status = workshop.get("status")
-        if not (Status.is_completed(workshop_status) or Status.is_pending_approval(workshop_status) or Status.is_rejected(workshop_status) or Status.is_approved(workshop_status)):
+        if not (Status.is_completed(workshop_status) or
+                Status.is_pending_approval(workshop_status) or
+                Status.is_rejected(workshop_status) or
+                Status.is_approved(workshop_status)):
             raise StateError("cannot upload artefact")
         
                     
@@ -1892,7 +2061,8 @@ class DeleteArtefact():
 
         artefact_set = workshop.get("artefacts")
         
-        new_set = filter(lambda art: not art.get("name") == artefact.get("name"), artefact_set)
+        new_set = filter(lambda art: not art.get("name") ==
+                         artefact.get("name"), artefact_set)
 
         workshop.set(artefacts = new_set)
         
@@ -1909,7 +2079,8 @@ class TestDeleteArtefact(TestCase):
         System.initialize_system(ObjectHandler)
 
     def tearDown(self):
-        admin = filter( lambda x: x.get("email").get("email") == "app-admin@vlabs.ac.in",
+        admin = filter( lambda x: x.get("email").get("email") ==
+                        "app-admin@vlabs.ac.in",
                         System.handler.user_set)
         System.user_set = admin
         System.session_set = []
@@ -1923,34 +2094,52 @@ class TestDeleteArtefact(TestCase):
         admin_user=System.handler.user_set[0]
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-        institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=session)
-        workshop_institute = System.do("create_institute", name = "NITK", address = "Surathkal", session = session)
-        oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
+        institute = System.do("create_institute",name="IIIT",
+                              address="Hyderabad",session=session)
+        workshop_institute = System.do("create_institute", name = "NITK",
+                                        address = "Surathkal",
+                                        session = session)
+        oc = System.do("create_oc",institute=institute,spokes=[],
+                       session=session, oc_target = None)
+        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+                        nc_target = None, workshops = [])
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target)
-        
+        nc_target = NCTarget(usage = 200, date = target_date,
+                             oc_target = oc_target, wstargets = [])
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
+                            date = target_date, nc_target = nc_target)
         
         ws_status = Status.pending
-        nc_user = System.do("add_user",name=Name(name="ncuser"),email=Email(email="ncuser@gmail.com"),session = session)
+        nc_user = System.do("add_user",name=Name(name="ncuser"),
+                            email=Email(email="ncuser@gmail.com"),
+                            session = session)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
-        nc_session = Session(user = nc_user, role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
+        nc_session = Session(user = nc_user,
+                             role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
         
-        new_workshop = System.do("create_workshop", institute = workshop_institute, name = Name(name = "Lab Workshop"), ws_target = wstarget, status = ws_status, artefacts = [], nc = nc, session = nc_session) 
+        new_workshop = System.do("create_workshop",
+                                 institute = workshop_institute,
+                                 name = Name(name = "Lab Workshop"),
+                                 ws_target = wstarget, status = ws_status,
+                                 artefacts = [], nc = nc, session = nc_session) 
         
-        System.do("conduct_workshop", workshop = new_workshop, session = nc_session)
+        System.do("conduct_workshop", workshop = new_workshop,
+                  session = nc_session)
         
 
-        new_artefact = Artefact(name = "Photo", path = "/main/photos", a_type = Type.photo)
+        new_artefact = Artefact(name = "Photo", path = "/main/photos",
+                                a_type = Type.photo)
 
-        System.do("upload_artefact", workshop = new_workshop, session = nc_session, artefact = new_artefact)
+        System.do("upload_artefact", workshop = new_workshop,
+                  session = nc_session, artefact = new_artefact)
         
-        System.do("delete_artefact", workshop = new_workshop, session = nc_session, artefact = new_artefact)
+        System.do("delete_artefact", workshop = new_workshop,
+                  session = nc_session, artefact = new_artefact)
         self.assertEqual(len(new_workshop.get("artefacts")), 0)
-        self.assertEqual(new_workshop.get("status").get("name") , Status.pending_approval.get("name"))
+        self.assertEqual(new_workshop.get("status").get("name") ,
+                         Status.pending_approval.get("name"))
         
 
     #+END_SRC
