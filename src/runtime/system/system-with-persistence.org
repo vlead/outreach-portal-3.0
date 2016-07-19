@@ -1029,9 +1029,7 @@ class CreateOC():
         spokes=args["spokes"]
         oc_target = args['oc_target']
         new_oc = OC(institute=institute,spokes=spokes, oc_target = oc_target)
-#        new_role = Role(name="OCC",centre_oc=new_oc,centre_nc=None)
         new_oc.save()
-#        new_role.save()
 
         return new_oc
 
@@ -1111,8 +1109,6 @@ class CreateNC():
         new_nc = NC(institute=institute,hub=oc, workshops = workshops, nc_target = nc_target)
         new_nc.save()
         oc.append_spoke(new_nc)
-#        new_role = Role(name="NCC",centre_oc=None,centre_nc=new_nc)
-#        new_role.save()
         return new_nc
 #+end_src
 ** Test CreateNC
