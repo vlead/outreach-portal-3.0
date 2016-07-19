@@ -1271,7 +1271,6 @@ class CreateWorkshop():
                                 a_experiments = 0,
                                 a_usage = 0)
         new_workshop.save()
-        System.workshop_set.append(new_workshop)
         nc.add_workshop_to_nc(new_workshop)        
         
         return new_workshop
@@ -1298,19 +1297,32 @@ class TestCreateWorkshop(TestCase):
 
     def test_create_workshop(self):
         print "test_create_workshop"
-        login_user = System.user_set[0]
-        login_role = System.role_set[0]
+        login_user = User.get_by_id(1)
+        login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
+
         institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=sess)
+        institute.save()
         workshop_institute = System.do("create_institute", name = "NITK", address = "Surathkal", session = sess)
+        workshop_institute.save() 
+        
         oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],session=sess, oc_target = None)
+        oc.save()
+        occ_role = Role(name="OCC",centre_oc=oc,centre_nc=None)
+        occ_role.save()
+
         nc = System.do("create_nc",institute= Institute.get_by_id(1),hub=oc,session=sess, nc_target = None, workshops = [])
+        nc.save()
+        ncc_role = Role(name="NCC",centre_oc=None,centre_nc=nc)
+        ncc_role.save()
+
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
         nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
         wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
         oc_target.save()
         nc_target.save()
+
         session = Session(user=login_user,role=Role.admin)
         System.session_set.append(session)
         ws_status = Status(name = "pending")
@@ -1320,9 +1332,10 @@ class TestCreateWorkshop(TestCase):
         name.save()
         email.save()
                 
+
         nc_user = System.do("add_user",name = name, email = email, session = sess)
-        System.do("add_role", user = nc_user, role = Role.get_by_id(6), session = sess)
-        nc_session = Session(user = nc_user, role = Role.get_by_id(6))
+        System.do("add_role", user = nc_user, role = ncc_role, session = sess)
+        nc_session = Session(user = nc_user, role = ncc_role)
         System.session_set.append(nc_session)
         role_check = Role.get_by_id(6)
                
