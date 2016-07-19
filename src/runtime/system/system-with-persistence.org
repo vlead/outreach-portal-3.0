@@ -131,7 +131,6 @@ class TestSystemConstructor(TestCase):
         System.initialize_system(PersistenceHandler)
 
     def tearDown(self):
-        System.handler.session_set = []
         db.session.remove()
         db.drop_all()
 
@@ -221,9 +220,21 @@ class TestSystemConstructor(TestCase):
 *** Test Arity and Type Checks
 #+NAME: test_arity_and_types
 #+BEGIN_SRC python
-'''
 class TestSystemArityAndType(TestCase):
     TESTING = True
+
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+        System.initialize_system(PersistenceHandler)
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
 
     def test_arity(self):
         print "test_arity"
@@ -242,7 +253,7 @@ class TestSystemArityAndType(TestCase):
 
         with self.assertRaises(TypeError):
             System.type_check(args, arg_types)
-'''
+
 #+END_SRC
 
 
