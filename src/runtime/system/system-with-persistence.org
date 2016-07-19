@@ -722,7 +722,6 @@ class TestUpdateUser(TestCase):
         oc_user= System.do("add_user", name=Name.get_by_id(2), email=Email.get_by_id(2), session=session)
         oc_user.save()
 
-        print Role.get_all()
         oc_role = filter(lambda x:x.get('name') == "OCC" and x.get('centre_oc').get("institute").get("name") ==institute.get("name"), Role.get_all())
         if oc_role:
             oc_user.append_role(oc_role[0])
@@ -1411,10 +1410,22 @@ class TestCancelWorkshop(TestCase):
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
+
         institute = System.do("create_institute",name="IIIT",address="Hyderabad",session=session)
+        institute.save()
         workshop_institute = System.do("create_institute", name = "NITK", address = "Surathkal", session = session)
+        workshop_institute.save() 
+
         oc = System.do("create_oc",institute=institute,spokes=[],session=session, oc_target = None)
+        oc.save() 
+        occ_role = Role(name="OCC",centre_oc=oc,centre_nc=None)
+        occ_role.save()
+
         nc = System.do("create_nc",institute=institute,hub=oc,session=session, nc_target = None, workshops = [])
+        nc.save() 
+        ncc_role = Role(name="NCC",centre_oc=None,centre_nc=nc)
+        ncc_role.save()
+
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
         nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
@@ -1422,16 +1433,18 @@ class TestCancelWorkshop(TestCase):
         oc_target.save()
         nc_target.save()
         wstarget.save()
+
         ws_status = Status(name = "pending")
         ws_status.save()
+
         name=Name(name="ncuser")
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
                 
         nc_user = System.do("add_user",name = name, email = email, session = session)
-        System.do("add_role", user = nc_user, role = Role.get_by_id(6), session = session)
-        nc_session = Session(user = nc_user, role = Role.get_by_id(6))
+        System.do("add_role", user = nc_user, role = ncc_role, session = session)
+        nc_session = Session(user = nc_user, role = ncc_role)
         System.session_set.append(nc_session)
 
         name1 = Name(name = "Lab Workshop")
