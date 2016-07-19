@@ -1844,6 +1844,146 @@ class TestConductWorkshop(TestCase):
 
  #+END_SRC
 
+* =upload_artefact=
+#+NAME: class_UploadArtefact
+#+begin_src python
+class UploadArtefact():
+    arg_types = {"workshop":is_workshop, "session":is_session,
+                 "artefact" : is_artefact}
+    arity_and_type_checks_needed = True   
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        workshop = args['workshop']
+        artefact = args['artefact']
+        
+        if System.is_session_NCC(session):
+            role = session.get('role')
+            nc_centre = role.get('centre_nc')
+            if workshop in nc_centre.get('workshops'):
+                return True
+            
+        else:
+            raise AuthError("Role not Authorized to perform this action")
+
+    @staticmethod
+    def state_check(args):
+        workshop = args["workshop"]
+        session = args["session"]
+        workshop_status = workshop.get("status")
+        if (Status.is_completed == workshop_status or
+            Status.is_pending_approval == workshop_status or
+            Status.is_rejected == workshop_status or
+            Status.is_approved == workshop_status):
+            raise StateError("cannot upload artefact")
+
+    @staticmethod
+    def action(args):
+        workshop = args["workshop"]
+        new_artefact = args['artefact']
+
+        artefacts = workshop.get("artefacts")
+        artefacts.append(new_artefact)
+        workshop.set(artefacts = artefacts)
+        
+        workshop.set(status = Status.pending_approval)
+        
+        
+#+end_src
+** Test UploadArtefact
+#+NAME: test_UploadArtefact
+#+BEGIN_SRC python
+class TestUploadArtefact(TestCase):
+    TESTING = True
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+        System.initialize_system(PersistenceHandler)
+
+    def tearDown(self):
+        System.session_set = []
+        db.session.remove()
+        db.drop_all()
+
+    def test_upload_artefact(self):
+        print "test_upload_artefact"
+        admin_user=User.get_by_id(1)
+        session = Session(user=admin_user,role=Role.admin)
+        System.session_set.append(session)
+
+        institute = System.do("create_institute",name="IIIT",
+                              address="Hyderabad",session=session)
+        institute.save()
+        workshop_institute = System.do("create_institute", name = "NITK",
+                                        address = "Surathkal",
+                                        session = session)
+        institute.save()
+        oc = System.do("create_oc",institute=institute,spokes=[],
+                        session=session, oc_target = None)
+        occ_role = Role(name="OCC",centre_oc=oc,centre_nc=None)
+        occ_role.save()
+
+        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+                        nc_target = None, workshops = [])
+        ncc_role = Role(name="NCC",centre_oc=None,centre_nc=nc)
+        ncc_role.save()
+
+        target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        oc_target.save()
+        nc_target = NCTarget(usage = 200, date = target_date, wstargets = [],
+                             oc_target = oc_target)
+        nc_target.save()
+        
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
+                            date = target_date, nc_target = nc_target)
+        wstarget.save()
+        
+        ws_status = Status(name = "pending")
+        ws_status.save()
+
+        name=Name(name="ncuser")
+        email=Email(email="ncuser@gmail.com")
+        name.save()
+        email.save()
+
+        nc_user = System.do("add_user",name = name, email = email,
+                             session = session)
+        System.do("add_role", user = nc_user, role = ncc_role,
+                   session = session)
+        nc_session = Session(user = nc_user, role = ncc_role)
+        System.session_set.append(nc_session)
+
+        name1 = Name(name = "Lab Workshop")
+        name1.save()
+        new_workshop = System.do("create_workshop",
+                                 institute = Institute.get_by_id(2),
+                                 name  = name1, ws_target = wstarget,
+                                 status = ws_status, artefacts = [],
+                                 nc = nc, session = nc_session) 
+
+        System.do("conduct_workshop", workshop = new_workshop,
+                   session = nc_session)
+        
+
+        new_artefact = Artefact(name = "Photo", path = "/main/photos",
+                                a_type = Type.photo)
+        new_artefact.save()
+         
+        System.do("upload_artefact", workshop = new_workshop,
+                  session = nc_session, artefact = new_artefact)
+        
+        self.assertEqual(new_workshop.get("artefacts")[0].get("name"),
+                         new_artefact.get("name"))
+        self.assertEqual(new_workshop.get("status").get("name") ,
+                         Status.pending_approval.get("name"))
+        
+
+    #+END_SRC
+
 * ops_table
 #+NAME: ops_table
 #+BEGIN_SRC python
@@ -1860,8 +2000,8 @@ ops_table = {'add_user' : AddUser,
              'create_workshop' : CreateWorkshop,
              'cancel_workshop' : CancelWorkshop,
              'reschedule_workshop' : RescheduleWorkshop, 
-             'conduct_workshop' : ConductWorkshop
-#             'upload_artefact' : UploadArtefact,
+             'conduct_workshop' : ConductWorkshop,
+             'upload_artefact' : UploadArtefact
 #             'approve_workshop' : ApproveWorkshop,
 #             'reject_workshop' : RejectWorkshop,
 #             'delete_artefact' : DeleteArtefact
@@ -1932,6 +2072,7 @@ if __name__ == '__main__':
 <<class_CancelWorkshop>>
 <<class_RescheduleWorkshop>>
 <<class_ConductWorkshop>>
+<<class_UploadArtefact>>
 <<ops_table>>
 #+end_src
 
@@ -1954,5 +2095,6 @@ if __name__ == '__main__':
 <<test_CancelWorkshop>>
 <<test_RescheduleWorkshop>>
 <<test_ConductWorkshop>>
+<<test_UploadArtefact>>
 <<run_test_cases>>
 #+end_src
