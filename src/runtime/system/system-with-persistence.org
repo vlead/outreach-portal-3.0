@@ -1974,7 +1974,7 @@ class TestUploadArtefact(TestCase):
         new_artefact.save()
          
         System.do("upload_artefact", workshop = new_workshop,
-                  session = nc_session, artefact = new_artefact)
+                  session = nc_session, artefact = Artefact.get_by_id(1))
         
         self.assertEqual(new_workshop.get("artefacts")[0].get("name"),
                          new_artefact.get("name"))
@@ -2123,7 +2123,7 @@ class TestApproveWorkshop(TestCase):
         new_artefact.save()
 
         System.do("upload_artefact", workshop = new_workshop,
-                  session = nc_session, artefact = new_artefact)
+                  session = nc_session, artefact = Artefact.get_by_id(1))
         
         System.do("approve_workshop", workshop = new_workshop,
                    session = oc_session)
@@ -2276,7 +2276,7 @@ class TestRejectWorkshop(TestCase):
         new_artefact.save()
 
         System.do("upload_artefact", workshop = new_workshop,
-                  session = nc_session, artefact = new_artefact)
+                  session = nc_session, artefact = Artefact.get_by_id(1))
         
         
         System.do("reject_workshop", workshop = new_workshop,
@@ -2427,13 +2427,13 @@ class TestDeleteArtefact(TestCase):
         new_artefact.save()
 
         System.do("upload_artefact", workshop = new_workshop,
-                  session = nc_session, artefact = new_artefact)
+                  session = nc_session, artefact = Artefact.get_by_id(1))
         
         System.do("delete_artefact", workshop = new_workshop,
                   session = nc_session, artefact = new_artefact)
 
         self.assertEqual(len(new_workshop.get("artefacts")), 0)
-        self.assertEqual(new_workshop.get("status").get("name") ,
+        self.assertEqual(new_workshop.get("status").get("name"),
                          Status.pending_approval.get("name"))
         
 
