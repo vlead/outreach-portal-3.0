@@ -11,32 +11,72 @@ Requirements of a Portal whose objective is to help advance the outreach of
 Virtual Labs are captured here. 
 
 * User
+:PROPERTIES:
+:CUSTOM_ID: req_user
+:END: 
 
   User is an entity in the system.  There are several user(s) in the system
   whose type is =User=.  The interaction of a user with the system is defined
   by the requirements below.
 
+  Realized in data model as [[../data-model/index.org::#entity_user][User]]
 ** Composition
+:PROPERTIES:
+:CUSTOM_ID: req_user_composition
+:END: 
    The system has users.
+   Realized in data model as [[../data-model/index.org::#user_session_sets][user-set]]
 ** User Identification
+:PROPERTIES:
+:CUSTOM_ID: req_user_identification
+:END: 
    Each user has an email address (string that corresponds to a
    valid email addr).  
 ** Uniqueness of a User
+:PROPERTIES:
+:CUSTOM_ID: req_user_uniqueness
+:END: 
+
    Email identifies a user.  Two users with the same email
    are the same users. 
+
+   Realized in data model as [[../data-model/index.org::#cardinal_constraints][cardinality]] and [[../data-model/index.org::#referential_constraints][referential]] constraints on [[../data-model/index.org::#entity_email][Email]]
+   entity.
+
 ** Name Attribute
+:PROPERTIES:
+:CUSTOM_ID: req_user_name
+:END: 
+
    Each user has a Name (string).
+      Realized in data model as [[../data-model/index.org::#cardinal_constraints][cardinality]] and [[../data-model/index.org::#referential_constraints][referential]] constraints on [[../data-model/index.org::#entity_name][Name]] entity.
 ** Role(s) of a User
+:PROPERTIES:
+:CUSTOM_ID: req_user_roles
+:END: 
+
    Each user has atleast one role, and by default when a user is created, the
    role that is associated with the newly created user is guest.
-
    
+   Realized in data model as [[../data-model/index.org::#cardinal_constraints][cardinality]] and [[../data-model/index.org::#referential_constraints][referential]] constraints on [[../data-model/index.org::#entity_name][Name]] entity.
+   
+
 * Role
+:PROPERTIES:
+:CUSTOM_ID: req_role
+:END: 
+
   Different privileges for accessing the system is maintained by roles.  A role
   whose type is =Role= defines a set of privileges i.e. what is accessible and
   what is not accessible in the system.
 
+  Realized in data model as [[../data-model/index.org::#entity_role][Role]]
+
 ** Types of Roles
+:PROPERTIES:
+:CUSTOM_ID: req_role_types
+:END: 
+
    There are 6 kinds of roles: =admin=, =guest=, =reviewer=, =noc= =occ(oc)=,
    =ncc(nc)=.  Each role determines what data access privileges are available
    to the user.
@@ -48,10 +88,21 @@ Virtual Labs are captured here.
    =ncc= - Nodal Center Coordinator
 
 ** Role Mapping to a User
+:PROPERTIES:
+:CUSTOM_ID: req_role_mapping_to_user
+:END: 
+
    Each user is mapped to at least one role meaning a user can have one or more
    roles.  In any given session, a user is mapped to a single role.
 
+   Realized in data model as [[../data-model/index.org::#cardinal_constraints][cardinalility]] and [[../data-model/index.org::#referential_constraints][referential]] constraints on [[../data-model/index.org::#entity_role][Role]] and
+   [[../data-model/index.org::#entity_user][User]] entities.
+
 ** Role Privileges
+:PROPERTIES:
+:CUSTOM_ID: req_role_privileges
+:END:    
+
    
    1. A user with role admin has the ability to:
 
@@ -94,10 +145,20 @@ Virtual Labs are captured here.
       1. Manage the nodal center =nc=.
 
 ** User with =admin= role
+:PROPERTIES:
+:CUSTOM_ID: req_role_admin
+:END:    
+
    There is atleast one user with role =admin= in the system.
+
+   Realized in data model as an [[../data-model/index.org::#admin_user][admin user]]
 
 
 * Outreach Center
+:PROPERTIES:
+:CUSTOM_ID: req_outreach_centre
+:END: 
+
   Coordination and delegation of outreach activity is carried by the Outreach
   Centers.  Each outreach center is a hub for outreach activity. 
   
@@ -119,8 +180,12 @@ Virtual Labs are captured here.
    An =OC= is created by user while donning the role =admin=
 
 
-* Nodal Center
-  A nodal center is one of the spokes of an outreach center (hub) that carries
+* Nodal Centre
+:PROPERTIES:
+:CUSTOM_ID: req_nodal_centre
+:END: 
+
+  A nodal centre is one of the spokes of an outreach center (hub) that carries
   out the activity related to the outreach of Virtual Labs.
 ** Host of a Nodal Center
    An nodal center (=NC=) is hosted in an institute.
@@ -141,6 +206,10 @@ Virtual Labs are captured here.
 
 
 * Activities
+:PROPERTIES:
+:CUSTOM_ID: req_activities
+:END: 
+
   Activities define the ways of how outreach of Virtual Labs is carried out.
 ** A type of Activity - Workshop
    A Workshop is an activity and a workshop is conducted at an Institute.
@@ -155,6 +224,9 @@ Virtual Labs are captured here.
 
 
 * Institute
+:PROPERTIES:
+:CUSTOM_ID: req_institute
+:END: 
   An institute is the host of either an outreach center or a nodal center or an
   outreach activity.
 ** Composition
@@ -172,22 +244,53 @@ Virtual Labs are captured here.
 
 
 * Sessions
+:PROPERTIES:
+:CUSTOM_ID: req_session
+:END: 
+
   A session defines the set of actions that a user is allowed to perform. 
+  Realized in datamodel as [[../data-model/index.org::#entity_session][Session]]
 ** Login is Mandatory
+:PROPERTIES:
+:CUSTOM_ID: req_session_login
+:END: 
+
    Users are required to login into the system.
 
+   Realized in data model as [[../data-model/index.org::#user_session_sets][session-set]]
 ** A logged user and a session
+:PROPERTIES:
+:CUSTOM_ID: req_session_association
+:END: 
+
    Each user once logged in is associated with a session.
 
+   Realized in data model as [[../data-model/index.org::#cardinal_constraints][cardinality]] and [[../data-model/index.org::#referential_constraints][referential]] constraints on
+   [[../data-model/index.org::#entity_session][Session]] entity.
+
 ** Privileges
+:PROPERTIES:
+:CUSTOM_ID: req_session_privileges
+:END: 
+
    Operations are permitted only if the user is logged into the system.
 
 ** Constraints
+:PROPERTIES:
+:CUSTOM_ID: req_session_constraints
+:END: 
+
    Users can have more than one session at a given time but no two sessions of
    a user can have the same role.
 
+   Realized in data model as [[../data-model/index.org::#cardinal_constraints][cardinality]] and [[../data-model/index.org::#referential_constraints][referential]] constraints on [[../data-model/index.org::#entity_session][Session]] entity.
+
 
 * Audit Trail
+:PROPERTIES:
+:CUSTOM_ID: req_audit_trail
+:END: 
+
   Every action that changes the state of the system is captured to enable an
   audit of the system. 
 
@@ -200,7 +303,12 @@ Virtual Labs are captured here.
    When an action - creation, updation or deletion - is performed, the user
    also provides a commit message, a reason for performing an action.
 
+
 * Usage   
+:PROPERTIES:
+:CUSTOM_ID: req_usage
+:END: 
+
   Usage of Virtual Labs is defined as the number of experiments performed. 
   
 ** Capture the usage for each nodal center
@@ -217,6 +325,7 @@ Virtual Labs are captured here.
 ** Usage from Cloud
    Virtual Labs usage generated by users performing experiments as not part of
    workshops is also made available by the portal. 
+
 
 * COMMENT Views
 ** Admin
