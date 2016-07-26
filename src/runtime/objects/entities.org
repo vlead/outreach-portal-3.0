@@ -546,6 +546,7 @@ class TestUser(TestCase):
                      email=Email(email="jimi@gnu.org"),
                      roles=[],user_status="active")
         user.append_role(Role(name="guest",centre_oc=None,centre_nc=None))
+        print user.to_client()
         self.assertTrue(len(user.get('roles'))==1)
 
 #+END_SRC
