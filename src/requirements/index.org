@@ -25,41 +25,8 @@ Virtual Labs are captured here.
 :CUSTOM_ID: req_user_composition
 :END: 
    The system has users.
-   Realized in data model as [[../data-model/index.org::#user_session_sets][user-set]]
-** User Identification
-:PROPERTIES:
-:CUSTOM_ID: req_user_identification
-:END: 
-   Each user has an email address (string that corresponds to a
-   valid email addr).  
-** Uniqueness of a User
-:PROPERTIES:
-:CUSTOM_ID: req_user_uniqueness
-:END: 
-
-   Email identifies a user.  Two users with the same email
-   are the same users. 
-
-   Realized in data model as [[../data-model/index.org::#cardinal_constraints][cardinality]] and [[../data-model/index.org::#referential_constraints][referential]] constraints on [[../data-model/index.org::#entity_email][Email]]
-   entity.
-
-** Name Attribute
-:PROPERTIES:
-:CUSTOM_ID: req_user_name
-:END: 
-
-   Each user has a Name (string).
-      Realized in data model as [[../data-model/index.org::#cardinal_constraints][cardinality]] and [[../data-model/index.org::#referential_constraints][referential]] constraints on [[../data-model/index.org::#entity_name][Name]] entity.
-** Role(s) of a User
-:PROPERTIES:
-:CUSTOM_ID: req_user_roles
-:END: 
-
-   Each user has atleast one role, and by default when a user is created, the
-   role that is associated with the newly created user is guest.
-   
-   Realized in data model as [[../data-model/index.org::#cardinal_constraints][cardinality]] and [[../data-model/index.org::#referential_constraints][referential]] constraints on [[../data-model/index.org::#entity_name][Name]] entity.
-   
+   Realized in data model as
+   [[../data-model/index.org::#primary_entity_sets][primary entity sets]]
 
 * Role
 :PROPERTIES:
@@ -257,7 +224,7 @@ Virtual Labs are captured here.
 
    Users are required to login into the system.
 
-   Realized in data model as [[../data-model/index.org::#user_session_sets][session-set]]
+   Realized in data model as [[../data-model/index.org::#primary_entity_sets][session-set]]
 ** A logged user and a session
 :PROPERTIES:
 :CUSTOM_ID: req_session_association
