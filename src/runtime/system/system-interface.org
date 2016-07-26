@@ -58,14 +58,23 @@ class TestSystemConstructor(TestCase):
 #+begin_src python
 class AddUser():
 
-    def api_add_user(self, name_str, email_str, session):
+    def api_add_user(self, name_str, email_str, session_email, session_role):
         name = Name(name=name_str)
         name.save()
         email = Email(email=email_str)
         email.save()
+
+        email_obj = Email.query.filter_by(email=session_email).first()
+        admin_user = User.query.filter_by(email=email_obj).first()
+        admin_role = Role.query.filter_by(name=session_role).first()
+
+        session = Session(user=admin_user,role=admin_role)
+        System.session_set.append(session)
+
         user = System.do("add_user", name=name, email=email ,session=session)
         user_dict =  user.to_client()
         return user_dict
+ 
 #+end_src
 
 ** TestAddUser
@@ -88,9 +97,10 @@ class TestAddUser(TestCase):
 
     def test_api_add_user(self):
         print "test_api_add_user"
-        admin_user=User.get_by_id(1)
-        session = Session(user=admin_user,role=Role.admin)
-        System.session_set.append(session)
+    
+        session_email="app-admin@vlabs.ac.in"
+        session_role="admin"
+
         name1 = "madhavi"
         email1 = "madhavi@vlabs.ac.in"
 
@@ -98,9 +108,9 @@ class TestAddUser(TestCase):
         email2 = "sripathi@vlabs.ac.in"
         
         add_user = AddUser()  
-     
-        user_dict1 = add_user.api_add_user(name1, email1, session)
-        user_dict2 = add_user.api_add_user(name2, email2, session)
+
+        user_dict1 = add_user.api_add_user(name1, email1, session_email, session_role)
+        user_dict2 = add_user.api_add_user(name2, email2, session_email, session_role)
 
 
         self.assertEqual("madhavi@vlabs.ac.in", user_dict1['email']['email'])
@@ -111,6 +121,64 @@ class TestAddUser(TestCase):
 
 
 #+END_SRC
+
+** DeleteUser
+#+NAME: class_si_delete_user
+#+begin_src python
+class DeleteUser():
+
+    def api_delete_user(self, user_id, session):
+        some_user = User.get_by_id(user_id)
+        user = System.do("delete_user", user=some_user,session=session)
+        return user
+#+end_src
+
+** TestDeleteUser
+#+NAME: test_class_si_delete_user
+#+BEGIN_SRC python
+class TestDeleteUser(TestCase):
+    TESTING = True
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+        SystemInterface.initialize_system_interface(PersistenceHandler)
+
+    def tearDown(self):
+        System.session_set = []
+        db.session.remove()
+        db.drop_all()
+
+    def test_api_delete_admin_user(self):
+        print "test_api_delete_admin_user"
+        admin_user=User.get_by_id(1)
+        session = Session(user=admin_user,role=Role.admin)
+        System.session_set.append(session)
+
+        name = "madhavi"
+        email = "madhavi@vlabs.ac.in"
+        
+        add_user = AddUser()  
+     
+        user_dict = add_user.api_add_user(name, email, session)
+
+        System.do("add_role", user = User.get_by_id(2),
+                    role = Role.get_by_id(1),
+                    session = session)
+
+        self.assertEqual("madhavi@vlabs.ac.in", user_dict['email']['email'])
+        self.assertEqual("madhavi", user_dict['name']['name'])
+
+
+        delete_user = DeleteUser()
+        user = delete_user.api_delete_user(2, session)
+
+        self.assertEqual(user.user_status,"inactive")
+
+#+END_SRC
+
 
 * Infra                                                         :boilerplate:
   

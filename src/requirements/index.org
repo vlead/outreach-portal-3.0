@@ -28,6 +28,7 @@ Virtual Labs are captured here.
    Realized in data model as
    [[../data-model/index.org::#primary_entity_sets][primary entity sets]]
 
+
 * Role
 :PROPERTIES:
 :CUSTOM_ID: req_role
