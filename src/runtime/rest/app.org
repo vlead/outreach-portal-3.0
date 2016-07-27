@@ -18,7 +18,8 @@ from flask import Flask, jsonify, make_response
 # from flask.ext.cors import CORS
 
 from runtime.utils.class_persistence_template import db
-
+from api import *
+from config import config
 
 def create_app(config):
     # init our app
@@ -28,6 +29,7 @@ def create_app(config):
     # init sqlalchemy db instance
     db.init_app(app)
     db.app = app
+    app.register_blueprint(api)
     return app
 
 
@@ -36,9 +38,20 @@ if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', threaded=True)
 
 #+END_SRC
+#+NAME: config
+#+BEGIN_SRC python
+config = {
+         'SQLALCHEMY_DATABASE_URI': ''
+         }
 
+#+END_SRC
 * Tangle                          :boilerplate:
 
 #+BEGIN_SRC python :tangle app.py :eval no :noweb yes
 <<application>>
+
+#+END_SRC
+
+#+BEGIN_SRC python :tangle config.py :eval no :noweb yes
+<<config>>
 #+END_SRC

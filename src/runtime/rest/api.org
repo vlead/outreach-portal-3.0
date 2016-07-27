@@ -9,17 +9,7 @@
 This document illustrates building of the REST API.
 * REST
 ** Create a user
-   This is the REST API method for creating a user. Only a user, who is an
-   admin and is currently logged in may create a user.
-   Usage:
-   #+BEGIN_EXAMPLE
-   POST request
-   {
-   "name": "Jimi hendrix",
-   "email": "jimi@gmail.com",
-   "session": "admin@vlabs.ac.in"
-   }
-   #+END_EXAMPLE
+   This is the REST API method for creating a user. 
 
 #+NAME: create_user
 #+BEGIN_SRC python
@@ -33,10 +23,14 @@ def create_user():
         email = request.json['email']
         session_email = request.json['session_email']
         session_role = request.json['session_role']
-#        print name, email, session
         try:
-            user = SystemInterface.api_add_user(name, email, session_email, session_role)
+            print "inside try"
+            db.create_all()
+            SystemInterface.initialize_system_interface(PersistenceHandler)
+            add = AddUser()
+            user = add.api_add_user(name, email, session_email, session_role)
             return jsonify(user)
+
         except Exception, e:
             current_app.logger.error("Error occured while inserting"
                                      "user record: %s" % str(e))
@@ -53,13 +47,10 @@ class TestCreateUser(TestCase):
         return app
 
     def setUp(self):
-        db.create_all()
-        SystemInterface.initialize_system_interface(PersistenceHandler)
+        pass
 
     def tearDown(self):
-        System.session_set = []
-        db.session.remove()
-        db.drop_all()
+        pass
 
     def test_create_new_user(self):
         print "test_create_new_user"
@@ -71,7 +62,7 @@ class TestCreateUser(TestCase):
 
         headers = {'content-type': 'application/json'}
 
-        print payload
+        #print payload
         response = self.client.post("/users", data=json.dumps(payload), headers=headers)
 
         self.assertEqual(response.status_code, 200)
