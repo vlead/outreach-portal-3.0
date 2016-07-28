@@ -1,0 +1,561 @@
+#+TITLE: System implementation for OutReach Portal 3.0
+#+AUTHOR: VLEAD
+#+DATE: [2016-07-28 Thu]
+#+SETUPFILE: ../../org-templates/level-2.org
+#+TAGS: boilerplate(b)
+#+EXCLUDE_TAGS: boilerplate
+#+OPTIONS: ^:nil
+
+
+* Introduction
+
+A system has clear boundaries of input, output and state.
+In the context of our application, the system interacts with
+the external world (through command line function calls)
+and also manages the entity objects in such a way that the
+system invariants are maintained. 
+
+
+The system holds two state variables:
+
+ - =user_set= :: The set of users in the system
+ - =session_set= :: The set of sessions in the system
+
+The system's inputs are in terms of /operations/.  Each
+operation consists of an operation name and a sequence of
+arguments.  
+
+In this implementation, an operation is identified by a
+class.  The dictionary =ops_table= maps operation names to
+their corresponding classes.
+
+Each operation is divided into five checks.  A /check/ is a
+predicate that either returns true or throws an exception.
+
+The following checks are performed:
+
+  - Arity check :: checks if the operation has the right
+       number  of arguments.
+
+  - Type check :: checks if the arguments have the correct
+       type. 
+
+  - Auth check :: checks if the session performing the
+       operation is authorized to do so.
+
+  - State check :: checks if the operation meets all the
+       constraints imposed by the state of the system
+       (referential integrity constraints, etc.)
+ 
+
+** Structure of each operation class
+
+The class corresponding to each operation has five fields:
+
+  - arg_types :: a list of type predicates.  The length of
+       this list is the arity of the operation.  The arity
+       check is simply a comparison of the length of this
+       list with the length of the list of arguments.  Each
+       predicate in the =arg_types= list is applied to the
+       corresponding argument to check the type of that
+       argument.
+
+  - auth_check :: a function that checks if the  =args= (which
+       may include a session) together satisfy the
+       authorization conditions imposed by the operation. 
+
+  - state_check :: a function that checks =args= and checks
+       if the particular state invariant holds.
+
+  - action :: a function on args that (presumably) changes
+       the state of the system and also returns an answer.
+       An exception thrown by this function indicates a
+       serious failure in the application (e.g., out of
+       memory error). 
+
+
+* The =System= class
+
+** Constructor
+
+   This is the generic =System= implementation.  The entities that make up the
+   sytem can be pure objects or objects that can be persisted.
+
+   The specific tasks on the composed objects is agnostic to the =system=.
+   This is achieved by defining an API that the system uses and is implemented
+   by composed entity set.
+
+   The system is initialized based on what the system should be composed of.
+
+#+NAME: class_system
+#+begin_src python
+class System ():
+
+    def __init__(self):
+        raise Error('Can not instantiate')
+
+    @staticmethod
+    def initialize_system(cls):
+        System.delegate = cls()
+        System.session_set = []
+
+    @staticmethod
+    def is_session_admin(session):
+        return session.get("role").get('name') == "admin"
+
+    @staticmethod
+    def is_session_OCC(session):
+        return session.get("role").get('name')== "OCC"
+
+    @staticmethod
+    def is_session_NCC(session):
+        return session.get("role").get('name')== "NCC"
+
+    @staticmethod
+    def is_session_reviewer(session):
+        return session.get("role").get('name')== "reviewer"
+
+    @staticmethod
+    def is_session_guest(session):
+        return session.get("role").get('name')== "guest"
+
+    @staticmethod
+    def is_session_noc(session):
+        return session.get("role").get('name')== "NOC"
+
+    @staticmethod
+    def session_exists(session):
+        return session in System.session_set
+ 
+#+end_src
+
+*** Test Constructor
+#+NAME: test_system_constructor
+#+BEGIN_SRC python
+class TestSystemConstructor(TestCase):
+    TESTING = True
+
+    def setUp(self):
+        System.initialize_system(ObjectDelegate)
+
+    def tearDown(self):
+        System.delegate = None
+        System.session_set = []
+   
+    def test_system_constructor(self):
+        print "test_system_constructor"
+        self.assertEqual(System.delegate.user_set[0].get("name").get("name"),
+                         Config.admin_name)
+        self.assertEqual(System.delegate.user_set[0].get("email").get("email"),
+                         "app-admin@vlabs.ac.in")
+        self.assertEqual(System.delegate.user_set[0].get('roles')[0].get('name'),
+                         "admin")
+
+    def test_is_session_admin(self):
+        print "test_is_session_admin"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user,role=Role.admin)
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_admin(session), True)
+
+    def test_is_session_OC(self):
+        print "test_is_session_OCC"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user,
+                          role=Role(name="OCC",centre_oc=None,centre_nc=None))
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_OCC(session), True)
+
+    def test_is_session_NCC(self):
+        print "test_is_session_NCC"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user,
+                          role=Role(name="NCC",centre_oc=None,centre_nc=None))
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_NCC(session), True)
+
+    def test_is_session_reviewer(self):
+        print "test_is_session_reviewer"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user,role=Role.reviewer)
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_reviewer(session), True)
+
+    def test_is_session_guest(self):
+        print "test_is_session_guest"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user,role=Role.guest)
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_guest(session), True)
+
+    def test_is_session_noc(self):
+        print "test_is_session_noc"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user,role=Role.noc)
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_noc(session), True)
+
+    def test_session_exists(self):
+        print "test_session_exists"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user, role=Role.admin)
+        System.session_set.append(session)
+        self.assertEqual(System.session_exists(session), True)
+
+#+END_SRC
+
+
+** Arity and Type check methods 
+   Arity Check ensures that correct number of arguments are passed to a functions. 
+   Type Check ensures that the type of the arguments passed to a function are
+   same as expected. 
+   
+   Any operation, before being executed is subjected to =Arity= and =Type=
+   checks.  
+#+NAME: arity_type_checks
+#+BEGIN_SRC python
+   
+    @staticmethod
+    def arity_check(args, n):
+       if  (len(args) != n) :
+          raise ArityError("arity mismatch: size of args  does not " + 
+                           "match operation arity " )
+
+    @staticmethod
+    def type_check(args, arg_types):
+        for key, value in args.iteritems():
+            if not arg_types[key](value):
+                raise TypeError("type mismatch: argument %s is not of " + 
+                                "type " )
+       
+   
+#+end_src
+
+*** Test Arity and Type Checks
+#+NAME: test_arity_and_types
+#+BEGIN_SRC python
+class TestSystemArityAndType(TestCase):
+    TESTING = True
+
+    def setUp(self):
+        System.initialize_system(ObjectDelegate)
+
+    def tearDown(self):
+        System.delegate = None
+
+    def test_arity(self):
+        print "test_arity"
+        with self.assertRaises(ArityError):
+            System.arity_check([1,2], 3)
+
+    def test_type_checks(self):
+        print "test_type_checks"
+        args = {"name": Name(name="Jimi Hendrix"),
+                "email": Name(name="Jimi Hendrix")
+                }
+
+        arg_types = {"name": is_name,
+                     "email": is_email
+                     }
+
+        with self.assertRaises(TypeError):
+            System.type_check(args, arg_types)
+
+#+END_SRC
+
+
+** =do= method 
+   The =do= method is the main work-horse of =System= which is construed as the
+   =Controller=.  Every operation follows a template and realized as a class
+   that defines:
+   1. Number of Arguments
+   2. Type of Arguments
+   3. Who is allowed to perform the operation
+   4. Referential integrity checks and finally
+   5. the operation that changes state of the system. 
+
+
+#+NAME: do_function
+#+begin_src python
+    @staticmethod   
+    def do(op, **args):
+        cls = ops_table[op]
+        arg_types  = cls.arg_types
+        auth_check = cls.auth_check
+        state_check = cls.state_check
+        arity_and_type_checks_needed = cls.arity_and_type_checks_needed
+        try:
+            if arity_and_type_checks_needed:
+               System.arity_check(args.keys(), len(arg_types.keys()))
+               System.type_check(args, arg_types)
+            auth_check(args)
+            state_check(args)
+            return cls.action(args)
+        except (ArityError, TypeError, AuthError, StateError) as err:
+            raise err
+
+#+end_src
+
+
+* Operations
+  Operations provide the mechanism to either change or retrieve the state of
+  the system.  While the system state is changed, it is imperative to maintain
+  the invariant of the system.  Before the actual change in system is made,
+  each operation goes through a series of checks:
+  1. Arity Check - ensures the right number of arguments are provided to
+     the operation.
+  2. Type Check - ensures the arguments are of right type
+  3. Auth Check - ensures only the authorized can perform the operation
+  4. State Check - ensures System invariant is maintained
+
+  Once these checks are satisfied, either the system state is modified or retrieved.
+
+** =AddUser=
+   
+ #+NAME: class_adduser
+ #+begin_src python
+class AddUser():
+    arg_types = {"user": is_user, "session": is_session}
+    arity_and_type_checks_needed = True
+
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        if not (System.is_session_admin(session)):
+            raise AuthError("Role not Authorized to perform this action")
+
+    @staticmethod
+    def state_check(args):
+        user = args["user"]
+        session = args["session"]
+
+        if not System.session_exists(session):
+            raise StateError("session %s does not exist in System"
+                                % session.to_client())
+        elif System.delegate.user_exists(user):
+            raise StateError("user %s already exists in System"
+                                % user.to_client())
+
+    @staticmethod
+    def action(args):
+        user = args["user"]
+        user = System.delegate.add_user(user)
+        return user
+ #+end_src
+
+*** Test AddUser
+  #+NAME: test_adduser
+  #+BEGIN_SRC python
+class TestAddUser(TestCase):
+    TESTING = True
+
+    def setUp(self):
+        System.initialize_system(ObjectDelegate)
+
+    def tearDown(self):
+        System.delegate = None
+
+    def test_add_user_passes(self):
+        print "test_add_user_by_admin"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user)
+        System.session_set.append(session)
+ 
+        user=User(name=Name(name="me mine myself"),
+                  email=Email(email="abc@gmail.com"),
+                  role=System.delegate.role_set[1])
+
+        self.assertEqual(System.do("add_user", user=user, session=session),
+                         System.delegate.user_set[1])
+
+
+    def test_add_user_raises_arity_error(self):
+        print "test_add_user_raises_arity_error"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user)
+        System.session_set.append(session)
+ 
+        user=User(name=Name(name="me"),
+                  email=Email(email="abc@gmail.com"),
+                  role=System.delegate.role_set[1])
+
+        with self.assertRaises(ArityError):
+            System.do("add_user", user=user)
+
+
+    def test_add_user_raises_type_check_error(self):
+        print "test_add_user_raises_type_check_error"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user)
+        System.session_set.append(session)
+ 
+        user=User(name=Name(name="me"),
+                  email=Email(email="abc@gmail.com"),
+                  role=System.delegate.role_set[1])
+
+        with self.assertRaises(TypeError):
+            System.do("add_user", user=session, session=session)
+
+    def test_add_user_raises_state_error_with_no_session(self):
+        print "test_add_user_raises_state_error_with_no_session"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user)
+         
+        user=User(name=Name(name="me"),
+                  email=Email(email="abc@gmail.com"),
+                  role=System.delegate.role_set[1])
+
+        with self.assertRaises(StateError):
+            System.do("add_user", user=user, session=session)
+
+
+    def test_add_user_raises_state_error_with_existing_user(self):
+        print "test_add_user_raises_state_error_with_existing_user"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user)
+        System.session_set.append(session)
+
+        with self.assertRaises(StateError):
+            System.do("add_user", user=admin_user, session=session)
+
+  #+END_SRC
+
+
+** =ShowUsers=
+  
+ #+NAME: class_showusers
+ #+begin_src python
+class ShowUsers():
+    arg_types = {"session": is_session}
+    arity_and_type_checks_needed = True
+
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        if not ((System.is_session_admin(session)) or 
+                (System.is_session_user(session))):
+            raise AuthError("Role not Authorized to perform this action")
+
+    @staticmethod
+    def state_check(args):
+        pass
+
+    @staticmethod
+    def action(args):
+        users = System.delegate.get_users()
+        return users
+ #+end_src
+
+*** Test ShowUsers
+  #+NAME: test_showusers
+  #+BEGIN_SRC python
+class TestShowUsers(TestCase):
+    TESTING = True
+
+    def setUp(self):
+        System.initialize_system(ObjectDelegate)
+
+    def tearDown(self):
+        System.delegate = None
+
+    def test_show_users_by_admin(self):
+        print "test_show_users__by_admin"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user)
+        System.session_set.append(session)
+ 
+        user=User(name=Name(name="me"),
+                  email=Email(email="abc@gmail.com"),
+                  role=System.delegate.role_set[1])
+
+        System.delegate.user_set.append(user)
+        self.assertEquals(len(System.do("show_users", session=session)), 2)
+
+
+    def test_show_users_by_user(self):
+        print "test_show_users__by_user"
+ 
+        user=User(name=Name(name="me"),
+                  email=Email(email="abc@gmail.com"),
+                  role=System.delegate.role_set[1])
+
+        System.delegate.user_set.append(user)
+
+        session = Session(user=user)
+        System.session_set.append(session)
+
+        self.assertEquals(len(System.do("show_users", session=session)), 2)
+
+
+  #+END_SRC
+
+  
+** Operations Table
+    Each operation has a corresponding implementation defined as a class. 
+
+ #+NAME: ops_table
+ #+BEGIN_SRC python                                                                          
+ops_table = {'add_user': AddUser,
+             'show_users': ShowUsers
+            }
+
+ #+END_SRC   
+
+
+* Infra                                                         :boilerplate:
+
+** sources
+*** Imports 
+#+name: imports_for_sources
+#+BEGIN_SRC python
+# -*- coding: utf-8 -*-
+from runtime.objects.entities import *
+from runtime.exceptions.custom_exceptions import *
+#+end_src
+
+
+** Tests
+*** Imports 
+#+name: imports_for_tests
+#+BEGIN_SRC python
+# -*- coding: utf-8 -*-
+import unittest
+from unittest import TestCase
+from system import *
+from object_delegates import * 
+
+#+end_src
+
+*** Running tests
+#+NAME: run_test_cases
+#+BEGIN_SRC python
+if __name__ == '__main__':
+    unittest.main()
+
+#+END_SRC
+
+
+* Tangling                                                      :boilerplate:
+
+** sources
+#+BEGIN_SRC python :tangle system.py :eval no :noweb yes
+<<imports_for_sources>>
+<<class_system>>
+<<arity_type_checks>>
+#<<do_function>>
+#<<class_adduser>>
+#<<class_showusers>>
+#<<ops_table>>
+#+end_src
+
+
+** tests
+#+BEGIN_SRC python :tangle test_system.py :eval no :noweb yes
+<<imports_for_tests>>
+<<test_system_constructor>>
+#<<test_arity_and_types>>
+#<<test_adduser>>
+#<<test_showusers>>
+<<run_test_cases>>
+#+end_src
+
