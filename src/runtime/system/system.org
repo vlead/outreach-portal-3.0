@@ -553,7 +553,7 @@ if __name__ == '__main__':
 #+BEGIN_SRC python :tangle test_system.py :eval no :noweb yes
 <<imports_for_tests>>
 <<test_system_constructor>>
-#<<test_arity_and_types>>
+<<test_arity_and_types>>
 #<<test_adduser>>
 #<<test_showusers>>
 <<run_test_cases>>
