@@ -1,4 +1,4 @@
-#+TITLE: Object Handler for the System
+#+TITLE: Object and Persistence Delegates for the System
 #+AUTHOR: VLEAD
 #+DATE: [2016-07-07 Thu]
 #+SETUPFILE: ../../org-templates/level-2.org
@@ -7,21 +7,21 @@
 #+OPTIONS: ^:nil
 
 
-* Object Handler
-  Object Handler encapsulates a set of functions where each function performs a
-  specific task.  With the use of these handlers, the core implementation of
-  the =system= will not alter but by plugging handlers that are specific to
+* Object Delegate
+  Object Delegate encapsulates a set of functions where each function performs a
+  specific task.  With the use of these delegates, the core implementation of
+  the =system= will not alter but by plugging delegates that are specific to
   each environment, for example, be it either objects or persistence, the
   =system= for that particular environment is derived while not modifying the
   =system= class.
 
-** Initialize Object Handler
-   Provides all the handlers that operate on objects.
+** Initialize Object Delegate
+   Provides all the delegates that operate on objects.
 
-*** class_object_handler 
-#+NAME: class_object_handler
+*** class_object_delegate 
+#+NAME: class_object_delegate
 #+BEGIN_SRC python
-class ObjectHandler():
+class ObjectDelegate():
    
     def __init__(self):
         self.role_set = []
@@ -65,26 +65,26 @@ class ObjectHandler():
 #+end_src
 
 *** Tests
-#+NAME: test_initialize_object_handler
+#+NAME: test_initialize_object_delegate
 #+BEGIN_SRC python
-class TestObjectHandler(TestCase):
+class TestObjectDelegate(TestCase):
     TESTING = True
-    object_handler = None
+    object_delegate = None
     
     def setUp(self):
-        self.obj_handler = ObjectHandler()
+        self.obj_delegate = ObjectDelegate()
     
     def tearDown(self):
-        self.obj_handler = None
+        self.obj_delegate = None
    
-    def test_initialize_object_handler(self):
-         print "test_initialize_object_handler"
-         self.assertEqual(len(self.obj_handler.role_set), 4)
-         self.assertEqual(self.obj_handler.role_set[0].get("name"), "admin")
-         self.assertEqual(len(self.obj_handler.user_set), 1)
-         self.assertEqual(self.obj_handler.user_set[0].get("roles")[0].get("name"),
+    def test_initialize_object_delegate(self):
+         print "test_initialize_object_delegate"
+         self.assertEqual(len(self.obj_delegate.role_set), 4)
+         self.assertEqual(self.obj_delegate.role_set[0].get("name"), "admin")
+         self.assertEqual(len(self.obj_delegate.user_set), 1)
+         self.assertEqual(self.obj_delegate.user_set[0].get("roles")[0].get("name"),
                           "admin")
-         self.assertEqual(self.obj_handler.user_set[0].get("roles")[1].get("name"),
+         self.assertEqual(self.obj_delegate.user_set[0].get("roles")[1].get("name"),
                           "guest")
 
 #+END_SRC
@@ -112,8 +112,8 @@ class TestObjectHandler(TestCase):
 #+BEGIN_SRC python
     def test_user_exists(self):
          print "test_user_exists"
-         user = self.obj_handler.user_set[0]
-         self.assertEqual(self.obj_handler.user_exists(user), True)
+         user = self.obj_delegate.user_set[0]
+         self.assertEqual(self.obj_delegate.user_exists(user), True)
 
 #+END_SRC
 
@@ -138,8 +138,8 @@ class TestObjectHandler(TestCase):
                           email=Email(email="tt@kk.com"),
                           roles=[Role.admin], user_status="active")
 
-         user = self.obj_handler.add_user(user)
-         self.assertEqual(self.obj_handler.user_exists(user), True)
+         user = self.obj_delegate.add_user(user)
+         self.assertEqual(self.obj_delegate.user_exists(user), True)
 
 #+END_SRC
 
@@ -159,7 +159,7 @@ class TestObjectHandler(TestCase):
 #+BEGIN_SRC python
     def test_get_users(self):
          print "test_get_users"
-         self.assertEqual(len(self.obj_handler.get_users()), 1)
+         self.assertEqual(len(self.obj_delegate.get_users()), 1)
 
 #+END_SRC
 
@@ -182,8 +182,8 @@ class TestObjectHandler(TestCase):
 #+BEGIN_SRC python
     def test_role_exists(self):
          print "test_role_exists"
-         role = self.obj_handler.role_set[0]
-         self.assertEqual(self.obj_handler.role_exists(role), True)
+         role = self.obj_delegate.role_set[0]
+         self.assertEqual(self.obj_delegate.role_exists(role), True)
 
 #+END_SRC
 
@@ -205,8 +205,8 @@ class TestObjectHandler(TestCase):
     def test_add_role(self):
          print "test_add_role"
          role = Role(name='user',centre_oc=None,centre_nc=None)
-         role = self.obj_handler.add_role(role)
-         self.assertEqual(self.obj_handler.role_exists(role), True)
+         role = self.obj_delegate.add_role(role)
+         self.assertEqual(self.obj_delegate.role_exists(role), True)
 
 #+END_SRC
 
@@ -226,7 +226,7 @@ class TestObjectHandler(TestCase):
 #+BEGIN_SRC python
     def test_get_roles(self):
          print "test_get_roles"
-         self.assertEqual(len(self.obj_handler.get_roles()), 4)
+         self.assertEqual(len(self.obj_delegate.get_roles()), 4)
 
 #+END_SRC
 
@@ -250,8 +250,8 @@ class TestObjectHandler(TestCase):
     def test_institute_exists(self):
          print "test_institute_exists"
          ins = Institute(name='IIIT',address='Hyderabad')
-         inst = self.obj_handler.add_institute(ins)
-         self.assertEqual(self.obj_handler.institute_exists(inst), True)
+         inst = self.obj_delegate.add_institute(ins)
+         self.assertEqual(self.obj_delegate.institute_exists(inst), True)
 
 #+END_SRC
 
@@ -273,8 +273,8 @@ class TestObjectHandler(TestCase):
     def test_add_institute(self):
          print "test_add_institute"
          ins = Institute(name='IIIT',address='Hyderabad')
-         inst = self.obj_handler.add_institute(ins)
-         self.assertEqual(self.obj_handler.institute_exists(inst), True)
+         inst = self.obj_delegate.add_institute(ins)
+         self.assertEqual(self.obj_delegate.institute_exists(inst), True)
 
 #+END_SRC
 
@@ -295,8 +295,8 @@ class TestObjectHandler(TestCase):
     def test_get_institutes(self):
          print "test_get_institutes"
          ins = Institute(name='IIIT',address='Hyderabad')
-         inst = self.obj_handler.add_institute(ins)
-         self.assertEqual(len(self.obj_handler.get_institutes()), 1)
+         inst = self.obj_delegate.add_institute(ins)
+         self.assertEqual(len(self.obj_delegate.get_institutes()), 1)
 
 #+END_SRC
 
@@ -321,8 +321,8 @@ class TestObjectHandler(TestCase):
          print "test_oc_exists"
          ins = Institute(name='IIIT',address='Hyderabad')
          oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
-         oc = self.obj_handler.add_oc(oc1)
-         self.assertEqual(self.obj_handler.oc_exists(oc), True)
+         oc = self.obj_delegate.add_oc(oc1)
+         self.assertEqual(self.obj_delegate.oc_exists(oc), True)
 #+END_SRC
 
 
@@ -344,8 +344,8 @@ class TestObjectHandler(TestCase):
          print "test_add_oc"
          ins = Institute(name='IIIT',address='Hyderabad')
          oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
-         oc = self.obj_handler.add_oc(oc1)
-         self.assertEqual(self.obj_handler.oc_exists(oc), True)
+         oc = self.obj_delegate.add_oc(oc1)
+         self.assertEqual(self.obj_delegate.oc_exists(oc), True)
 
 #+END_SRC
 
@@ -367,8 +367,8 @@ class TestObjectHandler(TestCase):
          print "test_get_ocs"
          ins = Institute(name='IIIT',address='Hyderabad')
          oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
-         oc = self.obj_handler.add_oc(oc1)
-         self.assertEqual(len(self.obj_handler.get_ocs()), 1)
+         oc = self.obj_delegate.add_oc(oc1)
+         self.assertEqual(len(self.obj_delegate.get_ocs()), 1)
 
 #+END_SRC
 
@@ -395,8 +395,8 @@ class TestObjectHandler(TestCase):
          ins = Institute(name='IIIT',address='Hyderabad')
          oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
          nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-         nc = self.obj_handler.add_nc(nc1)
-         self.assertEqual(self.obj_handler.nc_exists(nc), True)
+         nc = self.obj_delegate.add_nc(nc1)
+         self.assertEqual(self.obj_delegate.nc_exists(nc), True)
 
 #+END_SRC
 
@@ -420,8 +420,8 @@ class TestObjectHandler(TestCase):
          ins = Institute(name='IIIT',address='Hyderabad')
          oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
          nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-         nc = self.obj_handler.add_nc(nc1)
-         self.assertEqual(self.obj_handler.nc_exists(nc), True)
+         nc = self.obj_delegate.add_nc(nc1)
+         self.assertEqual(self.obj_delegate.nc_exists(nc), True)
 
 #+END_SRC
 
@@ -444,8 +444,8 @@ class TestObjectHandler(TestCase):
          ins = Institute(name='IIIT',address='Hyderabad')
          oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
          nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-         nc = self.obj_handler.add_nc(nc1)
-         self.assertEqual(len(self.obj_handler.get_ncs()), 1)
+         nc = self.obj_delegate.add_nc(nc1)
+         self.assertEqual(len(self.obj_delegate.get_ncs()), 1)
 
 #+END_SRC
 
@@ -470,8 +470,8 @@ class TestObjectHandler(TestCase):
                           email=Email(email="tt@kk.com"),
                           roles=[Role.admin], user_status="active")
 
-         self.obj_handler.add_user(user)
-         active_user_list = self.obj_handler.get_active_users()
+         self.obj_delegate.add_user(user)
+         active_user_list = self.obj_delegate.get_active_users()
          self.assertEqual(len(active_user_list), 2)
 
 #+END_SRC
@@ -514,8 +514,8 @@ class TestObjectHandler(TestCase):
                             a_participants = 0,
                             a_experiments = 0,
                             a_usage = 0)
-        workshop = self.obj_handler.add_workshop(workshop)
-        self.assertEqual(self.obj_handler.workshop_exists(workshop), True)
+        workshop = self.obj_delegate.add_workshop(workshop)
+        self.assertEqual(self.obj_delegate.workshop_exists(workshop), True)
 
 #+END_SRC
 
@@ -554,8 +554,8 @@ class TestObjectHandler(TestCase):
                             a_participants = 0,
                             a_experiments = 0,
                             a_usage = 0)
-        workshop = self.obj_handler.add_workshop(workshop)
-        self.assertEqual(self.obj_handler.workshop_exists(workshop), True)
+        workshop = self.obj_delegate.add_workshop(workshop)
+        self.assertEqual(self.obj_delegate.workshop_exists(workshop), True)
 
 #+END_SRC
 
@@ -592,8 +592,8 @@ class TestObjectHandler(TestCase):
                             a_participants = 0,
                             a_experiments = 0,
                             a_usage = 0)
-         workshop = self.obj_handler.add_workshop(workshop)
-         self.assertEqual(len(self.obj_handler.get_workshops()), 1)
+         workshop = self.obj_delegate.add_workshop(workshop)
+         self.assertEqual(len(self.obj_delegate.get_workshops()), 1)
 
 #+END_SRC
 
@@ -601,21 +601,21 @@ class TestObjectHandler(TestCase):
 
 
 
-* Persistence Handler
-  Persistence Handler encapsulates a set of functions where each function performs a
-  specific task.  With the use of these handlers, the core implementation of
-  the =system= will not alter but by plugging handlers that are specific to
+* Persistence Delegate
+  Persistence Delegate encapsulates a set of functions where each function performs a
+  specific task.  With the use of these delegates, the core implementation of
+  the =system= will not alter but by plugging delegates that are specific to
   each environment, for example, be it either objects or persistence, the
   =system= for that particular environment is derived while not modifying the
   =system= class.
 
-** Initialize Persistence Handler
-   Provides all the handlers that operate on objects.
+** Initialize Persistence Delegate
+   Provides all the delegates that operate on objects.
 
-*** class_persistence_handler 
-#+NAME: class_persistence_handler
+*** class_persistence_delegate 
+#+NAME: class_persistence_delegate
 #+BEGIN_SRC python
-class PersistenceHandler():
+class PersistenceDelegate():
    
     def __init__(self):
         pass
@@ -660,28 +660,28 @@ class PersistenceHandler():
 #+end_src
 
 *** Tests
-#+NAME: test_initialize_persistent_handler
+#+NAME: test_initialize_persistent_delegate
 #+BEGIN_SRC python
-class TestPersistentHandler(TestCase):
+class TestPersistentDelegate(TestCase):
     TESTING = True
-    object_handler = None
+    object_delegate = None
     def create_app(self):
         app = create_app(config)
         return app
 
     def setUp(self):
         db.create_all()
-        self.persistent_handler = PersistenceHandler()
-        self.persistent_handler.initialize_role_set()
-        self.persistent_handler.initialize_user_set()
+        self.persistent_delegate = PersistenceDelegate()
+        self.persistent_delegate.initialize_role_set()
+        self.persistent_delegate.initialize_user_set()
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-        self.persistent_handler = None
+        self.persistent_delegate = None
 
-    def test_initialize_object_handler(self):
-         print "test_initialize_persistent_handler"
+    def test_initialize_object_delegate(self):
+         print "test_initialize_persistent_delegate"
          self.assertEqual(len(Role.get_all()), 4)
          self.assertEqual(Role.get_by_id(1).get("name"), "admin")
          self.assertEqual(len(User.query.all()), 1)
@@ -716,7 +716,7 @@ class TestPersistentHandler(TestCase):
     def test_user_exists(self):
          print "test_user_exists"
          user = User.get_by_id(1)
-         self.assertEqual(self.persistent_handler.user_exists(user), True)
+         self.assertEqual(self.persistent_delegate.user_exists(user), True)
 
 #+END_SRC
 
@@ -743,8 +743,8 @@ class TestPersistentHandler(TestCase):
          user = User(name=name,
                      email=email,
                      roles=[Role.get_by_id(1)], user_status="active")
-         user = self.persistent_handler.add_user(user)
-         self.assertEqual(self.persistent_handler.user_exists(user), True)
+         user = self.persistent_delegate.add_user(user)
+         self.assertEqual(self.persistent_delegate.user_exists(user), True)
 
 #+END_SRC
 
@@ -771,8 +771,8 @@ class TestPersistentHandler(TestCase):
          ins.save()
          oc1 = OC(institute=ins.get_by_id(1), spokes=[], oc_target = None)
          oc1.save()
-#         oc = handler.add_oc(oc1)
-         self.assertEqual(self.persistent_handler.oc_exists(oc1), True)
+#         oc = delegate.add_oc(oc1)
+         self.assertEqual(self.persistent_delegate.oc_exists(oc1), True)
 #+END_SRC
 
 *** add_oc
@@ -793,8 +793,8 @@ class TestPersistentHandler(TestCase):
          ins = Institute(name='IIIT',address='Hyderabad')
          ins.save()
          oc1 = OC(institute=ins.get_by_id(1),spokes=[], oc_target = None)
-         oc = self.persistent_handler.add_oc(oc1)
-         self.assertEqual(self.persistent_handler.oc_exists(oc), True)
+         oc = self.persistent_delegate.add_oc(oc1)
+         self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 
 #+END_SRC
 
@@ -822,7 +822,7 @@ class TestPersistentHandler(TestCase):
          oc.save()
          nc1 = NC(institute=ins, hub=oc, nc_target = None, workshops=[])
          nc1.save()
-         self.assertEqual(self.persistent_handler.nc_exists(nc1), True)
+         self.assertEqual(self.persistent_delegate.nc_exists(nc1), True)
 
 #+END_SRC
 
@@ -847,8 +847,8 @@ class TestPersistentHandler(TestCase):
          oc = OC(institute=ins, spokes=[], oc_target = None)
          oc.save()   
          nc1 = NC(institute=ins, hub=oc, nc_target = None, workshops=[])
-         nc = self.persistent_handler.add_nc(nc1)
-         self.assertEqual(self.persistent_handler.nc_exists(nc), True)
+         nc = self.persistent_delegate.add_nc(nc1)
+         self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 
 #+END_SRC
 
@@ -896,8 +896,8 @@ class TestPersistentHandler(TestCase):
                             a_usage = 0)
         #workshop = Workshop(institute = ins, nc = nc1, artefacts = [], ws_target = wstarget, status = ws_status, name = workshop_name)
         workshop.save()
-        workshop = self.persistent_handler.add_workshop(workshop)
-        self.assertEqual(self.persistent_handler.workshop_exists(workshop), True)
+        workshop = self.persistent_delegate.add_workshop(workshop)
+        self.assertEqual(self.persistent_delegate.workshop_exists(workshop), True)
 
 #+END_SRC
 
@@ -947,8 +947,8 @@ class TestPersistentHandler(TestCase):
                             a_experiments = 0,
                             a_usage = 0)
         workshop.save()
-        workshop = self.persistent_handler.add_workshop(workshop)
-        self.assertEqual(self.persistent_handler.workshop_exists(workshop), True)
+        workshop = self.persistent_delegate.add_workshop(workshop)
+        self.assertEqual(self.persistent_delegate.workshop_exists(workshop), True)
 
 #+END_SRC
 
@@ -972,7 +972,7 @@ class TestPersistentHandler(TestCase):
     def test_role_exists(self):
          print "test_role_exists"
          role = Role.get_by_id(1)
-         self.assertEqual(self.persistent_handler.role_exists(role), True)
+         self.assertEqual(self.persistent_delegate.role_exists(role), True)
 
 #+END_SRC
 
@@ -993,8 +993,8 @@ class TestPersistentHandler(TestCase):
     def test_add_role(self):
          print "test_add_role"
          role = Role(name='user',centre_oc=None,centre_nc=None)
-         role = self.persistent_handler.add_role(role)
-         self.assertEqual(self.persistent_handler.role_exists(role), True)
+         role = self.persistent_delegate.add_role(role)
+         self.assertEqual(self.persistent_delegate.role_exists(role), True)
 
 #+END_SRC
 
@@ -1020,8 +1020,8 @@ class TestPersistentHandler(TestCase):
     def test_institute_exists(self):
          print "test_institute_exists"
          ins = Institute(name='IIIT',address='Hyderabad')
-         inst = self.persistent_handler.add_institute(ins)
-         self.assertEqual(self.persistent_handler.institute_exists(inst), True)
+         inst = self.persistent_delegate.add_institute(ins)
+         self.assertEqual(self.persistent_delegate.institute_exists(inst), True)
 
 #+END_SRC
 
@@ -1042,8 +1042,8 @@ class TestPersistentHandler(TestCase):
     def test_add_institute(self):
          print "test_add_institute"
          ins = Institute(name='IIIT',address='Hyderabad')
-         inst = self.persistent_handler.add_institute(ins)
-         self.assertEqual(self.persistent_handler.institute_exists(inst), True)
+         inst = self.persistent_delegate.add_institute(ins)
+         self.assertEqual(self.persistent_delegate.institute_exists(inst), True)
 
 #+END_SRC
 
@@ -1054,7 +1054,7 @@ class TestPersistentHandler(TestCase):
 
 ** sources
 *** Imports 
-#+name: imports_for_object_handlers
+#+name: imports_for_object_delegates
 #+BEGIN_SRC python
 # -*- coding: utf-8 -*-
 from runtime.objects.entities import *
@@ -1063,7 +1063,7 @@ from runtime.exceptions.custom_exceptions import *
 import datetime
 #+end_src
 
-#+name: imports_for_persistent_handlers
+#+name: imports_for_persistent_delegates
 #+BEGIN_SRC python
 # -*- coding: utf-8 -*-
 from runtime.persistence.entities import *
@@ -1078,7 +1078,7 @@ from runtime.config.config import Config
 # -*- coding: utf-8 -*-
 import unittest
 from unittest import TestCase
-from object_handlers import *
+from object_delegates import *
 import datetime
 #+end_src
 
@@ -1088,7 +1088,7 @@ import datetime
 import unittest
 from flask_testing import TestCase
 from runtime.rest.app import create_app
-from persistent_handlers import *
+from persistent_delegates import *
 
 
 config = {
@@ -1108,9 +1108,9 @@ if __name__ == '__main__':
 * Tangling                                                      :boilerplate:
 
 ** sources
-#+BEGIN_SRC python :tangle object_handlers.py :eval no :noweb yes
-<<imports_for_object_handlers>>
-<<class_object_handler>>
+#+BEGIN_SRC python :tangle object_delegates.py :eval no :noweb yes
+<<imports_for_object_delegates>>
+<<class_object_delegate>>
 <<initialize_object_role_set>>
 <<initialize_object_user_set>>
 <<user_exists>>
@@ -1136,9 +1136,9 @@ if __name__ == '__main__':
 #+end_src
 
 
-#+BEGIN_SRC python :tangle persistent_handlers.py :eval no :noweb yes
-<<imports_for_persistent_handlers>>
-<<class_persistence_handler>>
+#+BEGIN_SRC python :tangle persistent_delegates.py :eval no :noweb yes
+<<imports_for_persistent_delegates>>
+<<class_persistence_delegate>>
 <<initialize_persistent_role_set>>
 <<initialize_persistent_user_set>>
 <<persistent_user_exists>>
@@ -1155,9 +1155,9 @@ if __name__ == '__main__':
 <<add_persistent_institute>>
 #+end_src
 ** tests
-#+BEGIN_SRC python :tangle test_object_handlers.py :eval no :noweb yes
+#+BEGIN_SRC python :tangle test_object_delegates.py :eval no :noweb yes
 <<imports_for_tests_object>>
-<<test_initialize_object_handler>>
+<<test_initialize_object_delegate>>
 <<test_user_exists>>
 <<test_add_user>>
 <<test_get_users>>
@@ -1181,9 +1181,9 @@ if __name__ == '__main__':
 <<run_test_cases>>
 #+end_src
 
-#+BEGIN_SRC python :tangle test_persistent_handlers.py :eval no :noweb yes
+#+BEGIN_SRC python :tangle test_persistent_delegates.py :eval no :noweb yes
 <<imports_for_tests_persistence>>
-<<test_initialize_persistent_handler>>
+<<test_initialize_persistent_delegate>>
 <<test_persistent_user_exists>>
 <<test_add_persistent_user>>
 <<test_persistent_add_oc>>
