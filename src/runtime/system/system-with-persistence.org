@@ -88,7 +88,7 @@ class System ():
 
     @staticmethod
     def initialize_system(cls):
-        System.handler = cls()
+        System.delegate = cls()
         System.session_set = []
 
     @staticmethod
@@ -128,7 +128,7 @@ class TestSystemConstructor(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         db.session.remove()
@@ -229,7 +229,7 @@ class TestSystemArityAndType(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         db.session.remove()
@@ -335,7 +335,10 @@ class TestAddUser(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
+        self.persistent_delegate = PersistenceDelegate()
+        self.persistent_delegate.initialize_role_set()
+        self.persistent_delegate.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -468,7 +471,7 @@ class TestDeleteUser(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -673,7 +676,7 @@ class TestUpdateUser(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -873,7 +876,7 @@ class TestAddRole(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -939,7 +942,7 @@ class Testlogin(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -992,7 +995,7 @@ class Testlogout(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -1054,7 +1057,7 @@ class TestCreateInstitute(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -1126,7 +1129,7 @@ class TestCreateOC(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -1211,7 +1214,7 @@ class TestCreateNC(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -1286,7 +1289,7 @@ class TestUpdateInstitute(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -1388,7 +1391,7 @@ class TestCreateWorkshop(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -1506,7 +1509,7 @@ class TestCancelWorkshop(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -1633,7 +1636,7 @@ class TestRescheduleWorkshop(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -1769,7 +1772,7 @@ class TestConductWorkshop(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -1901,7 +1904,7 @@ class TestUploadArtefact(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -2032,7 +2035,7 @@ class TestApproveWorkshop(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -2183,7 +2186,7 @@ class TestRejectWorkshop(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -2348,7 +2351,7 @@ class TestDeleteArtefact(TestCase):
 
     def setUp(self):
         db.create_all()
-        System.initialize_system(PersistenceHandler)
+        System.initialize_system(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -2474,7 +2477,7 @@ from runtime.persistence.entities import *
 from runtime.config.config import Config
 from runtime.exceptions.custom_exceptions import *
 from runtime.utils.class_persistence_template import *
-from runtime.system.persistent_handlers import *
+from runtime.system.persistent_delegates import *
 #+end_src
 
 

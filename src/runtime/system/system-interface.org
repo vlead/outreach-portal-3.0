@@ -36,7 +36,7 @@ class TestSystemConstructor(TestCase):
 
     def setUp(self):
         db.create_all()
-        SystemInterface.initialize_system_interface(PersistenceHandler)
+        SystemInterface.initialize_system_interface(PersistenceDelegate)
 
     def tearDown(self):
         db.session.remove()
@@ -88,7 +88,7 @@ class TestAddUser(TestCase):
 
     def setUp(self):
         db.create_all()
-        SystemInterface.initialize_system_interface(PersistenceHandler)
+        SystemInterface.initialize_system_interface(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
@@ -144,7 +144,7 @@ class TestDeleteUser(TestCase):
 
     def setUp(self):
         db.create_all()
-        SystemInterface.initialize_system_interface(PersistenceHandler)
+        SystemInterface.initialize_system_interface(PersistenceDelegate)
 
     def tearDown(self):
         System.session_set = []
