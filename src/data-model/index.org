@@ -456,7 +456,7 @@ the  actors:  =session=.
 #+END_SRC   
 *** Actor credentials
 #+BEGIN_SRC spec :tangle spec.txt
-    s.role==admin or s.role==OCC(oc) where oc:oc-set
+    s.role==admin or s.role==NOC or s.role==OCC(oc) where oc:oc-set
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
@@ -689,7 +689,8 @@ the  actors:  =session=.
 #+END_SRC   
 *** Actor credentials
 #+BEGIN_SRC spec :tangle spec.txt    
-    s.role==admin  or s.role==OCC(oc) where oc:oc-set
+    s.role==admin or s.role==NOC or s.role==OCC(oc) where oc:oc-set
+    
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt    
