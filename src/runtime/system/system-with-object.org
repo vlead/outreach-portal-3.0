@@ -12,86 +12,89 @@
 class TestAddUser(TestCase):
     TESTING = True
     def setUp(self):
-        System.initialize_system(ObjectDelegate)
+	System.initialize_system(ObjectDelegate)
 
     def tearDown(self):
-        admin = filter( lambda x: x.get("email").get("email") ==
-                        "app-admin@vlabs.ac.in",
-                        System.delegate.user_set)
-        System.user_set = admin
-        System.session_set = []
-        System.delegate.institute_set = []
-        System.delegate.oc_set = []
-        System.delegate.nc_set = []
+	admin = filter( lambda x: x.get("email").get("email") ==
+			"app-admin@vlabs.ac.in",
+			System.delegate.user_set)
+	System.user_set = admin
+	System.session_set = []
+	System.delegate.institute_set = []
+	System.delegate.oc_set = []
+	System.delegate.nc_set = []
 
     def test_add_user_by_admin(self):
-        print "test_add_user_by_admin"
-        admin_user=System.delegate.user_set[0]
-        session = Session(user=admin_user,role=Role.admin)
-        System.session_set.append(session)
+	print "test_add_user_by_admin"
+	admin_user=System.delegate.user_set[0]
+	session = Session(user=admin_user,role=Role.admin)
+	System.session_set.append(session)
 
-        user_name=Name(name="me")
-        user_email=Email(email="abc@gmail.com")
+	user_name=Name(name="me")
+	user_email=Email(email="abc@gmail.com")
 
-        user = User(name=user_name, email= user_email, roles= [Role.guest],
-                    user_status="active")
+	user = User(name=user_name, email= user_email, roles= [Role.guest],
+		    user_status="active")
 
-        u = System.do("add_user", user=user, session=session)
+	u = System.do("add_user", user=user, session=session)
 
-        u = System.delegate.user_set[1]
-        self.assertEqual(u.get("name").get("name"),"me")
+	u = System.delegate.user_set[1]
+	self.assertEqual(u.get("name").get("name"),"me")
 
     def test_add_user_noc_by_admin(self):
-        print "test_add_user_by_noc"
-        admin_user=System.delegate.user_set[0]
-        session = Session(user=admin_user,role=Role.admin)
-        System.session_set.append(session)
- 
-        name=Name(name="nocuser")
-        email=Email(email="abc@gmail.com")
+	print "test_add_user_by_noc"
+	admin_user=System.delegate.user_set[0]
+	session = Session(user=admin_user,role=Role.admin)
+	System.session_set.append(session)
 
-        noc_user= System.do("add_user", name=name, email=email,
-                            session=session)
+	name = Name(name="nocuser")
+	email= Email(email="abc@gmail.com")
+	user = User(name=name, email= email, roles= [Role.guest],
+		    user_status="active")
 
-        session_noc = Session(user=noc_user,role=Role.noc)
-        System.session_set.append(session_noc)
+	noc_user= System.do("add_user", user=user, session=session)
 
-        u=System.delegate.user_set[1]
-        self.assertEqual(u.get("name").get("name"),"nocuser")
+	session_noc = Session(user=noc_user,role=Role.noc)
+	System.session_set.append(session_noc)
+
+	u=System.delegate.user_set[1]
+	self.assertEqual(u.get("name").get("name"),"nocuser")
 
     def test_add_user_by_noc(self):
-        print "test_add_user_by_noc"
-        admin_user=System.delegate.user_set[0]
-        session = Session(user=admin_user,role=Role.admin)
-        System.session_set.append(session)
-        
-        name=Name(name="nocuser")
-        email=Email(email="abc@gmail.com") 
+	print "test_add_user_by_noc"
+	admin_user=System.delegate.user_set[0]
+	session = Session(user=admin_user,role=Role.admin)
+	System.session_set.append(session)
 
-        noc_user=System.do("add_user", name=name, email=email, session=session)
+	name = Name(name="nocuser")
+	email= Email(email="abc@gmail.com") 
+	user = User(name=name, email= email, roles= [Role.guest],
+		    user_status="active")
 
-        session_noc = Session(user=noc_user, role=Role.noc)
-        System.session_set.append(session_noc)
-    
-        institute = System.do("create_institute", name="IIT", address="Delhi",
-                               session=session)
-        oc = System.do("create_oc",institute=institute, session=session,
-                        spokes=[], oc_target = None)
+	noc_user=System.do("add_user", user=user, session=session)
 
-        name1 = Name(name="ocuser")
-        email1 = Email(email="mary@gmail.com")       
+	session_noc = Session(user=noc_user, role=Role.noc)
+	System.session_set.append(session_noc)
 
-        oc_user = System.do("add_user", name=name1, email=email1,
-                             session=session_noc)
-        
-        oc_role = filter(lambda x:x.get('name') == "OCC" and
-                         x.get('centre_oc').get("institute").get("name") ==
-                         institute.get("name"), System.delegate.role_set)
-        if oc_role:
-            oc_user.append_role(oc_role[0])
-        
-        u=System.delegate.user_set[2]
-        self.assertEqual(u.get("name").get("name"),"ocuser")
+	institute = System.do("create_institute", name="IIT", address="Delhi",
+			       session=session)
+	oc = System.do("create_oc",institute=institute, session=session,
+			spokes=[], oc_target = None)
+
+	name1 = Name(name="ocuser")
+	email1 = Email(email="mary@gmail.com")       
+        user = User(name=name1, email= email1, roles= [Role.guest],
+		    user_status="active")
+	oc_user = System.do("add_user", user=user, session=session_noc)
+
+	oc_role = filter(lambda x:x.get('name') == "OCC" and
+			 x.get('centre_oc').get("institute").get("name") ==
+			 institute.get("name"), System.delegate.role_set)
+	if oc_role:
+	    oc_user.append_role(oc_role[0])
+
+	u=System.delegate.user_set[2]
+	self.assertEqual(u.get("name").get("name"),"ocuser")
 #+END_SRC
 
 * Test DeleteUser
