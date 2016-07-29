@@ -89,7 +89,7 @@ class TestObjectDelegate(TestCase):
 
 #+END_SRC
 
-
+    
 ** Other functions
    Other functions that help =System= perform the operations. 
 
@@ -151,15 +151,46 @@ class TestObjectDelegate(TestCase):
         user.set(name=name)
         user.set(email=email)
         return user
+
+#+END_SRC
+**** Tests
+#+NAME: test_update_user
+#+BEGIN_SRC python
+
+    def test_update_user(self):
+        print "test_update_user"
+	name=Name(name="test")
+	email=Email(email="test@gmail.com")
+	user = User(name=name, email=email, roles= [Role.guest],
+		    user_status="active")
+	user = self.obj_delegate.add_user(user)
+	user_name1=Name(name="alaska")
+	user_email1=Email(email="alaska@gmail.com")
+	user = self.obj_delegate.update_user(user_name1, user_email1, user)
+	self.assertEqual(user.get("name").get("name"), "alaska")
 #+END_SRC
 
-
 *** delete_user
-#+NAME: update_user
+#+NAME: delete_user
 #+BEGIN_SRC python 
     def delete_user(self, user):
         user.set(user_status="inactive")
+        return user
 #+END_SRC
+**** Tests
+#+NAME: test_delete_user
+#+BEGIN_SRC python
+    def test_delete_user(self):
+        print "test_delete_user"
+	name = Name(name="test")
+	email = Email(email="test@gmail.com")
+	user = User(name=name, email=email, roles= [Role.guest],
+		    user_status="active")
+	new_user = self.obj_delegate.add_user(user)
+        del_user = self.obj_delegate.delete_user(new_user)
+	self.assertEqual(del_user.get("user_status") , "inactive")
+#+END_SRC
+
 
 *** add_role_to_user
 #+NAME: add_role_to_user
@@ -168,6 +199,21 @@ class TestObjectDelegate(TestCase):
         user.append_role(role)
         return user
 #+END_SRC
+**** Tests
+#+NAME: test_add_role_to_user
+#+BEGIN_SRC python
+    def test_add_role_to_user(self):
+        print "test_add_role_to_user"
+	name = Name(name="test")
+	email = Email(email="test@gmail.com")
+	user = User(name=name, email=email, roles= [Role.guest],
+		    user_status="active")
+	new_user = self.obj_delegate.add_user(user)
+        user_with_new_role = self.obj_delegate.add_role_to_user(new_user, Role.noc)
+        self.assertTrue(len(user_with_new_role.get('roles'))==2)
+#+END_SRC
+
+
 *** get_users
 
     This return the user_set maintained by the system.
@@ -178,7 +224,7 @@ class TestObjectDelegate(TestCase):
         return self.get_active_users()
 
 #+END_SRC
-
+**** Tests
 #+NAME: test_get_users
 #+BEGIN_SRC python
     def test_get_users(self):
@@ -235,7 +281,7 @@ class TestObjectDelegate(TestCase):
 #+END_SRC
 
 
-
+     
 *** get_roles
 
     This return the role_set maintained by the system.
@@ -245,7 +291,7 @@ class TestObjectDelegate(TestCase):
         return self.role_set
 
 #+END_SRC
-
+**** Tests
 #+NAME: test_get_roles
 #+BEGIN_SRC python
     def test_get_roles(self):
@@ -356,7 +402,7 @@ class TestObjectDelegate(TestCase):
          self.assertEqual(self.obj_delegate.oc_exists(oc), True)
 #+END_SRC
 
-
+     
 *** add_oc
     Add a oc to the system
     This function adds an outreach centre to the oc-set maintained by the system.
@@ -1212,6 +1258,7 @@ if __name__ == '__main__':
 <<user_exists>>
 <<add_user>>
 <<update_user>>
+<<delete_user>>
 <<add_role_to_user>>
 <<get_users>>
 <<role_exists>>
@@ -1266,8 +1313,11 @@ if __name__ == '__main__':
 <<test_initialize_object_delegate>>
 <<test_user_exists>>
 <<test_add_user>>
+<<test_update_user>>
+<<test_delete_user>>
 <<test_get_users>>
 <<test_role_exists>>
+<<test_add_role_to_user>>
 <<test_add_role>>
 <<test_get_roles>>
 <<test_institute_exists>>
