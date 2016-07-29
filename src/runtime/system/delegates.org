@@ -591,12 +591,69 @@ class TestObjectDelegate(TestCase):
 #+END_SRC
 
 *** cancel_workshop
-#+NAME: add_workshop
+#+NAME: cancel_workshop
 #+BEGIN_SRC python
     def cancel_workshop(self, workshop):
         workshop.set(status = Status.cancelled)
         return workshop
 #+END_SRC
+*** reschedule_workshop
+#+NAME: reschedule_workshop
+#+BEGIN_SRC python
+    def reschedule_workshop(self, workshop, wstarget):
+        workshop.set(status = Status.pending)
+        workshop.set(ws_target = wstarget)
+        return workshop
+
+#+END_SRC
+
+*** conduct_workshop
+#+NAME: conduct_workshop
+#+BEGIN_SRC python
+    def conduct_workshop(self, workshop):
+        workshop.set(status = Status.completed)
+        return workshop
+#+END_SRC
+
+*** upload_artefact
+#+NAME: upload_artefact
+#+BEGIN_SRC python
+    def upload_artefact(self, workshop, new_artefact):
+        artefacts = workshop.get("artefacts")
+        artefacts.append(new_artefact)
+        workshop.set(artefacts = artefacts)
+        workshop.set(status = Status.pending_approval)
+        return workshop
+#+END_SRC
+
+*** approve_workshop
+#+NAME: approve_workshop
+#+BEGIN_SRC python
+    def approve_workshop(self, workshop):
+        workshop.set(status = Status.approved)
+        return workshop
+#+END_SRC
+*** reject_workshop
+#+NAME: reject_workshop
+#+BEGIN_SRC python
+    def reject_workshop(self, workshop):
+        workshop.set(status = Status.rejected)
+        return workshop
+#+END_SRC
+
+*** delete_artefact
+#+NAME: delete_artefact
+#+BEGIN_SRC python
+    def delete_artefact(self, workshop, artefact):
+        artefact_set = workshop.get("artefacts")
+        new_set = filter(lambda art: not art.get("name") ==
+                         artefact.get("name"), artefact_set)
+
+        workshop.set(artefacts = new_set)
+        workshop.set(status = Status.pending_approval)
+        return workshop
+#+END_SRC
+
 *** get_workshops
 
     This return the workshop_set maintained by the system.
@@ -1172,6 +1229,13 @@ if __name__ == '__main__':
 <<get_ncs>>
 <<workshop_exists>>
 <<add_workshop>>
+<<cancel_workshop>>
+<<reschedule_workshop>>
+<<conduct_workshop>>
+<<upload_artefact>>
+<<approve_workshop>>
+<<reject_workshop>>
+<<delete_artefact>>
 <<get_workshops>>
 <<get_active_users>>
 
@@ -1218,6 +1282,7 @@ if __name__ == '__main__':
 <<test_get_active_users>>
 <<test_workshop_exists>>
 <<test_add_workshop>>
+
 <<test_get_workshops>>
 
 <<run_test_cases>>

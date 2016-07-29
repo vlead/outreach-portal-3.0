@@ -832,8 +832,8 @@ class CreateWorkshop():
                                 a_participants = 0,
                                 a_experiments = 0,
                                 a_usage = 0)
-        System.delegate.add_workshop(new_workshop)
-        return new_workshop
+        workshop = System.delegate.add_workshop(new_workshop)
+        return workshop
 #+end_src
 
 ** =cancel_workshop=
@@ -869,9 +869,8 @@ class CancelWorkshop():
     @staticmethod
     def action(args):
         workshop = args["workshop"]
-        System.delegate.cancel_workshop(workshop)     
-
-        
+        workshop = System.delegate.cancel_workshop(workshop)     
+        return workshop
         
 #+end_src
 
@@ -911,8 +910,8 @@ class RescheduleWorkshop():
     def action(args):
         workshop = args["workshop"]
         wstarget = args['wstarget']
-        workshop.set(status = Status.pending)
-        workshop.set(ws_target = wstarget)
+        workshop = System.delegate.reschedule_workshop(workshop, wstarget)     
+        return workshop
         
 #+end_src
 
@@ -949,7 +948,10 @@ class ConductWorkshop():
     @staticmethod
     def action(args):
         workshop = args["workshop"]
-        workshop.set(status = Status.completed)
+        workshop = System.delegate.conduct_workshop(workshop)     
+        return workshop
+
+
         
         
 #+end_src
@@ -992,12 +994,9 @@ class UploadArtefact():
     def action(args):
         workshop = args["workshop"]
         new_artefact = args['artefact']
+        workshop = System.delegate.upload_artefact(workshop, new_artefact)     
+        return workshop
 
-        artefacts = workshop.get("artefacts")
-        artefacts.append(new_artefact)
-        workshop.set(artefacts = artefacts)
-        
-        workshop.set(status = Status.pending_approval)
         
         
 #+end_src
@@ -1035,8 +1034,8 @@ class ApproveWorkshop():
     @staticmethod
     def action(args):
         workshop = args["workshop"]
-        workshop.set(status = Status.approved)
-        
+        workshop = System.delegate.approve_workshop(workshop)     
+        return workshop
         
 #+end_src
 
@@ -1073,9 +1072,9 @@ class RejectWorkshop():
     @staticmethod
     def action(args):
         workshop = args["workshop"]
-        workshop.set(status = Status.rejected)
-        
-        
+        workshop = System.delegate.reject_workshop(workshop)     
+        return workshop
+
 #+end_src
 
 ** =delete_artefact=
@@ -1117,14 +1116,10 @@ class DeleteArtefact():
         workshop = args["workshop"]
         artefact = args['artefact']
 
-        artefact_set = workshop.get("artefacts")
-        
-        new_set = filter(lambda art: not art.get("name") ==
-                         artefact.get("name"), artefact_set)
+        workshop = System.delegate.delete_artefact(workshop, artefact)     
+        return workshop
 
-        workshop.set(artefacts = new_set)
-        
-        workshop.set(status = Status.pending_approval)
+
         
         
 #+end_src
