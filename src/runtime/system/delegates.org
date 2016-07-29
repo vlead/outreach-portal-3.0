@@ -150,7 +150,7 @@ class TestObjectDelegate(TestCase):
     def update_user(self, name, email, user):
         user.set(name=name)
         user.set(email=email)
-
+        return user
 #+END_SRC
 
 
@@ -309,7 +309,7 @@ class TestObjectDelegate(TestCase):
     def update_institute(self, institute, name, address):
         institute.set(name=name)
         institute.set(address=address)
-
+        return institute
 #+END_SRC
 *** get_institutes
     This return the institute_set maintained by the system.

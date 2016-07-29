@@ -265,10 +265,10 @@ class TestUpdateUser(TestCase):
         other_user= System.do("add_user", user=user,
                                session=session)
 
-        System.do("update_user", name=Name(name="john"), user=other_user,
+        user = System.do("update_user", name=Name(name="john"), user=other_user,
                    session=session)
 
-        self.assertEqual(other_user.get("name").get("name"), "john")
+        self.assertEqual(user.get("name").get("name"), "john")
 
     def test_update_user_by_occ(self):
         print "test_update_user_by_occ"
@@ -551,9 +551,9 @@ class TestUpdateInstitute(TestCase):
         
         institute = System.do("create_institute",name="IIIT",
                               address="Hyderabad",session=session)
-        System.do("update_institute",name="NITK",institute=institute,
+        inst = System.do("update_institute",name="NITK",institute=institute,
                    session=session)
-        self.assertEqual(institute.get("name"),"NITK")
+        self.assertEqual(inst.get("name"),"NITK")
 
 #+END_SRC
 

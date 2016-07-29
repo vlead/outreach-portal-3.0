@@ -467,8 +467,8 @@ class UpdateUser():
         else:
            email=args["email"]
 
-        System.delegate.update_user(name, email, user)
-
+        user = System.delegate.update_user(name, email, user)
+        return user
 #+end_src
 ** =AddRole=
 #+NAME: class_AddRole
@@ -763,7 +763,8 @@ class UpdateInstitute():
         else:
             address = args["address"]
 
-        System.delegate.update_institute(institute, name, address)    
+        institute = System.delegate.update_institute(institute, name, address)    
+        return institute
 #+end_src
 
 ** =create_workshop=
