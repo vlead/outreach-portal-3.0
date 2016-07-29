@@ -303,7 +303,14 @@ class TestObjectDelegate(TestCase):
 #+END_SRC
 
 
+*** update_institute
+#+NAME: update_institute
+#+BEGIN_SRC python
+    def update_institute(self, institute, name, address):
+        institute.set(name=name)
+        institute.set(address=address)
 
+#+END_SRC
 *** get_institutes
     This return the institute_set maintained by the system.
 #+NAME: get_institutes
@@ -1147,6 +1154,7 @@ if __name__ == '__main__':
 <<get_roles>>
 <<institute_exists>>
 <<add_institute>>
+<<update_institute>>
 <<get_institutes>>
 <<oc_exists>>
 <<add_oc>>

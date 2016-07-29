@@ -279,9 +279,8 @@ class TestUpdateUser(TestCase):
 
         name=Name(name="useroc")
         email=Email(email="useroc@gmail.com")       
-        user = User(name=name, email= email, roles= [Role.guest],
-                    user_status="active")
-        oc_user=System.do("add_user", user=user, session=session)
+
+        oc_user=System.do("add_user", name=name, email=email, session=session)
 
         oc_role = filter(lambda x:x.get('name') == "OCC" and
                          x.get('centre_oc').get("institute").get("name") ==
@@ -294,9 +293,8 @@ class TestUpdateUser(TestCase):
 
         name1=Name(name="usernc")
         email1=Email(email="usernc@gmail.com")
-        user = User(name=name1, email= email1, roles= [Role.guest],
-                    user_status="active")
-        nc_user= System.do("add_user", user=user,
+
+        nc_user= System.do("add_user", name=name1, email=email1,
                             session=session)
 
         nc_role = filter(lambda x:x.get('name') == "NCC" and
@@ -330,9 +328,8 @@ class TestUpdateUser(TestCase):
        
         name=Name(name="useroc")
         email=Email(email="useroc@gmail.com")
-        user = User(name=name, email= email, roles= [Role.guest],
-                    user_status="active")
-        oc_user= System.do("add_user", user=user, session=session)
+
+        oc_user= System.do("add_user", name=name, email=email, session=session)
 
         oc_role = filter(lambda x:x.get('name') == "OCC" and
                          x.get('centre_oc').get("institute").get("name") ==
@@ -342,9 +339,8 @@ class TestUpdateUser(TestCase):
 
         name1=Name(name="usernoc")
         email1=Email(email="usernoc@gmail.com")
-        user = User(name=name1, email= email1, roles= [Role.guest],
-                    user_status="active")
-        noc_user=System.do("add_user", user=user,
+
+        noc_user=System.do("add_user", name=name1, email=email1,
                             session=session)
 
         noc_user.append_role(Role.noc)
