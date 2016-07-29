@@ -590,26 +590,28 @@ class TestCreateWorkshop(TestCase):
         session = Session(user=login_user,role=Role.admin)
         System.session_set.append(session)
         ws_status = Status.pending
-        nc_user = System.do("add_user",name=Name(name="ncuser"),
-                             email=Email(email="ncuser@gmail.com"),
+        name = Name(name="ncuser")
+        email=Email(email="ncuser@gmail.com")
+        user = User(name=name, email= email, roles= [Role.guest],
+                    user_status="active")
+
+        nc_user = System.do("add_user", user=user,
                              session = sess)
         nc_user.set(roles=[Role(name = "NCC", centre_oc = oc, centre_nc = nc)])
         nc_session = Session(user = nc_user,
                              role = Role(name = "NCC", centre_oc = oc, centre_nc = nc))
         System.session_set.append(nc_session)
-        
-        new_workshop = System.do("create_workshop", 
-                                 institute = workshop_institute, 
-                                 name = Name(name = "Lab Workshop"), 
-                                 ws_target = wstarget, 
-                                 status = ws_status, 
-                                 artefacts = [], 
+
+        new_workshop = System.do("create_workshop",
+                                 institute = workshop_institute,
+                                 name = Name(name = "Lab Workshop"),
+                                 ws_target = wstarget,
+                                 status = ws_status,
+                                 artefacts = [],
                                  nc = nc,
                                  session = nc_session)
-                                 
+
         self.assertEqual(new_workshop.get('institute'),workshop_institute)
-        self.assertEqual(nc.get('workshops')[0],new_workshop)
-  
 #+END_SRC
 
 * Test CancelWorkshop

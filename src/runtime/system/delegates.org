@@ -889,6 +889,7 @@ class TestPersistentDelegate(TestCase):
     This function adds a workshop to the workshop-set maintained by the system.
 #+NAME: persistent_add_workshop
 #+BEGIN_SRC python
+
     def add_workshop(self, workshop):
         workshop.save()
         return workshop

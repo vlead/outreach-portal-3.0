@@ -770,12 +770,12 @@ class UpdateInstitute():
 #+NAME: class_CreateWorkshop
 #+begin_src python
 class CreateWorkshop():
-    arg_types = {"institute":is_institute, 
-                 "name" : is_name , 
-                 "session":is_session, 
-                 "ws_target" : is_wstarget, 
-                 "artefacts": are_artefacts, 
-                 "status" : is_status, 
+    arg_types = {"institute":is_institute,
+                 "name" : is_name ,
+                 "session":is_session,
+                 "ws_target" : is_wstarget,
+                 "artefacts": are_artefacts,
+                 "status" : is_status,
                  "nc" : is_nc
                  }
     arity_and_type_checks_needed = True
@@ -811,8 +811,8 @@ class CreateWorkshop():
                              % institute.get('name'))
         if not System.delegate.nc_exists(nc):
             raise StateError("nc %s not in System" % nc.get('name'))
-        
-    @staticmethod        
+
+    @staticmethod
     def action(args):
         session = args["session"]
         institute = args['institute']
@@ -821,21 +821,18 @@ class CreateWorkshop():
         artefacts = args["artefacts"]
         status = args["status"]
         nc = args['nc']
-        new_workshop = Workshop(institute = institute, 
-                                name = name, 
-                                ws_target = ws_target, 
-                                artefacts = artefacts, 
-                                status = status, 
+        new_workshop = Workshop(institute = institute,
+                                name = name,
+                                ws_target = ws_target,
+                                artefacts = artefacts,
+                                status = status,
                                 nc = nc,
                                 a_date = None,
                                 a_participants = 0,
                                 a_experiments = 0,
                                 a_usage = 0)
-        System.delegate.workshop_set.append(new_workshop)
-        nc.add_workshop_to_nc(new_workshop)        
-        
+        System.delegate.add_workshop(new_workshop)
         return new_workshop
-
 #+end_src
 
 ** =cancel_workshop=
