@@ -160,6 +160,14 @@ class TestObjectDelegate(TestCase):
     def delete_user(self, user):
         user.set(user_status="inactive")
 #+END_SRC
+
+*** add_role_to_user
+#+NAME: add_role_to_user
+#+BEGIN_SRC python 
+    def add_role_to_user(self, user, role):
+        user.append_role(role)
+        return user
+#+END_SRC
 *** get_users
 
     This return the user_set maintained by the system.
@@ -295,7 +303,14 @@ class TestObjectDelegate(TestCase):
 #+END_SRC
 
 
+*** update_institute
+#+NAME: update_institute
+#+BEGIN_SRC python
+    def update_institute(self, institute, name, address):
+        institute.set(name=name)
+        institute.set(address=address)
 
+#+END_SRC
 *** get_institutes
     This return the institute_set maintained by the system.
 #+NAME: get_institutes
@@ -1132,12 +1147,14 @@ if __name__ == '__main__':
 <<user_exists>>
 <<add_user>>
 <<update_user>>
+<<add_role_to_user>>
 <<get_users>>
 <<role_exists>>
 <<add_role>>
 <<get_roles>>
 <<institute_exists>>
 <<add_institute>>
+<<update_institute>>
 <<get_institutes>>
 <<oc_exists>>
 <<add_oc>>
