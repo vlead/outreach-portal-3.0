@@ -120,19 +120,22 @@ class TestDeleteUser(TestCase):
         admin_user=System.delegate.user_set[0]
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-        
-        name=Name(name="me")
-        email=Email(email="abc@gmail.com")
 
-        other_admin_user= System.do("add_user", name=name, email=email,
+        user_name=Name(name="me")
+        user_email=Email(email="abc@gmail.com")
+
+        user = User(name=user_name, email= user_email, roles= [Role.guest],
+                    user_status="active")
+
+
+        other_admin_user= System.do("add_user", user=user,
                                     session=session)
 
         other_admin_user.append_role(Role.admin)
         length = len(System.delegate.user_set)
         System.do("delete_user", user=other_admin_user, session=session)
         self.assertEqual(other_admin_user.get("user_status"),"inactive")
-        
-        
+
 
     def test_delete_user_by_occ(self):
         print "test_delete_user_by_occ"
