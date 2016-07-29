@@ -399,6 +399,7 @@ class DeleteUser():
 class UpdateUser():
     arg_types = {"name": is_name, "email": is_email, "user":is_user,
                  "session":is_session}
+
     arity_and_type_checks_needed = False
 
     @staticmethod
@@ -410,7 +411,7 @@ class UpdateUser():
         if System.is_session_noc(session):
             role = filter (lambda x: x.get("name") == "OCC", user.get('roles'))
             if role:
-               return True            
+               return True
         elif System.is_session_OCC(session):
             role = filter (lambda x: x.get("name") == "NCC" and
                            x.get('centre_nc').get("hub") ==
@@ -424,6 +425,8 @@ class UpdateUser():
     def state_check(args):
         user = args["user"]
         session = args["session"]
+
+
         for s in System.session_set:
             if(s.get("user")==user):
               raise StateError("cannot update user, user is in session %s"
@@ -433,26 +436,31 @@ class UpdateUser():
             raise StateError("You are not in session set %s"
                             % session.get("user").get("name"))
         if not (user in System.delegate.user_set):
-            raise StateError("user %s not in System"
+            raise StateError("user %s not in user set"
                              % user.get("name").get("name"))
+        if "email" in args:
+            email = args["email"]
+            if (email in System.delegate.email_set):
+                raise StateError("email %s is already exists in email set"
+                                % user.get("email").get("email"))
+
 
     @staticmethod
     def action(args):
         user = args["user"]
-        session = args["session"]
-        
+
         if not "name" in args:
            name=user.get("name")
         else:
-           name=args["name"]      
+           name=args["name"]
 
         if not "email" in args:
            email=user.get("email")
         else:
            email=args["email"]
 
-        user.set(name=name)
-        user.set(email=email)
+        System.delegate.update_user(name, email, user)
+
 #+end_src
 ** =AddRole=
 #+NAME: class_AddRole

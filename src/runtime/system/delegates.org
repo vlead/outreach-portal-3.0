@@ -144,6 +144,16 @@ class TestObjectDelegate(TestCase):
 #+END_SRC
 
 
+*** update_user
+#+NAME: update_user
+#+BEGIN_SRC python 
+    def update_user(self, name, email, user):
+        user.set(name=name)
+        user.set(email=email)
+
+#+END_SRC
+
+
 *** get_users
 
     This return the user_set maintained by the system.
@@ -1115,6 +1125,7 @@ if __name__ == '__main__':
 <<initialize_object_user_set>>
 <<user_exists>>
 <<add_user>>
+<<update_user>>
 <<get_users>>
 <<role_exists>>
 <<add_role>>

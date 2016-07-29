@@ -245,15 +245,18 @@ class TestUpdateUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
 
-        name = Name(name="me")
-        email = Email(email="abc@gmail.com") 
+        user_name=Name(name="me")
+        user_email=Email(email="abc@gmail.com")
 
-        other_user= System.do("add_user", name=name, email=email,
+        user = User(name=user_name, email= user_email, roles= [Role.guest],
+                    user_status="active")
+
+        other_user= System.do("add_user", user=user,
                                session=session)
 
-        System.do("update_user",name=Name(name="john"), user=other_user,
+        System.do("update_user", name=Name(name="john"), user=other_user,
                    session=session)
-       
+
         self.assertEqual(other_user.get("name").get("name"), "john")
 
     def test_update_user_by_occ(self):
@@ -1171,6 +1174,7 @@ if __name__ == '__main__':
 <<test_system_constructor>>
 <<test_arity_and_types>>
 <<test_adduser>>
+<<test_updateuser>>
 <<test_deleteuser>>
 <<test_login>>
 <<test_logout>>
