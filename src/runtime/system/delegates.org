@@ -590,6 +590,13 @@ class TestObjectDelegate(TestCase):
 
 #+END_SRC
 
+*** cancel_workshop
+#+NAME: add_workshop
+#+BEGIN_SRC python
+    def cancel_workshop(self, workshop):
+        workshop.set(status = Status.cancelled)
+        return workshop
+#+END_SRC
 *** get_workshops
 
     This return the workshop_set maintained by the system.

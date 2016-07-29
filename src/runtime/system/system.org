@@ -869,7 +869,8 @@ class CancelWorkshop():
     @staticmethod
     def action(args):
         workshop = args["workshop"]
-        workshop.set(status = Status.cancelled)
+        System.delegate.cancel_workshop(workshop)     
+
         
         
 #+end_src
