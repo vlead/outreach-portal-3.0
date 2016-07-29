@@ -314,7 +314,7 @@ class TestSystemArityAndType(TestCase):
 #+NAME: class_adduser
 #+begin_src python
 class AddUser():
-    arg_types = {"name":is_name, "email":is_email,  "session":is_session}
+    arg_types = {"user": is_user,  "session":is_session}
     arity_and_type_checks_needed = True 
   
     @staticmethod
@@ -325,10 +325,12 @@ class AddUser():
                 System.is_session_noc(session)):
             raise AuthError("Role not Authorized to perform this action")
 
+
     @staticmethod
     def state_check(args):
-        
+
         session = args["session"]
+        user = args["user"]
 
         if not System.session_exists(session):
             raise StateError("session %s does not exist in System"
@@ -337,16 +339,13 @@ class AddUser():
             raise StateError("user %s already exists in System"
                                 % user.to_client())
 
-    
+
     @staticmethod
     def action(args):
-        user_name = args["name"]
-        user_email = args["email"]
-        session = args["session"]
-        user = User(name=user_name, email= user_email, roles= [Role.guest],
-                    user_status="active")
+        user = args["user"]
         System.delegate.add_user(user)
         return user
+
 #+end_src
 ** =DeleteUser=
 #+NAME: class_deleteuser
