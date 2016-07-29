@@ -151,7 +151,9 @@ class TestDeleteUser(TestCase):
        
         name = Name(name="maryoc")
         email = Email(email="mary@gmail.com")
-        oc_user= System.do("add_user", name=name, email=email, session=session)
+        user = User(name=name, email= email, roles= [Role.guest],
+                    user_status="active")
+        oc_user= System.do("add_user", user=user, session=session)
         
         
         oc_role = filter(lambda x:x.get('name') == "OCC" and
@@ -165,8 +167,9 @@ class TestDeleteUser(TestCase):
 
         name1 = Name(name="xyznc")
         email1 = Email(email="xyz@gmail.com")
-
-        nc_user = System.do("add_user", name=name1, email=email1,
+        user = User(name=name1, email= email1, roles= [Role.guest],
+                    user_status="active")
+        nc_user = System.do("add_user", user=user,
                              session=session)
 
         nc_role = filter(lambda x:x.get('name') == "NCC" and
@@ -199,8 +202,9 @@ class TestDeleteUser(TestCase):
        
         name = Name(name="maryoc")
         email = Email(email="mary@gmail.com")
-
-        oc_user= System.do("add_user", name=name, email=email, session=session)
+        user = User(name=name, email= email, roles= [Role.guest],
+                    user_status="active")
+        oc_user= System.do("add_user", user=user, session=session)
         
         
         oc_role = filter(lambda x:x.get('name') == "OCC" and
@@ -211,8 +215,9 @@ class TestDeleteUser(TestCase):
 
         name1=Name(name="xyznc")
         email1=Email(email="xyz@gmail.com")
-
-        noc_user = System.do("add_user", name=name1, email=email1,
+        user = User(name=name1, email= email1, roles= [Role.guest],
+                    user_status="active")
+        noc_user = System.do("add_user", user=user,
                               session=session)
 
         noc_user.append_role(Role.noc)
