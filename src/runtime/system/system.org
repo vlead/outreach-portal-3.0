@@ -419,9 +419,11 @@ class UpdateUser():
             if role:
                return True
         elif System.is_session_OCC(session):
+            print session
+            
             role = filter (lambda x: x.get("name") == "NCC" and
                            x.get('centre_nc').get("hub") ==
-                           session.get("role").centre_oc, user.get('roles'))
+                           session.get("role").get('centre_oc'), user.get('roles'))
             if role:
                 return True
         else:
