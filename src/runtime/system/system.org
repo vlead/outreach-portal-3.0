@@ -329,9 +329,13 @@ class AddUser():
     def state_check(args):
         
         session = args["session"]
-        if not (session in System.session_set):
-            raise StateError("user not in session %s"
-                             % session.get("user").get("name").get("name"))
+
+        if not System.session_exists(session):
+            raise StateError("session %s does not exist in System"
+                                % session.to_client())
+        elif System.delegate.user_exists(user):
+            raise StateError("user %s already exists in System"
+                                % user.to_client())
 
     
     @staticmethod
@@ -1130,9 +1134,6 @@ ops_table = {'add_user' : AddUser,
              'delete_artefact' : DeleteArtefact
 }
 
-             'show_users': ShowUsers
-            }
-
  #+END_SRC   
 
     
@@ -1205,8 +1206,6 @@ if __name__ == '__main__':
 <<imports_for_tests>>
 <<test_system_constructor>>
 <<test_arity_and_types>>
-#<<test_adduser>>
-#<<test_showusers>>
 <<run_test_cases>>
 #+end_src
 
