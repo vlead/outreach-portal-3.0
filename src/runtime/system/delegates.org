@@ -148,9 +148,10 @@ class TestObjectDelegate(TestCase):
 #+NAME: update_user
 #+BEGIN_SRC python 
     def update_user(self, name, email, user):
-         user.set(name=name)
-         user.set(email=email)
-         return user
+        user.set(name=name)
+        user.set(email=email)
+        return user
+
 #+END_SRC
 **** Tests
 #+NAME: test_update_user
@@ -354,7 +355,7 @@ class TestObjectDelegate(TestCase):
     def update_institute(self, institute, name, address):
         institute.set(name=name)
         institute.set(address=address)
-
+        return institute
 #+END_SRC
 *** get_institutes
     This return the institute_set maintained by the system.
@@ -635,6 +636,13 @@ class TestObjectDelegate(TestCase):
 
 #+END_SRC
 
+*** cancel_workshop
+#+NAME: add_workshop
+#+BEGIN_SRC python
+    def cancel_workshop(self, workshop):
+        workshop.set(status = Status.cancelled)
+        return workshop
+#+END_SRC
 *** get_workshops
 
     This return the workshop_set maintained by the system.
@@ -934,6 +942,7 @@ class TestPersistentDelegate(TestCase):
     This function adds a workshop to the workshop-set maintained by the system.
 #+NAME: persistent_add_workshop
 #+BEGIN_SRC python
+
     def add_workshop(self, workshop):
         workshop.save()
         return workshop
