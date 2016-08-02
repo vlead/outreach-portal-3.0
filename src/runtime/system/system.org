@@ -1159,8 +1159,14 @@ ops_table = {'add_user' : AddUser,
 #+name: imports_for_sources
 #+BEGIN_SRC python
 # -*- coding: utf-8 -*-
-from runtime.objects.entities import *
+
 from runtime.exceptions.custom_exceptions import *
+from runtime.exceptions.exceptions import *
+from runtime.objects.entities import is_user, is_session, is_role, is_email, \
+     is_name, is_alphabetic_str, is_str, are_spokes, is_institute, is_octarget, \
+     is_oc, is_nctarget, are_workshops, is_wstarget, are_artefacts, is_status, is_nc, \
+     is_workshop, is_wst, is_artefact
+
 #+end_src
 
 
@@ -1173,7 +1179,6 @@ import unittest
 from unittest import TestCase
 from system import *
 from object_delegates import * 
-
 #+end_src
 
 *** Running tests

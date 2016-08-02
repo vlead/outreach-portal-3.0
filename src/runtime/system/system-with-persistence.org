@@ -6,335 +6,13 @@
 #+EXCLUDE_TAGS: boilerplate
 #+OPTIONS: ^:nil
 
-* Introduction
 
-A system has clear boundaries of input, output and state.
-In the context of our application, the system interacts with
-the external world (through command line function calls)
-and also manages the entity objects in such a way that the
-system invariants are maintained. 
-
-
-The system holds two state variables:
-
- - =user_set= :: The set of users in the system
- - =session_set= :: The set of sessions in the system
-
-The system's inputs are in terms of /operations/.  Each
-operation consists of an operation name and a sequence of
-arguments.  
-
-In this implementation, an operation is identified by a
-class.  The dictionary =ops_table= maps operation names to
-their corresponding classes.
-
-Each operation is divided into five checks.  A /check/ is a
-predicate that either returns true or throws an exception.
-
-The following checks are performed:
-
-  - Arity check :: checks if the operation has the right
-       number  of arguments.
-
-  - Type check :: checks if the arguments have the correct
-       type. 
-
-  - Auth check :: checks if the session performing the
-       operation is authorized to do so.
-
-  - State check :: checks if the operation meets all the
-       constraints imposed by the state of the system
-       (referential integrity constraints, etc.)
- 
-
-** Structure of each operation class
-
-The class corresponding to each operation has five fields:
-
-  - arg_types :: a list of type predicates.  The length of
-       this list is the arity of the operation.  The arity
-       check is simply a comparison of the length of this
-       list with the length of the list of arguments.  Each
-       predicate in the =arg_types= list is applied to the
-       corresponding argument to check the type of that
-       argument.
-
-  - auth_check :: a function that checks if the  =args= (which
-       may include a session) together satisfy the
-       authorization conditions imposed by the operation. 
-
-  - state_check :: a function that checks =args= and checks
-       if the particular state invariant holds.
-
-  - action :: a function on args that (presumably) changes
-       the state of the system and also returns an answer.
-       An exception thrown by this function indicates a
-       serious failure in the application (e.g., out of
-       memory error). 
-
-* The =System= class
-
-** Constructor
-
-   The constructor ensures that the system ensures the presence of at least one
-   user with role =admin=.
-
-#+NAME: class_persistent_system
-#+begin_src python
-class System ():
-    
-    def __init__(self):
-        raise Error('Can not instantiate')
-
-    @staticmethod
-    def initialize_system(cls):
-        System.delegate = cls()
-        System.session_set = []
-
-    @staticmethod
-    def is_session_admin(session):
-        return session.get("role").get('name') == "admin"
-    
-    @staticmethod    
-    def is_session_OCC(session):
-        return session.get("role").get('name')== "OCC"
-
-    @staticmethod    
-    def is_session_NCC(session):
-        return session.get("role").get('name')== "NCC"
-    
-    @staticmethod    
-    def is_session_reviewer(session):
-        return session.get("role").get('name')== "reviewer"
-    
-    @staticmethod    
-    def is_session_guest(session):
-        return session.get("role").get('name')== "guest"
-
-    @staticmethod    
-    def is_session_noc(session):
-        return session.get("role").get('name')== "noc"
-
-#+end_src
-
-*** Test Constructor
-#+NAME: test_persistent_system_constructor
-#+BEGIN_SRC python
-class TestSystemConstructor(TestCase):
-    TESTING = True
-    def create_app(self):
-        app = create_app(config)
-        return app
-
-    def setUp(self):
-        db.create_all()
-        System.initialize_system(PersistenceDelegate)
-        self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-
-    def test_system_constructor(self):
-        print "test_system_constructor"
-        self.assertEqual(User.get_by_id(1).get("name").get("name"),
-                         Config.admin_name)
-        self.assertEqual(User.get_by_id(1).get("email").get("email"),
-                         "app-admin@vlabs.ac.in")
-        self.assertEqual(User.get_by_id(1).get('roles')[0].get('name'),
-                         "admin")
-
-    def test_is_session_admin(self):
-        print "test_is_session_admin"
-        admin_user=User.get_by_id(1)
-        session = Session(user=admin_user,role=Role.get_by_id(1))
-        System.session_set.append(session)
-        self.assertEqual(System.is_session_admin(session), True)
-
-    def test_is_session_OC(self):
-        print "test_is_session_OCC"
-        admin_user=User.get_by_id(1)
-        role = Role(name="OCC",centre_oc=None,centre_nc=None)
-        role.save()
-        role_occ = Role.get_by_id(5)
-        session = Session(user=admin_user,role=role_occ)
-        System.session_set.append(session)
-        self.assertEqual(System.is_session_OCC(session), True)
-
-    def test_is_session_reviewer(self):
-        print "test_is_session_reviewer"
-        admin_user = User.get_by_id(1)
-        reviewer_role = Role.get_by_id(3)
-        session = Session(user=admin_user,role=reviewer_role)
-        System.session_set.append(session)
-        self.assertEqual(System.is_session_reviewer(session), True)
-
-    def test_is_session_NCC(self):
-        print "test_is_session_NCC"
-        admin_user = User.get_by_id(1)
-        role = Role(name="NCC",centre_oc=None,centre_nc=None)
-        role.save()
-        role_ncc = Role.get_by_id(5)
-        session = Session(user=admin_user,role=role_ncc)
-        System.session_set.append(session)
-        self.assertEqual(System.is_session_NCC(session), True)
-
-    def test_is_session_guest(self):
-        print "test_is_session_guest"
-        admin_user = User.get_by_id(1)
-        session = Session(user=admin_user,role=Role.get_by_id(2))
-        System.session_set.append(session)
-        self.assertEqual(System.is_session_guest(session), True)
-
-    def test_is_session_noc(self):
-        print "test_is_session_noc"
-        admin_user= User.get_by_id(1)
-        session = Session(user=admin_user,role=Role.get_by_id(4))
-        System.session_set.append(session)
-        self.assertEqual(System.is_session_noc(session), True)
-
-#+END_SRC
-
-
-** Arity and Type check methods 
-
-   The =do= method is the main work-horse of =Controller=.  
-#+NAME: arity_type_checks
-#+BEGIN_SRC python
-   
-    @staticmethod
-    def arity_check(args, n):
-       if  (len(args) != n) :
-          raise ArityError("arity mismatch: size of args  does not " + 
-                           "match operation arity " )
-
-    @staticmethod
-    def type_check(args, arg_types):
-        for key, value in args.iteritems():
-            if not arg_types[key](value):
-                raise TypeError("type mismatch: argument  is not of " + 
-                                "type " )
-       
-   
-#+end_src
-
-*** Test Arity and Type Checks
-#+NAME: test_arity_and_types
-#+BEGIN_SRC python
-class TestSystemArityAndType(TestCase):
-    TESTING = True
-
-    def create_app(self):
-        app = create_app(config)
-        return app
-
-    def setUp(self):
-        db.create_all()
-        System.initialize_system(PersistenceDelegate)
-        self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-
-
-    def test_arity(self):
-        print "test_arity"
-        with self.assertRaises(ArityError):
-            System.arity_check([1,2], 3)
-
-    def test_type_checks(self):
-        print "test_type_checks"
-        args = {"name": Name(name="Jimi Hendrix"),
-                "email": Name(name="Jimi Hendrix")
-                }
-
-        arg_types = {"name": is_name,
-                     "email": is_email
-                     }
-
-        with self.assertRaises(TypeError):
-            System.type_check(args, arg_types)
-
-#+END_SRC
-
-
-** =do= method 
-#+NAME: do_function
-#+begin_src python
-    @staticmethod   
-    def do(op, **args):
-        cls = ops_table[op]
-        arg_types  = cls.arg_types
-        auth_check = cls.auth_check
-        state_check = cls.state_check
-        arity_and_type_checks_needed = cls.arity_and_type_checks_needed
-        try:
-            System.user_set = User.query.all()
-            System.active_user_set = User.query.filter_by(user_status='active')
-            System.role_set = Role.query.all()
-            System.institute_set = Institute.query.all()
-            System.oc_set = OC.query.all()
-            System.nc_set = NC.query.all()
-            if arity_and_type_checks_needed:
-               System.arity_check(args.keys(), len(arg_types.keys()))
-               System.type_check(args, arg_types)
-            auth_check(args)
-            state_check(args)
-            return cls.action(args)
-        except (ArityError, TypeError, AuthError, StateError) as err:
-            print str(err)
-  
-
-
-#+end_src
-
-* =AddUser=
-#+NAME: class_adduser
-#+begin_src python
-class AddUser():
-    arg_types = {"name":is_name,"email":is_email, "session":is_session}
-    arity_and_type_checks_needed = True 
-  
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        if not (System.is_session_admin(session) or System.is_session_OCC(session) or
-                System.is_session_noc(session)):
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        user_name = args["name"]
-        user_email = args["email"]
-        session = args["session"]
-        if not (session in System.session_set):
-            raise StateError("user not in session %s"
-                            % session.get("user").get("name").get("name"))
- 
-   
-    @staticmethod
-    def action(args):
-        user_name = args["name"]
-        user_email = args["email"]
-        session = args["session"]
-        rl = Role.query.filter_by(name='guest').first()
-        user = User(name=user_name , email=user_email , roles=[rl] ,
-                    user_status="active")
-        user.save()
-        System.user_set = User.query.all()
-        return user
-#+end_src
-*** Test AddUser
+* Test AddUser
 #+NAME: test_adduser
 #+BEGIN_SRC python
-
 class TestAddUser(TestCase):
     TESTING = True
+    persistent_delegate = None
     def create_app(self):
         app = create_app(config)
         return app
@@ -347,21 +25,25 @@ class TestAddUser(TestCase):
         self.persistent_delegate.initialize_user_set()
 
     def tearDown(self):
-        System.session_set = []
         db.session.remove()
         db.drop_all()
-    
+        self.persistent_delegate = None
+
     def test_add_user_by_admin(self):
         print "test_add_user_by_admin"
-        admin_user=User.get_by_id(1)
+        admin_user = User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-        name = Name(name="me")
-        name.save()
-        email = Email(email="abc@gmail.com")
-        email.save()
-        user = System.do("add_user",name=name,email=email,session=session)
-        
+        user_name = Name(name="me")
+        user_name.save()
+        user_email = Email(email="abc@gmail.com")
+        user_email.save()
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+
+        user = System.do("add_user", user=user, session=session)
+
         u=User.get_by_id(2)
         self.assertEqual(u.get("name").get("name"),"me")
 
@@ -370,15 +52,21 @@ class TestAddUser(TestCase):
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-        
+
         name = Name(name="nocuser")
         name.save()
         email = Email(email="abc@gmail.com")
         email.save()
-        noc_user=System.do("add_user", name=Name.get_by_id(2),
-                            email=Email.get_by_id(2), session=session)
 
-        session_noc = Session(user=noc_user,role=Role.noc)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
+                    user_status="active")
+
+        noc_user=System.do("add_user", user=user, session=session)
+
+        session_noc = Session(user=noc_user, role=Role.noc)
+
         System.session_set.append(session_noc)
 
         u=User.get_by_id(2)
@@ -423,50 +111,7 @@ class TestAddUser(TestCase):
         self.assertEqual(u.get("name").get("name"),"ocuser")
 
 #+END_SRC
-
-* =DeleteUser=
-#+NAME: class_deleteuser
-#+begin_src python
-class DeleteUser():
-    arg_types = {"user":is_user, "session":is_session}
-    arity_and_type_checks_needed = True   
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        user = args['user']
-        if System.is_session_admin(session):
-            return True 
-        elif System.is_session_OCC(session):
-            role = filter (lambda x: x.get('name') == "NCC" and
-                            x.get('centre_nc').get("hub") ==
-                            session.get("role").centre_oc, user.get('roles'))
-            if role:
-                return True
-        elif System.is_session_noc(session):
-            role = filter (lambda x: x.get('name') == "OCC", user.get('roles'))
-            if role:
-                return True
-
-        else:
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        user = args["user"]
-        session = args["session"]
-        for s in System.session_set:
-            if(s.get("user")==user):
-              raise StateError("cannot delete user, user is in session %s"
-                                 % s.get("user").get("name"))
-
-            
-    @staticmethod
-    def action(args):
-        user = args["user"]
-        user.set(user_status="inactive")
-        
-#+end_src
-** Test DeleteUser
+* Test DeleteUser
 #+NAME: test_adduser
 #+BEGIN_SRC python
 class TestDeleteUser(TestCase):
@@ -611,69 +256,6 @@ class TestDeleteUser(TestCase):
         self.assertEqual(oc_user.get("user_status"),"inactive")
 
 #+END_SRC
-* =UpdateUser=
-#+NAME: class_updateuser
-#+begin_src python
-class UpdateUser():
-    arg_types = {"name": is_name, "email": is_email, "user":is_user,
-                 "session":is_session}
-    arity_and_type_checks_needed = False
-
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        user = args['user']
-        if System.is_session_admin(session):
-            return True
-        if System.is_session_noc(session):
-            role = filter (lambda x: x.get("name") == "OCC", user.get('roles'))
-            if role:
-               return True            
-        elif System.is_session_OCC(session):
-            role = filter (lambda x: x.get("name") == "NCC" and
-                            x.get('centre_nc').get("hub") ==
-                            session.get("role").centre_oc, user.get('roles'))
-            if role:
-                return True
-        else:
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        user = args["user"]
-        session = args["session"]
-        for s in System.session_set:
-            if(s.get("user")==user):
-              raise StateError("cannot update user, user is in session %s"
-                                 % s.get("user").get("name"))
-
-        if not (session in System.session_set):
-            raise StateError("You are not in session set %s"
-                             % session.get("user").get("name"))
-        if not (user in System.user_set):
-            raise StateError("user %s not in System"
-                             % user.get("name").get("name"))
-
-    @staticmethod
-    def action(args):
-        user = args["user"]
-        session = args["session"]
-        
-        if not "name" in args:
-           name=user.get("name")
-        else:
-           name=args["name"]      
-
-        if not "email" in args:
-           email=user.get("email")
-        else:
-           email=args["email"]
-
-        user.set(name=name)
-        user.set(email=email)
-        
-        System.user_set = User.query.all()
-#+end_src
 *** Test UpdateUser
 #+NAME: test_adduser
 #+BEGIN_SRC python
@@ -830,54 +412,7 @@ class TestUpdateUser(TestCase):
 
 
 #+END_SRC
-* =AddRole=
-#+NAME: class_AddRole
-#+begin_src python
-class AddRole():
-    arg_types = {"user":is_user, "role":is_role,"session":is_session}
-    arity_and_type_checks_needed = True  
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        if not (System.is_session_admin(session) or 
-                System.is_session_OCC(session) or 
-                System.is_session_noc(session)):
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        session = args["session"]
-        user = args['user']
-        role = args['role']
-        if not (session in System.session_set):
-            raise StateError("user not in session %s"
-                              % session.get('user').get('name').get('name'))
-        if System.is_session_admin(session):
-            if role not in System.role_set:
-                raise StateError("Invalid Role")
-        if System.is_session_noc(session):
-            if role.get('name') != 'OCC':
-                raise StateError('AddRole %s not allowed' %role.get('name'))
-        if System.is_session_OCC(session):
-            if role.get('name') != 'NCC':
-                raise StateError("AddRole %s not allowed" %role.get('name'))
-            else:
-                if not (session.get('role').get('centre_oc') ==
-                        role.get('centre_nc').get('hub')):
-                    raise StateError("AddRole %s not allowed"
-                                        %role.get('name'))
-
-    @staticmethod
-    def action(args):
-        user = args["user"]
-        role = args['role']
-        user.append_role(role)
-
-        return user
-                
-
-#+end_src
-** Test AddRole
+* Test AddRole
 #+NAME: test_AddRole
 #+BEGIN_SRC python
 class TestAddRole(TestCase):
@@ -907,46 +442,7 @@ class TestAddRole(TestCase):
                    session=sess)
         self.assertEqual(len(User.get_by_id(1).get('roles')), 3)
 #+END_SRC
-* =login=
-#+NAME: class_login
-#+begin_src python
-class login():
-    arg_types = {"user":is_user, "role":is_role}
-    arity_and_type_checks_needed = True  
-    @staticmethod
-    def auth_check(args):
-        user = args['user']
-        role = args['role']
-        for sess in System.session_set:
-            if sess.get('user') == user and sess.get('role') == role:
-                raise AuthError("User already logged in with this role")
-        for rol in user.get('roles'):
-            if role.get('name') == rol.get('name'):
-                return
-        raise AuthError("User not Authorized to take this role")
-        
-    @staticmethod
-    def state_check(args):
-        user = args["user"]
-        role = args["role"]
-        if role not in System.role_set:
-            raise StateError("role %s not in System " % role.get('name'))
-        if (user not in System.user_set):
-            raise StateError("user %s not in System"
-                              % user.get('name').get('name'))
-
-    @staticmethod        
-    def action(args):
-        user = args["user"]
-        role = args["role"]
-        new_session = Session(user=user,role=role)
-        System.session_set.append(new_session)
-        return new_session
-
-
-
-#+end_src
-** Test login
+* Test login
 #+NAME: test_login
 #+BEGIN_SRC python
 class Testlogin(TestCase):
@@ -978,31 +474,7 @@ class Testlogin(TestCase):
 
 #+END_SRC
 
-* =logout=
-#+NAME: class_logout
-#+begin_src python
-class logout():
-    arg_types = {"session":is_session}
-    arity_and_type_checks_needed = True
-    @staticmethod
-    def auth_check(args):
-        return
-
-    @staticmethod
-    def state_check(args):
-        session = args["session"]
-        if not (session in System.session_set):
-            raise StateError("user not in session %s"
-                              % session.get('user').get('name').get('name'))
-
-    @staticmethod
-    def action(args):
-        session = args["session"] 
-        System.session_set.remove(session)
-        return True
-
-#+end_src
-** Test logout
+* Test logout
 #+NAME: test_logout
 #+BEGIN_SRC python
 class Testlogout(TestCase):
@@ -1032,42 +504,7 @@ class Testlogout(TestCase):
         System.do("logout",session=sess)
         self.assertEqual(System.session_set,[])
 #+END_SRC
-* =create institute=
-#+NAME: class_CreateInstitute
-#+begin_src python
-class CreateInstitute():
-    arg_types = {"name":is_alphabetic_str, "address":is_str,
-                 "session":is_session}
-    arity_and_type_checks_needed = True
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        if System.is_session_guest(session) or System.is_session_reviewer(session):
-            raise AuthError("Role not Authorized to perform this action")
-    
-    @staticmethod
-    def state_check(args):
-        session = args["session"]
-        name = args['name']
-        address = args['address']
-        if not (session in System.session_set):
-            raise StateError("user not in session %s"
-                              % session.get('user').get('name').get('name'))
-        for inst in System.institute_set:
-            if inst.get('name') == name and inst.get('address') == address:
-                raise StateError("institute %s already in System"
-                                  % institute.get('name'))
-
-    @staticmethod        
-    def action(args):
-        name = args["name"]
-        address = args["address"]
-        new_institute = Institute(name=name,address=address)
-        new_institute.save()
-
-        return new_institute
-#+end_src
-** Test create_institute
+* Test create_institute
 #+NAME: test_CreateInstitute
 #+BEGIN_SRC python
 class TestCreateInstitute(TestCase):
@@ -1099,50 +536,7 @@ class TestCreateInstitute(TestCase):
         self.assertEqual(Institute.get_by_id(1).get('name'),'IIIT')
 
 #+END_SRC
-* =create_oc=
-#+NAME: class_CreateOC
-#+begin_src python
-class CreateOC():
-    arg_types = {"institute":is_institute,"spokes":are_spokes,
-                  "session":is_session, "oc_target": is_octarget}
-    arity_and_type_checks_needed = True
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        institute = args['institute']
-        if not (System.is_session_admin(session) or
-                System.is_session_noc(session)):
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        session = args["session"]
-        institute = args['institute']
-        if not (session in System.session_set):
-            raise StateError("user not in session %s"
-                              % session.get('user').get('name').get('name'))
-        if institute not in System.institute_set:
-            raise StateError("institute %s not in System"
-                              % institute.get('name'))
-        for oc in System.oc_set:
-            if oc.get('institute') == institute:
-                raise StateError("institute %s already has an oc associated with it" %oc)
-        for nc in System.nc_set:
-            if nc.get('institute') == institute:
-                raise StateError("institute %s already has an nc associated with it" %nc)
-
-    @staticmethod        
-    def action(args):
-        institute = args["institute"]
-        spokes=args["spokes"]
-        oc_target = args['oc_target']
-        new_oc = OC(institute=institute,spokes=spokes, oc_target = oc_target)
-        new_oc.save()
-
-        return new_oc
-
-#+end_src
-** Test create_oc
+* Test create_oc
 #+NAME: test_CreateOC
 #+BEGIN_SRC python
 class TestCreateOC(TestCase):
@@ -1180,57 +574,7 @@ class TestCreateOC(TestCase):
 
 #+END_SRC
 
-* =create_nc=
-#+NAME: class_CreateNC
-#+begin_src python
-class CreateNC():
-    arg_types = {"institute":is_institute,"hub":is_oc,"session":is_session,
-                 "workshops":are_workshops, "nc_target":is_nctarget}
-    arity_and_type_checks_needed = True
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        institute = args['institute']
-        oc = args['hub']
-        if not (System.is_session_admin(session) or
-                System.is_session_OCC(session)):
-            raise AuthError("Role not Authorized to perform this action")
-        if System.is_session_OCC(session):
-            if oc != session.get('role').get('centre_oc'):
-                raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        session = args["session"]
-        institute = args['institute']
-        oc = args['hub']
-        if not (session in System.session_set):
-            raise StateError("user not in session %s"
-                             % session.get('user').get('name').get('name'))
-        if institute not in System.institute_set:
-            raise StateError("institute %s not in System"
-                             % institute.get('name'))
-        for nc in System.nc_set:
-            if nc.get('institute') == institute:
-                raise StateError("institute %s already has an nc associated with it" %nc)
-        for oc1 in System.oc_set:
-            if oc1.get('institute') == institute:
-                if oc != oc:
-                    raise StateError("institute %s already has an oc associated with it,the new nc's hub should be same" %oc1)
-                
-    @staticmethod        
-    def action(args):
-        institute = args["institute"]
-        oc = args['hub']
-        workshops = args['workshops']
-        nc_target = args['nc_target']
-        new_nc = NC(institute=institute,hub=oc, workshops = workshops,
-                    nc_target = nc_target)
-        new_nc.save()
-        oc.append_spoke(new_nc)
-        return new_nc
-#+end_src
-** Test CreateNC
+* Test CreateNC
 #+NAME: test_CreateNC
 #+BEGIN_SRC python
 class TestCreateNC(TestCase):
@@ -1268,47 +612,7 @@ class TestCreateNC(TestCase):
         self.assertEqual(NC.get_by_id(1).get('institute'),institute)
         self.assertEqual(OC.get_by_id(1).get('spokes')[0],nc)
 #+END_SRC
-* =update institute=
-#+NAME: class_UpdateInstitute
-#+begin_src python
-class UpdateInstitute():
-    arg_types = {"name":is_alphabetic_str, "address":is_str,
-                 "institute":is_institute,"session":is_session}
-    arity_and_type_checks_needed = False
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        if System.is_session_guest(session) or System.is_session_reviewer(session):
-            raise AuthError("Role not Authorized to perform this action")
-    
-    @staticmethod
-    def state_check(args):
-        session = args["session"]
-        institute = args["institute"]
-            
-        if not (session in System.session_set):
-            raise StateError("user not in session %s"
-                              % session.get('user').get('name').get('name'))
-
-    @staticmethod        
-    def action(args):
-        institute = args["institute"]
-
-        if not "name" in args:
-            name = institute.get("name")
-        else:
-            name = args['name']
-        if not "address" in args:
-            address = institute.get("address")
-        else:
-            address = args["address"]
-
-        institute.set(name=name)
-        institute.set(address=address)
-
-        
-#+end_src
-** Test update_institute
+* Test update_institute
 #+NAME: test_UpdateInstitute
 #+BEGIN_SRC python
 class TestUpdateInstitute(TestCase):
@@ -1346,74 +650,7 @@ class TestUpdateInstitute(TestCase):
 
 #+END_SRC
 
-* =create_workshop=
-#+NAME: class_CreateWorkshop
-#+begin_src python
-class CreateWorkshop():
-    arg_types = {"institute":is_institute, "name" : is_name ,
-                  "session":is_session, "ws_target" : is_wstarget,
-                  "artefacts": are_artefacts, "status" : is_status,
-                  "nc" : is_nc}
-    arity_and_type_checks_needed = True
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        institute = args['institute']
-        name = args['name']
-        ws_target = args['ws_target']
-        artefacts = args["artefacts"]
-        status = args["status"]
-        nc = args["nc"]
-        if not (System.is_session_NCC(session)):
-            raise AuthError("Role not Authorized to perform this action")
-        if System.is_session_NCC(session):
-            if nc != session.get('role').get('centre_nc'):
-                raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        session = args["session"]
-        institute = args['institute']
-        name = args['name']
-        ws_target = args['ws_target']
-        artefacts = args["artefacts"]
-        status = args["status"]
-        nc = args["nc"]
-        if not (session in System.session_set):
-            raise StateError("user not in session %s"
-                             % session.get('user').get('name').get('name'))
-        if institute not in System.institute_set:
-            raise StateError("institute %s not in System"
-                             % institute.get('name'))
-        if nc not in System.nc_set:
-            raise StateError("nc %s not in System" % nc.get('name'))
-        
-    @staticmethod        
-    def action(args):
-        session = args["session"]
-        institute = args['institute']
-        name = args['name']
-        ws_target = args['ws_target']
-        artefacts = args["artefacts"]
-        status = args["status"]
-        nc = args['nc']
-        new_workshop = Workshop(institute = institute, 
-                                name = name, 
-                                ws_target = ws_target, 
-                                artefacts = artefacts, 
-                                status = status, 
-                                nc = nc, 
-                                a_date = None,
-                                a_participants = 0,
-                                a_experiments = 0,
-                                a_usage = 0)
-        new_workshop.save()
-        nc.add_workshop_to_nc(new_workshop)        
-        
-        return new_workshop
-
-#+end_src
-** Test CreateWorkshop
+* Test CreateWorkshop
 #+NAME: test_CreateWorkshop
 #+BEGIN_SRC python
 class TestCreateWorkshop(TestCase):
@@ -1499,42 +736,7 @@ class TestCreateWorkshop(TestCase):
         self.assertEqual(nc.get('workshops')[0],new_workshop)
 #+END_SRC
 
-* =cancel_workshop=
-#+NAME: class_CancelWorkshop
-#+begin_src python
-class CancelWorkshop():
-    arg_types = {"workshop":is_workshop, "session":is_session}
-    arity_and_type_checks_needed = True   
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        workshop = args['workshop']
-        
-        
-        if System.is_session_NCC(session):
-            role = session.get('role')
-            nc_centre = role.get('centre_nc')
-            if workshop in nc_centre.get('workshops'):
-                return True
-            
-        else:
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        workshop = args["workshop"]
-        session = args["session"]
-        workshop_status = workshop.get("status")
-        if not Status.is_pending(workshop_status):
-            raise StateError("cannot cancel workshop")
-        
-                    
-    @staticmethod
-    def action(args):
-        workshop = args["workshop"]
-        workshop.set(status = Status.cancelled)        
-#+end_src
-** Test CancelWorkshop
+* Test CancelWorkshop
 #+NAME: test_CancelWorkshop
 #+BEGIN_SRC python
 class TestCancelWorkshop(TestCase):
@@ -1624,47 +826,7 @@ class TestCancelWorkshop(TestCase):
         
     #+END_SRC
 
-* =reschedule_workshop=
-#+NAME: class_RescheduleWorkshop
-#+begin_src python
-class RescheduleWorkshop():
-    arg_types = {"workshop":is_workshop, "session":is_session,
-                 "wstarget" : is_wst}
-    arity_and_type_checks_needed = True   
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        workshop = args['workshop']
-        wstarget = args['wstarget']
-        
-        if System.is_session_NCC(session):
-            role = session.get('role')
-            nc_centre = role.get('centre_nc')
-            if workshop in nc_centre.get('workshops'):
-                return True
-            
-        else:
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        workshop = args["workshop"]
-        session = args["session"]
-        wstarget = args['wstarget']
-        workshop_status = workshop.get("status")
-        if Status.is_cancelled == workshop_status:
-            raise StateError("cannot reschedule workshop")
-        
-                    
-    @staticmethod
-    def action(args):
-        workshop = args["workshop"]
-        wstarget = args['wstarget']
-        workshop.set(status = Status.pending)
-        workshop.set(ws_target = wstarget)
-        
-#+end_src
-** Test RescheduleWorkshop
+* Test RescheduleWorkshop
 #+NAME: test_RescheduleWorkshop
 #+BEGIN_SRC python
 class TestRescheduleWorkshop(TestCase):
@@ -1766,44 +928,7 @@ class TestRescheduleWorkshop(TestCase):
         
     #+END_SRC
 
-* =conduct_workshop=
-#+NAME: class_ConductWorkshop
-#+begin_src python
-class ConductWorkshop():
-    arg_types = {"workshop":is_workshop, "session":is_session}
-    arity_and_type_checks_needed = True   
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        workshop = args['workshop']
-        
-        
-        if System.is_session_NCC(session):
-            role = session.get('role')
-            nc_centre = role.get('centre_nc')
-            if workshop in nc_centre.get('workshops'):
-                return True
-            
-        else:
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        workshop = args["workshop"]
-        session = args["session"]
-        workshop_status = workshop.get("status")
-        if not Status.is_pending(workshop_status):
-            raise StateError("cannot conduct workshop")
-        
-                    
-    @staticmethod
-    def action(args):
-        workshop = args["workshop"]
-        workshop.set(status = Status.completed)
-        
-        
-#+end_src
-** Test ConductWorkshop
+* Test ConductWorkshop
 #+NAME: test_ConductWorkshop
 #+BEGIN_SRC python
 class TestConductWorkshop(TestCase):
@@ -1892,53 +1017,7 @@ class TestConductWorkshop(TestCase):
 
  #+END_SRC
 
-* =upload_artefact=
-#+NAME: class_UploadArtefact
-#+begin_src python
-class UploadArtefact():
-    arg_types = {"workshop":is_workshop, "session":is_session,
-                 "artefact" : is_artefact}
-    arity_and_type_checks_needed = True   
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        workshop = args['workshop']
-        artefact = args['artefact']
-        
-        if System.is_session_NCC(session):
-            role = session.get('role')
-            nc_centre = role.get('centre_nc')
-            if workshop in nc_centre.get('workshops'):
-                return True
-            
-        else:
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        workshop = args["workshop"]
-        session = args["session"]
-        workshop_status = workshop.get("status")
-        if (Status.is_completed == workshop_status or
-            Status.is_pending_approval == workshop_status or
-            Status.is_rejected == workshop_status or
-            Status.is_approved == workshop_status):
-            raise StateError("cannot upload artefact")
-
-    @staticmethod
-    def action(args):
-        workshop = args["workshop"]
-        new_artefact = args['artefact']
-
-        artefacts = workshop.get("artefacts")
-        artefacts.append(new_artefact)
-        workshop.set(artefacts = artefacts)
-        
-        workshop.set(status = Status.pending_approval)
-        
-        
-#+end_src
-** Test UploadArtefact
+* Test UploadArtefact
 #+NAME: test_UploadArtefact
 #+BEGIN_SRC python
 class TestUploadArtefact(TestCase):
@@ -2035,44 +1114,7 @@ class TestUploadArtefact(TestCase):
 
     #+END_SRC
 
-* =approve_workshop=
-#+NAME: class_ApproveWorkshop
-#+begin_src python
-class ApproveWorkshop():
-    arg_types = {"workshop":is_workshop, "session":is_session}
-    arity_and_type_checks_needed = True   
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        workshop = args['workshop']
-        role = session.get('role')
-        oc_centre = role.get('centre_oc')
-        
-        spokes  = oc_centre.get("spokes")
-        if System.is_session_OCC(session):
-            for nc in spokes:
-                if workshop in nc.get("workshops"):
-                    return True
-        else:
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        workshop = args["workshop"]
-        session = args["session"]
-        workshop_status = workshop.get("status")
-        if Status.is_pending_approval == workshop_status:
-            raise StateError("cannot approve workshop")
-        
-                    
-    @staticmethod
-    def action(args):
-        workshop = args["workshop"]
-        workshop.set(status = Status.approved)
-        
-        
-#+end_src
-** Test ApproveWorkshop
+* Test ApproveWorkshop
 #+NAME: test_ApproveWorkshop
 #+BEGIN_SRC python
 class TestApproveWorkshop(TestCase):
@@ -2189,44 +1231,7 @@ class TestApproveWorkshop(TestCase):
 
     #+END_SRC
 
-* =reject_workshop=
-#+NAME: class_RejectWorkshop
-#+begin_src python
-class RejectWorkshop():
-    arg_types = {"workshop":is_workshop, "session":is_session}
-    arity_and_type_checks_needed = True   
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        workshop = args['workshop']
-        role = session.get('role')
-        oc_centre = role.get('centre_oc')
-        
-        spokes  = oc_centre.get("spokes")
-        if System.is_session_OCC(session):
-            for nc in spokes:
-                if workshop in nc.get("workshops"):
-                    return True
-        else:
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        workshop = args["workshop"]
-        session = args["session"]
-        workshop_status = workshop.get("status")
-        if Status.is_pending_approval == workshop_status:
-            raise StateError("cannot reject workshop")
-        
-                    
-    @staticmethod
-    def action(args):
-        workshop = args["workshop"]
-        workshop.set(status = Status.rejected)
-        
-        
-#+end_src
-** Test RejectWorkshop
+* Test RejectWorkshop
 #+NAME: test_RejectWorkshop
 #+BEGIN_SRC python
 class TestRejectWorkshop(TestCase):
@@ -2344,57 +1349,7 @@ class TestRejectWorkshop(TestCase):
         
 
     #+END_SRC
-* =delete_artefact=
-#+NAME: class_DeleteArtefact
-#+begin_src python
-class DeleteArtefact():
-    arg_types = {"workshop":is_workshop, "session":is_session,
-                 "artefact" : is_artefact}
-    arity_and_type_checks_needed = True   
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        workshop = args['workshop']
-        artefact = args['artefact']
-        
-        if System.is_session_NCC(session):
-            role = session.get('role')
-            nc_centre = role.get('centre_nc')
-            if workshop in nc_centre.get('workshops'):
-                return True
-            
-        else:
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        workshop = args["workshop"]
-        session = args["session"]
-        workshop_status = workshop.get("status")
-        if (Status.is_completed == workshop_status or
-            Status.is_pending_approval == workshop_status or
-            Status.is_rejected == workshop_status or
-            Status.is_approved == workshop_status):
-            raise StateError("cannot upload artefact")
-        
-                    
-    @staticmethod
-    def action(args):
-        workshop = args["workshop"]
-        artefact = args['artefact']
-
-        artefact_set = workshop.get("artefacts")
-        
-        new_set = filter(lambda art: not art.get("name") ==
-                         artefact.get("name"), artefact_set)
-
-        workshop.set(artefacts = new_set)
-        
-        workshop.set(status = Status.pending_approval)
-        
-        
-#+end_src
-** Test DeleteArtefact
+* Test DeleteArtefact
 #+NAME: test_DeleteArtefact
 #+BEGIN_SRC python
 class TestDeleteArtefact(TestCase):
@@ -2525,23 +1480,12 @@ ops_table = {'add_user' : AddUser,
 
 * Infra                                                         :boilerplate:
 
-** sources
-*** Imports 
-#+name: imports_for_sources
-#+BEGIN_SRC python
-# -*- coding: utf-8 -*-
-from runtime.persistence.entities import *
-from runtime.config.config import Config
-from runtime.exceptions.custom_exceptions import *
-from runtime.utils.class_persistence_template import *
-from runtime.system.persistent_delegates import *
-#+end_src
-
-
 ** Tests
 *** Imports 
 #+name: imports_for_tests
 #+BEGIN_SRC python
+# -*- coding: utf-8 -*-
+
 # -*- coding: utf-8 -*-
 import unittest
 from flask_testing import TestCase
@@ -2549,12 +1493,14 @@ from runtime.utils.class_persistence_template import *
 from runtime.rest.app import create_app
 from sqlalchemy.exc import IntegrityError
 from runtime.persistence.entities import *
+from runtime.system.persistent_delegates import *
 
-from persistent_system import *
+from runtime.system.system import *
 
 config = {
          'SQLALCHEMY_DATABASE_URI': ''
          }
+
 #+end_src
 
 *** Running tests
@@ -2566,33 +1512,6 @@ if __name__ == '__main__':
 #+END_SRC
 
 * Tangling                                                      :boilerplate:
-
-** sources
-#+BEGIN_SRC python :tangle persistent_system.py :eval no :noweb yes
-<<imports_for_sources>>
-<<class_persistent_system>>
-<<do_function>>
-<<arity_type_checks>>
-<<class_adduser>>
-<<class_login>>
-<<class_logout>>
-<<class_updateuser>>
-<<class_deleteuser>>
-<<class_CreateInstitute>>
-<<class_CreateOC>>
-<<class_AddRole>>
-<<class_CreateNC>>
-<<class_UpdateInstitute>>
-<<class_CreateWorkshop>>
-<<class_CancelWorkshop>>
-<<class_RescheduleWorkshop>>
-<<class_ConductWorkshop>>
-<<class_UploadArtefact>>
-<<class_ApproveWorkshop>>
-<<class_RejectWorkshop>>
-<<class_DeleteArtefact>>
-<<ops_table>>
-#+end_src
 
 
 ** tests
