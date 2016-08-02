@@ -89,9 +89,8 @@ class TestAddUser(TestCase):
 
         session_noc = Session(user=noc_user,role=Role.get_by_id(4))
         System.session_set.append(session_noc)
-
-        institute = System.do("create_institute",name="IIT",
-                               address="Delhi",session=session)
+        inst = Institute(name = "NITK", address = "Surathkal")
+        institute = System.do("create_institute", institute = inst, session=session)
         oc = System.do("create_oc", institute = institute, session = session,
                         spokes = [], oc_target = None)
 
@@ -163,9 +162,8 @@ class TestDeleteUser(TestCase):
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-
-        institute = System.do("create_institute",name="IIT",address="Delhi",
-                               session=session)
+        inst = Institute(name="IIT",address="Delhi")
+        institute = System.do("create_institute", institute = inst, session=session)
         oc = System.do("create_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
         institute.save()
@@ -224,9 +222,8 @@ class TestDeleteUser(TestCase):
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-
-        institute = System.do("create_institute",name="IIT",address="Delhi",
-                               session=session)
+        inst = Institute(name="IIT",address="Delhi")
+        institute = System.do("create_institute", institute = inst, session=session)
         oc = System.do("create_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
         institute.save()
@@ -315,9 +312,8 @@ class TestUpdateUser(TestCase):
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-
-        institute = System.do("create_institute", name="IIT",
-                               address="Madras", session=session)
+        inst = Institute(name="IIT",address="Madras")
+        institute = System.do("create_institute", institute = inst, session=session)
         oc = System.do("create_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
         oc.save() 
@@ -382,9 +378,8 @@ class TestUpdateUser(TestCase):
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-
-        institute = System.do("create_institute",name="IIT",address="Madras",
-                               session=session)
+        inst = Institute(name="IIT",address="Madras")
+        institute = System.do("create_institute", institute = inst, session=session)
         oc = System.do("create_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
         institute.save()
@@ -551,8 +546,8 @@ class TestCreateInstitute(TestCase):
         login_user= User.get_by_id(1)
         login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
-        institute = System.do("create_institute",name="IIIT",
-                               address="Hyderabad",session=sess)
+        inst = Institute(name="IIIT",address="Hyderabad")
+        institute = System.do("create_institute",institute = inst, session=sess)
         institute.save()
         self.assertEqual(Institute.get_by_id(1).get('name'),'IIIT')
 
@@ -584,8 +579,8 @@ class TestCreateOC(TestCase):
         login_user=User.get_by_id(1)
         login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
-        institute = System.do("create_institute",name="IIIT",
-                               address="Hyderabad",session=sess)
+        inst = Institue(name="IIIT",address="Hyderabad")
+        institute = System.do("create_institute",institute = inst,session=sess)
         oc = System.do("create_oc",institute=institute,spokes=[],
                         session=sess, oc_target = None)
         institute.save()
@@ -621,8 +616,8 @@ class TestCreateNC(TestCase):
         login_user= User.get_by_id(1)
         login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
-        institute = System.do("create_institute",name="IIIT",
-                               address="Hyderabad",session=sess)
+        inst = Institue(name="IIIT",address="Hyderabad")
+        institute = System.do("create_institute", institute = inst, session=sess)
         oc = System.do("create_oc",institute=institute,spokes=[],
                         session=sess, oc_target = None)
         nc = System.do("create_nc",institute=institute,hub=oc,session=sess,
@@ -661,9 +656,8 @@ class TestUpdateInstitute(TestCase):
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-        
-        institute = System.do("create_institute",name="IIIT",
-                               address="Hyderabad",session=session)
+        inst = Institue(name="IIIT",address="Hyderabad")
+        institute = System.do("create_institute", institute = inst, session=session)
         institute.save()
         System.do("update_institute",name="NITK",
                    institute=institute,session=session)
@@ -698,12 +692,11 @@ class TestCreateWorkshop(TestCase):
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
-
-        institute = System.do("create_institute",name="IIIT",
-                               address="Hyderabad",session=sess)
+        inst = Institue(name="IIIT",address="Hyderabad")
+        institute = System.do("create_institute",institute = inst, session=sess)
         institute.save()
-        workshop_institute = System.do("create_institute", name = "NITK",
-                                        address = "Surathkal", session = sess)
+        inst = Institue(name="NITK",address="Surathkal")
+        workshop_institute = System.do("create_institute", institute = inst, session = sess)
         workshop_institute.save() 
         
         oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
@@ -785,13 +778,11 @@ class TestCancelWorkshop(TestCase):
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-
-        institute = System.do("create_institute",name="IIIT",
-                               address="Hyderabad",session=session)
+        inst = Institue(name="IIIT",address="Hyderabad")
+        institute = System.do("create_institute", institute = inst,session=session)
         institute.save()
-        workshop_institute = System.do("create_institute", name = "NITK",
-                                        address = "Surathkal",
-                                        session = session)
+        inst = Institue(name="NITK",address="Surathkal")
+        workshop_institute = System.do("create_institute", institute = inst, session = session)
         workshop_institute.save() 
 
         oc = System.do("create_oc", institute=institute,spokes=[],
@@ -875,13 +866,11 @@ class TestRescheduleWorkshop(TestCase):
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-
-        institute = System.do("create_institute",name="IIIT",
-                              address="Hyderabad",session=session)
+        inst = Institue(name="IIIT",address="Hyderabad")
+        institute = System.do("create_institute",institute = inst,session=session)
         institute.save()
-        workshop_institute = System.do("create_institute", name = "NITK",
-                                        address = "Surathkal",
-                                        session = session)
+        inst = Institue(name="NITK",address="Surathkal")
+        workshop_institute = System.do("create_institute", institute = inst, session = session)
         workshop_institute.save()
 
         oc = System.do("create_oc",institute=institute,spokes=[],
@@ -978,13 +967,11 @@ class TestConductWorkshop(TestCase):
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-
-        institute = System.do("create_institute",name="IIIT",
-                               address="Hyderabad",session=session)
+        inst = Institue(name="IIIT",address="Hyderabad")
+        institute = System.do("create_institute",institute = inst,session=session)
         institute.save() 
-        workshop_institute = System.do("create_institute", name = "NITK",
-                                        address = "Surathkal",
-                                        session = session)
+        inst = Institue(name="NITK",address="Surathkal")
+        workshop_institute = System.do("create_institute", institute = inst, session = session)
         workshop_institute.save()
 
         oc = System.do("create_oc",institute=institute,spokes=[],
@@ -1068,13 +1055,11 @@ class TestUploadArtefact(TestCase):
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-
-        institute = System.do("create_institute",name="IIIT",
-                              address="Hyderabad",session=session)
+        inst = Institue(name="IIIT",address="Hyderabad")
+        institute = System.do("create_institute", institute = inst, session=session)
         institute.save()
-        workshop_institute = System.do("create_institute", name = "NITK",
-                                        address = "Surathkal",
-                                        session = session)
+        inst = Institue(name="NITK",address="Surathkal")
+        workshop_institute = System.do("create_institute", institute = inst, session = session)
         institute.save()
         oc = System.do("create_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
@@ -1166,13 +1151,11 @@ class TestApproveWorkshop(TestCase):
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-
-        institute = System.do("create_institute",name="IIIT",
-                               address="Hyderabad",session=session)
+        inst = Institute(name = "IIIT", address = "Hyderabad")
+        institute = System.do("create_institute", institute = inst, session=session)
         institute.save() 
-        workshop_institute = System.do("create_institute",
-                                        name = "NITK", address = "Surathkal",
-                                        session = session)
+        inst = Institute(name = "NITK", address = "Surathkal")
+        workshop_institute = System.do("create_institute", institute = inst, session = session)
         workshop_institute.save()
 
         oc = System.do("create_oc",institute=institute,spokes=[],
@@ -1286,13 +1269,11 @@ class TestRejectWorkshop(TestCase):
         admin_user= User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-
-        institute = System.do("create_institute",name="IIIT",
-                              address="Hyderabad",session=session)
+        inst = Institute(name = "IIIT", address = "Hyderabad")
+        institute = System.do("create_institute",name="IIIT", institute = inst, session=session)
         institute.save()
-        workshop_institute = System.do("create_institute", name = "NITK",
-                                        address = "Surathkal",
-                                        session = session)
+        inst = Institute(name = "NITK", address = "Surathkal")
+        workshop_institute = System.do("create_institute", institute=inst, session = session)
         workshop_institute.save()
         oc = System.do("create_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
@@ -1405,13 +1386,11 @@ class TestDeleteArtefact(TestCase):
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-
-        institute = System.do("create_institute",name="IIIT",
-                              address="Hyderabad",session=session)
+        inst = Institute(name = "IIIT", address = "Hyderabad")
+        institute = System.do("create_institute",institution = inst, session=session)
         institute.save() 
-        workshop_institute = System.do("create_institute", name = "NITK",
-                                        address = "Surathkal",
-                                        session = session)
+        inst = Institute(name = "NITK", address = "Surathkal")
+        workshop_institute = System.do("create_institute", institute = inst, session = session)
         workshop_institute.save()
     
         oc = System.do("create_oc",institute=institute,spokes=[],
