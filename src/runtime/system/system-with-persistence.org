@@ -82,8 +82,10 @@ class TestAddUser(TestCase):
         name.save()
         email = Email(email="abc@gmail.com")
         email.save()
-        noc_user= System.do("add_user", name=Name.get_by_id(2),
-                            email=Email.get_by_id(2), session=session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        noc_user= System.do("add_user", user=user, session=session)
 
         session_noc = Session(user=noc_user,role=Role.get_by_id(4))
         System.session_set.append(session_noc)
@@ -97,8 +99,10 @@ class TestAddUser(TestCase):
         name.save()
         email = Email(email="mary@gmail.com")
         email.save()
-        oc_user= System.do("add_user", name=Name.get_by_id(3),
-                            email=Email.get_by_id(3), session=session_noc)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        oc_user= System.do("add_user", user=user, session=session_noc)
 
 
         oc_role = filter(lambda x:x.get('name') == "OCC" and
@@ -143,9 +147,10 @@ class TestDeleteUser(TestCase):
         email = Email(email="abc@gmail.com")
         name.save()
         email.save()
-        other_admin_user = System.do("add_user", name = Name.get_by_id(2),
-                                     email = Email.get_by_id(2),
-                                     session = session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        other_admin_user = System.do("add_user", user = user, session = session)
         System.do("add_role", user = other_admin_user,
                     role = Role.get_by_id(1),
                     session = session)
@@ -173,8 +178,10 @@ class TestDeleteUser(TestCase):
         email = Email(email="mary@gmail.com")
         name.save()
         email.save()
-        oc_user= System.do("add_user", name=Name.get_by_id(2),
-                            email=Email.get_by_id(2), session=session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        oc_user= System.do("add_user", user = user, session=session)
         oc_user.save()
 
         oc_role = filter(lambda x:x.get('name') == "OCC" and
@@ -195,9 +202,10 @@ class TestDeleteUser(TestCase):
         nc = System.do("create_nc",institute=institute,hub=oc,session=session,
                         workshops = [], nc_target = None)
         nc.save()
-
-        nc_user= System.do("add_user", name=Name.get_by_id(3),
-                            email=Email.get_by_id(3), session=session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        nc_user= System.do("add_user", user = user, session=session)
         nc_user.save()
         nc_role = filter(lambda x:x.get("name") == "NCC" and
                          x.get("centre_nc").get("institute").get("name") ==
@@ -227,8 +235,10 @@ class TestDeleteUser(TestCase):
         email = Email(email="mary@gmail.com")
         name.save()
         email.save()
-        oc_user= System.do("add_user", name=Name.get_by_id(2),
-                            email=Email.get_by_id(2), session=session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        oc_user= System.do("add_user", user = user, session=session)
         oc_user.save()
 
 
@@ -242,8 +252,10 @@ class TestDeleteUser(TestCase):
         name1.save()
         email1 = Email(email="xyz@gmail.com")
         email1.save()
-        noc_user=System.do("add_user", name=Name.get_by_id(3),
-                            email=Email.get_by_id(3), session=session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        noc_user=System.do("add_user", user = user, session=session)
 
         noc_user.append_role(Role.noc)
 
@@ -287,7 +299,10 @@ class TestUpdateUser(TestCase):
         email= Email(email="abc@gmail.com")
         name.save()
         email.save()
-        other_user=System.do("add_user", name=name,email=email, session=session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        other_user=System.do("add_user", user = user, session=session)
         other_user.save()
         name3 = Name(name="john")
         name3.save()
@@ -315,9 +330,10 @@ class TestUpdateUser(TestCase):
         email = Email(email="useroc@gmail.com")
         name.save()
         email.save()
-
-        oc_user=System.do("add_user", name=Name.get_by_id(2),
-                           email=Email.get_by_id(2), session=session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        oc_user=System.do("add_user", user = user, session=session)
         oc_user.save()
 
         oc_role = filter(lambda x:x.get('name') == "OCC" and
@@ -340,8 +356,10 @@ class TestUpdateUser(TestCase):
         email1 = Email(email="usernc@gmail.com")
         name1.save()
         email1.save()
-        nc_user= System.do("add_user", name=Name.get_by_id(3),
-                            email=Email.get_by_id(3), session=session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        nc_user= System.do("add_user", user=user, session=session)
         nc_user.save()
 
         nc_role = filter(lambda x:x.get('name') == "NCC" and
@@ -376,8 +394,10 @@ class TestUpdateUser(TestCase):
         name.save()
         email = Email(email="useroc@gmail.com")
         email.save()
-        oc_user= System.do("add_user", name=Name.get_by_id(2),
-                            email=Email.get_by_id(2), session=session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        oc_user= System.do("add_user", user = user, session=session)
         oc_user.save()
 
         oc_role = filter(lambda x:x.get('name') == "OCC" and
@@ -390,9 +410,10 @@ class TestUpdateUser(TestCase):
         name1.save()
         email1= Email(email="usernoc@gmail.com")
         email1.save()
-
-        noc_user=System.do("add_user", name=Name.get_by_id(3),
-                            email=Email.get_by_id(3), session=session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        noc_user=System.do("add_user", user=user, session=session)
         noc_user.save()
 
         System.do("add_role",user=noc_user,role=Role.get_by_id(4),
@@ -714,10 +735,11 @@ class TestCreateWorkshop(TestCase):
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
-                
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
 
-        nc_user = System.do("add_user",name = name, email = email,
-                             session = sess)
+        nc_user = System.do("add_user", user=user, session = sess)
         System.do("add_role", user = nc_user, role = ncc_role, session = sess)
         nc_session = Session(user = nc_user, role = ncc_role)
         System.session_set.append(nc_session)
@@ -801,9 +823,10 @@ class TestCancelWorkshop(TestCase):
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
-                
-        nc_user = System.do("add_user",name = name, email = email,
-                             session = session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        nc_user = System.do("add_user",user = user, session = session)
         System.do("add_role", user = nc_user, role = ncc_role,
                    session = session)
         nc_session = Session(user = nc_user, role = ncc_role)
@@ -891,9 +914,10 @@ class TestRescheduleWorkshop(TestCase):
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
-
-        nc_user = System.do("add_user",name = name, email = email,
-                             session = session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        nc_user = System.do("add_user",user = user, session = session)
         System.do("add_role", user = nc_user, role = ncc_role,
                    session = session)
         nc_session = Session(user = nc_user, role = ncc_role)
@@ -991,9 +1015,10 @@ class TestConductWorkshop(TestCase):
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
-
-        nc_user = System.do("add_user",name = name, email = email,
-                             session = session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        nc_user = System.do("add_user",user = user, session = session)
         System.do("add_role", user = nc_user, role = ncc_role,
                    session = session)
         nc_session = Session(user = nc_user, role = ncc_role)
@@ -1079,9 +1104,10 @@ class TestUploadArtefact(TestCase):
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
-
-        nc_user = System.do("add_user",name = name, email = email,
-                             session = session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        nc_user = System.do("add_user",user = user, session = session)
         System.do("add_role", user = nc_user, role = ncc_role,
                    session = session)
         nc_session = Session(user = nc_user, role = ncc_role)
@@ -1178,9 +1204,10 @@ class TestApproveWorkshop(TestCase):
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
-
-        nc_user = System.do("add_user",name = name, email = email,
-                             session = session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        nc_user = System.do("add_user",user = user, session = session)
         System.do("add_role", user = nc_user, role = ncc_role,
                    session = session)
         nc_session = Session(user = nc_user, role = ncc_role)
@@ -1194,9 +1221,10 @@ class TestApproveWorkshop(TestCase):
      
         email1=Email(email="ocuser@gmail.com")
         email1.save()
-
-        oc_user = System.do("add_user",name = name1, email = email1,
-                             session = session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        oc_user = System.do("add_user",user = user, session = session)
         System.do("add_role", user = oc_user, role = occ_role,
                    session = session)
         oc_session = Session(user = nc_user, role = occ_role)
@@ -1296,9 +1324,10 @@ class TestRejectWorkshop(TestCase):
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
-
-        nc_user = System.do("add_user",name = name, email = email,
-                             session = session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        nc_user = System.do("add_user",user = user, session = session)
         System.do("add_role", user = nc_user, role = ncc_role,
                    session = session)
         nc_session = Session(user = nc_user, role = ncc_role)
@@ -1309,9 +1338,10 @@ class TestRejectWorkshop(TestCase):
      
         email1=Email(email="ocuser@gmail.com")
         email1.save()
-
-        oc_user = System.do("add_user",name = name1, email = email1,
-                             session = session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        oc_user = System.do("add_user", user=user, session = session)
         System.do("add_role", user = oc_user, role = occ_role,
                    session = session)
         oc_session = Session(user = nc_user, role = occ_role)
@@ -1400,9 +1430,10 @@ class TestDeleteArtefact(TestCase):
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
-
-        nc_user = System.do("add_user",name = name, email = email,
-                             session = session)
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+        nc_user = System.do("add_user",user = user, session = session)
         System.do("add_role", user = nc_user, role = ncc_role,
                    session = session)
         nc_session = Session(user = nc_user, role = ncc_role)
