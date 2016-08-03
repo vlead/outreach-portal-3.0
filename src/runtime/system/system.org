@@ -718,12 +718,9 @@ class CreateNC():
         oc = args['hub']
         nc_target = args['nc_target']
         workshops = args["workshops"]
-        new_nc = NC(institute=institute,hub=oc, nc_target = nc_target,
-                    workshops = workshops)
-        System.delegate.add_nc(new_nc)
-        oc.append_spoke(new_nc)
-        new_role = Role(name="NCC",centre_oc=None,centre_nc=new_nc)
-        System.delegate.add_role(new_role)
+        new_nc = System.delegate.add_nc(institute, oc, nc_target, workshops)
+        new_role = System.delegate.add_ncc_role("NCC", None, new_nc)
+#        oc.append_spoke(new_nc)
         return new_nc
 
 #+end_src

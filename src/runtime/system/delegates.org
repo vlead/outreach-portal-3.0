@@ -1034,7 +1034,29 @@ class TestPersistentDelegate(TestCase):
 **** Tests
 #+NAME: test_persistent_add_occ_role
 #+BEGIN_SRC python
-    def test_add_role(self):
+    def test_add_occ_role(self):
+         print "test_add_occ_role"
+         role = Role(name='user',centre_oc=None,centre_nc=None)
+         role = self.persistent_delegate.add_role(role)
+         self.assertEqual(self.persistent_delegate.role_exists(role), True)
+
+#+END_SRC
+
+*** add_ncc_role
+    Add ncc role to the system
+    This function adds a user to the role-set maintained by the system.
+#+NAME: persistent_add_ncc_role
+#+BEGIN_SRC python
+    def add_ncc_role(self, name, centre_oc, new_nc):
+        self.new_role = Role(name=name,centre_oc=centre_oc,centre_nc=new_nc)
+        self.new_role.save()
+        return self.new_role
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_add_ncc_role
+#+BEGIN_SRC python
+    def test_add_ncc_role(self):
          print "test_add_role"
          role = Role(name='user',centre_oc=None,centre_nc=None)
          role = self.persistent_delegate.add_role(role)
@@ -1168,6 +1190,34 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+*** add_nc
+    Add a nc to the system
+    This function adds an outreach centre to the oc-set maintained by the system.
+#+NAME: persistent_add_nc
+#+BEGIN_SRC python
+    def add_nc(self, institute, oc, nc_target, workshops):
+        self.new_nc = NC(institute=institute,hub=oc, nc_target = nc_target,
+                        workshops = workshops)
+        self.new_nc.save()
+        return self.new_nc
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_add_nc
+#+BEGIN_SRC python
+    def test_add_oc(self):
+         print "test_persistent_add_nc"
+         ins = Institute(name='IIIT',address='Hyderabad')
+         ins.save()
+         oc1 = OC(institute=ins.get_by_id(1),spokes=[], oc_target = None)
+         oc = self.persistent_delegate.add_oc(oc1)
+         self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
+
+#+END_SRC
+
+
+
+
 *** get_ocs
 
     This return the oc_set maintained by the system.
@@ -1214,32 +1264,6 @@ class TestPersistentDelegate(TestCase):
          nc1 = NC(institute=ins, hub=oc, nc_target = None, workshops=[])
          nc1.save()
          self.assertEqual(self.persistent_delegate.nc_exists(nc1), True)
-
-#+END_SRC
-
-*** add_nc
-    Add a nc to the system
-    This function adds a nodal centre to the nc-set maintained by the system.
-#+NAME: persistent_add_nc
-#+BEGIN_SRC python
-    def add_nc(self, nc):
-        nc.save() 
-        return nc
-
-#+END_SRC
-
-**** Tests
-#+NAME: test_persistent_add_nc
-#+BEGIN_SRC python
-    def test_add_nc(self):
-         print "test_add_nc"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         ins.save()
-         oc = OC(institute=ins, spokes=[], oc_target = None)
-         oc.save()   
-         nc1 = NC(institute=ins, hub=oc, nc_target = None, workshops=[])
-         nc = self.persistent_delegate.add_nc(nc1)
-         self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 
 #+END_SRC
 
@@ -1622,6 +1646,7 @@ if __name__ == '__main__':
 <<persistent_get_workshops>>
 <<persistent_add_role>>
 <<persistent_add_occ_role>>
+<<persistent_add_ncc_role>>
 <<persistent_get_roles>>
 <<persistent_add_institute>>
 <<persistent_update_institute>>
