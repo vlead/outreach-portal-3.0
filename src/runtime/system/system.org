@@ -121,7 +121,7 @@ class System ():
 
     @staticmethod
     def is_session_noc(session):
-        return session.get("role").get('name')== "NOC"
+        return session.get("role").get('name')== "noc"
 
     @staticmethod
     def session_exists(session):
@@ -664,11 +664,9 @@ class CreateOC():
     def action(args):
         institute = args["institute"]
         spokes=args["spokes"]
-        oc_target = args['oc_target']
-        new_oc = OC(institute=institute,spokes=spokes, oc_target = oc_target)
-        System.delegate.add_oc(new_oc)
-        new_role = Role(name="OCC",centre_oc=new_oc,centre_nc=None)
-        System.delegate.add_role(new_role)
+        oc_target = args["oc_target"]
+        new_oc = System.delegate.add_oc(institute, spokes, oc_target)
+        new_role = System.delegate.add_occ_role("OCC", new_oc, None)
         return new_oc
 #+end_src
 

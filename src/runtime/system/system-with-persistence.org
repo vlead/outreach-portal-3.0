@@ -99,7 +99,7 @@ class TestAddUser(TestCase):
         email = Email(email="mary@gmail.com")
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3), roles= [guest_role],
                     user_status="active")
         oc_user= System.do("add_user", user=user, session=session_noc)
 

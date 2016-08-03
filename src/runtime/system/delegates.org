@@ -1004,13 +1004,35 @@ class TestPersistentDelegate(TestCase):
 #+NAME: add_persistent_role
 #+BEGIN_SRC python
     def add_role(self, role):
-        self.role.save()
+        role.save()
         return role
 
 #+END_SRC
 
 **** Tests
 #+NAME: test_add_persistent_role
+#+BEGIN_SRC python
+    def test_add_role(self):
+         print "test_add_role"
+         role = Role(name='user',centre_oc=None,centre_nc=None)
+         role = self.persistent_delegate.add_role(role)
+         self.assertEqual(self.persistent_delegate.role_exists(role), True)
+
+#+END_SRC
+
+*** add_occ_role
+    Add occ role to the system
+    This function adds a user to the role-set maintained by the system.
+#+NAME: persistent_add_occ_role
+#+BEGIN_SRC python
+    def add_occ_role(self, name, new_oc, centre_nc):
+        self.new_role = Role(name=name,centre_oc=new_oc,centre_nc=centre_nc)
+        self.new_role.save()
+        return self.new_role
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_add_occ_role
 #+BEGIN_SRC python
     def test_add_role(self):
          print "test_add_role"
@@ -1127,9 +1149,10 @@ class TestPersistentDelegate(TestCase):
     This function adds an outreach centre to the oc-set maintained by the system.
 #+NAME: persistent_add_oc
 #+BEGIN_SRC python
-    def add_oc(self, oc):
-        self.oc.save()
-        return oc
+    def add_oc(self, institute, spokes, oc_target):
+        self.new_oc = OC(institute=institute, spokes=spokes, oc_target = oc_target)
+        self.new_oc.save()
+        return self.new_oc
 #+END_SRC
 
 **** Tests
@@ -1587,6 +1610,7 @@ if __name__ == '__main__':
 <<persistent_get_ncs>>
 <<persistent_get_workshops>>
 <<persistent_add_role>>
+<<persistent_add_occ_role>>
 <<persistent_get_roles>>
 <<persistent_add_institute>>
 <<persistent_update_institute>>
@@ -1649,6 +1673,7 @@ if __name__ == '__main__':
 <<test_add_persistent_role>>
 <<test_persistent_institute_exists>>
 <<test_add_persistent_institute>>
+<<test_persistent_add_occ_role>>
 <<run_test_cases>>
 #+end_src
 
