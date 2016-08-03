@@ -1374,7 +1374,6 @@ class TestPersistentDelegate(TestCase):
                                 a_participants = 0,
                                 a_experiments = 0,
                                 a_usage = 0)
-        self.workshop_set.append(new_workshop)
         new_workshop.save()
         return new_workshop
 

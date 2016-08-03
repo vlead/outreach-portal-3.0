@@ -693,7 +693,11 @@ class TestCreateWorkshop(TestCase):
                     user_status="active")
 
         nc_user = System.do("add_user", user=user, session = sess)
-        System.do("add_role", user = nc_user, role = ncc_role, session = sess)
+
+        ncc_role =  Role.get_by_id(6)
+        if ncc_role:
+            nc_user.append_role(ncc_role)
+
         nc_session = Session(user = nc_user, role = ncc_role)
         System.session_set.append(nc_session)
         role_check = Role.get_by_id(6)
@@ -704,11 +708,10 @@ class TestCreateWorkshop(TestCase):
                                  ws_target = wstarget, 
                                  status = ws_status, 
                                  artefacts = [], 
-                                 nc = NC.get_by_id(1), 
+                                 nc = nc, 
                                  session = nc_session) 
         
-        self.assertEqual(Workshop.get_by_id(1).get("institute").get_name("name"), p_institute)
-        self.assertEqual(nc.get('workshops')[0],new_workshop)
+        self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"), workshop_institute.get("name"))
 #+END_SRC
 
 * Test CancelWorkshop

@@ -820,7 +820,6 @@ class CreateWorkshop():
         artefacts = args["artefacts"]
         status = args["status"]
         nc = args['nc']
-        
         workshop = System.delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
         return workshop
 #+end_src
