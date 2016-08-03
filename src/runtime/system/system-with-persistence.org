@@ -169,9 +169,6 @@ class TestDeleteUser(TestCase):
         oc = System.do("create_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
 
-        new_role = Role(name="OCC",centre_oc=oc,centre_nc=None)
-        new_role.save()
-
         name = Name(name="maryoc")
         email = Email(email="mary@gmail.com")
         name.save()
@@ -201,7 +198,7 @@ class TestDeleteUser(TestCase):
                         workshops = [], nc_target = None)
 
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3), roles= [guest_role],
                     user_status="active")
 
         nc_user= System.do("add_user", user=user, session=session)
@@ -249,7 +246,7 @@ class TestDeleteUser(TestCase):
         email1 = Email(email="xyz@gmail.com")
         email1.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3), roles= [guest_role],
                     user_status="active")
         noc_user=System.do("add_user", user = user, session=session)
 
@@ -314,10 +311,6 @@ class TestUpdateUser(TestCase):
         institute = System.do("create_institute", institute = inst, session=session)
         oc = System.do("create_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
-        institute.save()
-
-        new_role = Role(name="OCC",centre_oc=oc,centre_nc=None)
-        new_role.save()
 
         name = Name(name="useroc")
         email = Email(email="useroc@gmail.com")
@@ -347,7 +340,7 @@ class TestUpdateUser(TestCase):
         name1.save()
         email1.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3), roles= [guest_role],
                     user_status="active")
         nc_user= System.do("add_user", user=user, session=session)
         nc_role = filter(lambda x:x.get('name') == "NCC" and
@@ -393,7 +386,7 @@ class TestUpdateUser(TestCase):
         email1= Email(email="usernoc@gmail.com")
         email1.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3), roles= [guest_role],
                     user_status="active")
         noc_user=System.do("add_user", user=user, session=session)
         System.do("add_role",user=noc_user,role=Role.get_by_id(4),
@@ -636,7 +629,7 @@ class TestUpdateInstitute(TestCase):
         System.session_set.append(session)
         inst = Institute(name="IIIT",address="Hyderabad")
         institute = System.do("create_institute", institute = inst, session=session)
-        institute.save()
+
         System.do("update_institute",name="NITK",
                    institute=institute,session=session)
         self.assertEqual(institute.get("name"),"NITK")
@@ -677,9 +670,6 @@ class TestCreateWorkshop(TestCase):
         
         oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
                         session=sess, oc_target = None)
-
-        occ_role = Role(name="OCC",centre_oc=oc,centre_nc=None)
-        occ_role.save()
 
         nc = System.do("create_nc",institute= Institute.get_by_id(1),
                         hub=oc,session=sess, nc_target = None, workshops = [])
@@ -760,8 +750,7 @@ class TestCancelWorkshop(TestCase):
         workshop_institute = System.do("create_institute", institute = inst, session = session)
         oc = System.do("create_oc", institute=institute,spokes=[],
                         session=session, oc_target = None)
-        occ_role = Role(name="OCC",centre_oc=oc,centre_nc=None)
-        occ_role.save()
+
 
         nc = System.do("create_nc",institute=institute,hub=oc,
                         session=session, nc_target = None, workshops = [])
@@ -843,9 +832,6 @@ class TestRescheduleWorkshop(TestCase):
         workshop_institute = System.do("create_institute", institute = inst, session = session)
         oc = System.do("create_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
-        occ_role = Role(name="OCC",centre_oc=oc,centre_nc=None)
-        occ_role.save()
-
 
         nc = System.do("create_nc",institute=institute,hub=oc,session=session,
                         nc_target = None, workshops = [])
@@ -942,8 +928,6 @@ class TestConductWorkshop(TestCase):
 
         oc = System.do("create_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
-        occ_role = Role(name="OCC",centre_oc=oc,centre_nc=None)
-        occ_role.save()
 
         nc = System.do("create_nc",institute=institute,hub=oc,session=session,
                         nc_target = None, workshops = [])
@@ -1027,8 +1011,6 @@ class TestUploadArtefact(TestCase):
         workshop_institute = System.do("create_institute", institute = inst, session = session)
         oc = System.do("create_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
-        occ_role = Role(name="OCC",centre_oc=oc,centre_nc=None)
-        occ_role.save()
 
         nc = System.do("create_nc",institute=institute,hub=oc,session=session,
                         nc_target = None, workshops = [])
@@ -1121,9 +1103,6 @@ class TestApproveWorkshop(TestCase):
         workshop_institute = System.do("create_institute", institute = inst, session = session)
         oc = System.do("create_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
-        occ_role = Role(name="OCC",centre_oc=oc,centre_nc=None)
-        occ_role.save()
-
 
         nc = System.do("create_nc",institute=institute,hub=oc,session=session,
                         nc_target = None, workshops = [])
@@ -1236,8 +1215,6 @@ class TestRejectWorkshop(TestCase):
         workshop_institute = System.do("create_institute", institute=inst, session = session)
         oc = System.do("create_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
-        occ_role = Role(name="OCC",centre_oc=oc,centre_nc=None)
-        occ_role.save()
 
         nc = System.do("create_nc",institute=institute,hub=oc,session=session,
                         nc_target = None, workshops = [])
@@ -1351,9 +1328,6 @@ class TestDeleteArtefact(TestCase):
         oc = System.do("create_oc",institute=institute,spokes=[],
                        session=session, oc_target = None)
         
-        occ_role = Role(name="OCC",centre_oc=oc,centre_nc=None)
-        occ_role.save()
-
         nc = System.do("create_nc",institute=institute,hub=oc,session=session,
                         nc_target = None, workshops = [])
         
