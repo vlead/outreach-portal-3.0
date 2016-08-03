@@ -386,10 +386,11 @@ class DeleteUser():
         if not (session in System.session_set):
             raise StateError("You are not in session  %s"
                             % session.get("user").get("name"))
-        if not (user in System.delegate.user_set):
+
+        active_user_set = System.delegate.get_active_users()
+        if not (user in active_user_set):
             raise StateError("user %s not in user set"
                              % user.get("name").get("name"))
-
 
     @staticmethod
     def action(args):
@@ -443,9 +444,12 @@ class UpdateUser():
         if not (session in System.session_set):
             raise StateError("You are not in session set %s"
                             % session.get("user").get("name"))
-        if not (user in System.delegate.user_set):
+
+        active_user_set = System.delegate.get_active_users()
+        if not (user in active_user_set):
             raise StateError("user %s not in user set"
                              % user.get("name").get("name"))
+
         if "email" in args:
             email = args["email"]
             if (email in System.delegate.email_set):
@@ -512,9 +516,11 @@ class AddRole():
             raise StateError("role %s is already assigned to this user"
                                  % role)
 
-        if not (user in System.delegate.user_set):
+        active_user_set = System.delegate.get_active_users()
+        if not (user in active_user_set):
             raise StateError("user %s not in user set"
                              % user.get("name").get("name"))
+
 
 
     @staticmethod
@@ -592,7 +598,7 @@ class logout():
 #+NAME: class_CreateInstitute
 #+begin_src python
 class CreateInstitute():
-    arg_types = {"name":is_alphabetic_str, "address":is_str,
+    arg_types = {"institute": is_institute,
                  "session":is_session}
     arity_and_type_checks_needed = True
     @staticmethod
@@ -604,23 +610,20 @@ class CreateInstitute():
     @staticmethod
     def state_check(args):
         session = args["session"]
-        name = args['name']
-        address = args['address']
+        institute = args['institute']
         if not (session in System.session_set):
             raise StateError("user not in session %s"
                               % session.get('user').get('name').get('name'))
         for inst in System.delegate.get_institutes():
-            if inst.get('name') == name and inst.get('address') == address:
+            if inst.get('name') == institute.get('name') and inst.get('address') == institute.get('address'):
                 raise StateError("institute %s already in System"
                                   % inst.get('name'))
 
     @staticmethod
     def action(args):
-        name = args["name"]
-        address = args["address"]
-        new_institute = Institute(name=name,address=address)
-        System.delegate.add_institute(new_institute)
-        return new_institute
+        institute = args["institute"]
+        System.delegate.add_institute(institute)
+        return institute
 #+end_src
 
 ** =create_oc=
@@ -1163,9 +1166,10 @@ ops_table = {'add_user' : AddUser,
 from runtime.exceptions.custom_exceptions import *
 from runtime.exceptions.exceptions import *
 from runtime.objects.entities import is_user, is_session, is_role, is_email, \
-     is_name, is_alphabetic_str, is_str, are_spokes, is_institute, is_octarget, \
-     is_oc, is_nctarget, are_workshops, is_wstarget, are_artefacts, is_status, is_nc, \
-     is_workshop, is_wst, is_artefact
+    is_name, is_alphabetic_str, is_str, are_spokes, is_institute, is_octarget, \
+    is_oc, is_nctarget, are_workshops, is_wstarget, are_artefacts, is_status, is_nc, \
+    is_workshop, is_wst, is_artefact, Session, OC, NC
+
 
 #+end_src
 
