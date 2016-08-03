@@ -713,7 +713,7 @@ class TestCreateWorkshop(TestCase):
                                  nc = NC.get_by_id(1), 
                                  session = nc_session) 
         
-        self.assertEqual(new_workshop.get('institute'),workshop_institute)
+        self.assertEqual(Workshop.get_by_id(1).get("institute").get_name("name"), p_institute)
         self.assertEqual(nc.get('workshops')[0],new_workshop)
 #+END_SRC
 

@@ -823,17 +823,8 @@ class CreateWorkshop():
         artefacts = args["artefacts"]
         status = args["status"]
         nc = args['nc']
-        new_workshop = Workshop(institute = institute,
-                                name = name,
-                                ws_target = ws_target,
-                                artefacts = artefacts,
-                                status = status,
-                                nc = nc,
-                                a_date = None,
-                                a_participants = 0,
-                                a_experiments = 0,
-                                a_usage = 0)
-        workshop = System.delegate.add_workshop(new_workshop)
+        
+        workshop = System.delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
         return workshop
 #+end_src
 
