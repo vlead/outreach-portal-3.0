@@ -757,14 +757,17 @@ class PersistenceDelegate():
    
     def __init__(self):
         pass
-#        self.initialize_role_set()
-#        self.initialize_user_set()
         
 #+END_SRC
 
-*** initialize_role_set
-#+NAME: initialize_persistent_role_set
-#+begin_src python
+
+*** Tests
+#+NAME: test_class_persistent_delegate
+#+BEGIN_SRC python
+class TestPersistentDelegate(TestCase):
+    TESTING = True
+    object_delegate = None
+
     def initialize_role_set(self):
         self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
         self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
@@ -775,13 +778,6 @@ class PersistenceDelegate():
         self.reviewer_role.save()
         self.noc_role.save()
         return Role.query.all()
-
-
-#+end_src
-
-*** initialize_user_set
-#+NAME: initialize_persistent_user_set
-#+begin_src python
 
     def initialize_user_set(self):
         admin_name = Name(name=Config.admin_name)
@@ -795,14 +791,7 @@ class PersistenceDelegate():
                           roles=[role_admin, role_guest], user_status="active")
         self.admin_user.save()
         return User.get_all()
-#+end_src
 
-*** Tests
-#+NAME: test_initialize_persistent_delegate
-#+BEGIN_SRC python
-class TestPersistentDelegate(TestCase):
-    TESTING = True
-    object_delegate = None
     def create_app(self):
         app = create_app(config)
         return app
@@ -810,8 +799,8 @@ class TestPersistentDelegate(TestCase):
     def setUp(self):
         db.create_all()
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         db.session.remove()
@@ -833,19 +822,18 @@ class TestPersistentDelegate(TestCase):
 
 ** Other functions
    Other functions that help =System= perform the operations. 
-
+   
 *** user_exists
     Check if =user= already exists
     This function checks if a user is already in the user-set of the =System=.
 #+NAME: persistent_user_exists
 #+BEGIN_SRC python
     def user_exists(self, user):
-        active_users = User.query.filter_by(user_status='active')
+        active_users = self.get_active_users()
         if user in active_users:
             return True
         else:
             return False
-
 #+END_SRC
 
 **** Tests
@@ -861,7 +849,7 @@ class TestPersistentDelegate(TestCase):
 *** add_user
     Add a user to the system
     This function adds a user to the user-set maintained by the system.
-#+NAME: add_persistent_user
+#+NAME: persistent_add_user
 #+BEGIN_SRC python
     def add_user(self, user):
         user.save()
@@ -870,7 +858,7 @@ class TestPersistentDelegate(TestCase):
 #+END_SRC
 
 **** Tests
-#+NAME: test_add_persistent_user
+#+NAME: test_persistent_add_user
 #+BEGIN_SRC python
     def test_add_user(self):
          print "test_add_user"
@@ -897,20 +885,26 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 **** Tests
-#+NAME: test_update_user
+#+NAME: test_persistent_update_user
 #+BEGIN_SRC python
-
     def test_update_user(self):
         print "test_update_user"
-	name=Name(name="test")
-	email=Email(email="test@gmail.com")
-	user = User(name=name, email=email, roles= [Role.guest],
-		    user_status="active")
-	user = self.obj_delegate.add_user(user)
-	user_name1=Name(name="alaska")
-	user_email1=Email(email="alaska@gmail.com")
-	user = self.obj_delegate.update_user(user_name1, user_email1, user)
-	self.assertEqual(user.get("name").get("name"), "alaska")
+        name = Name(name="some user")
+        name.save()
+        email = Email(email="tt@kk.com")
+        email.save()
+        user = User(name=name,
+                    email=email,
+                    roles=[Role.get_by_id(2)], user_status="active")
+        new_user = self.persistent_delegate.add_user(user)
+
+        user_name1=Name(name="alaska")
+        user_name1.save()
+        user_email1=Email(email="alaska@gmail.com")
+        user_email1.save()
+        updated_user = self.persistent_delegate.update_user(user_name1, user_email1, new_user)
+        self.assertEqual(updated_user.get("name").get("name"), "alaska")
+ 
 #+END_SRC
 
 *** delete_user
@@ -922,17 +916,19 @@ class TestPersistentDelegate(TestCase):
         return user
 #+END_SRC
 **** Tests
-#+NAME: test_delete_user
+#+NAME: test_persistent_delete_user
 #+BEGIN_SRC python
     def test_delete_user(self):
-        print "test_delete_user"
-	name = Name(name="test")
-	email = Email(email="test@gmail.com")
-	user = User(name=name, email=email, roles= [Role.guest],
-		    user_status="active")
-	new_user = self.obj_delegate.add_user(user)
-        del_user = self.obj_delegate.delete_user(new_user)
-	self.assertEqual(del_user.get("user_status") , "inactive")
+        name = Name(name="some user")
+        name.save()
+        email = Email(email="tt@kk.com")
+        email.save()
+        user = User(name=name,
+                    email=email,
+                    roles=[Role.get_by_id(2)], user_status="active")
+        new_user = self.persistent_delegate.add_user(user)
+        del_user = self.persistent_delegate.delete_user(new_user)
+        self.assertEqual(del_user.get("user_status") , "inactive")
 #+END_SRC
 
 *** add_role_to_user
@@ -944,16 +940,18 @@ class TestPersistentDelegate(TestCase):
         return user
 #+END_SRC
 **** Tests
-#+NAME: test_add_role_to_user
+#+NAME: test_persistent_add_role_to_user
 #+BEGIN_SRC python
     def test_add_role_to_user(self):
-        print "test_add_role_to_user"
-	name = Name(name="test")
-	email = Email(email="test@gmail.com")
-	user = User(name=name, email=email, roles= [Role.guest],
-		    user_status="active")
-	new_user = self.obj_delegate.add_user(user)
-        user_with_new_role = self.obj_delegate.add_role_to_user(new_user, Role.noc)
+        name = Name(name="some user")
+        name.save()
+        email = Email(email="tt@kk.com")
+        email.save()
+        user = User(name=name,
+                    email=email,
+                    roles=[Role.get_by_id(2)], user_status="active")
+        new_user = self.persistent_delegate.add_user(user)
+        user_with_new_role = self.persistent_delegate.add_role_to_user(new_user, Role.get_by_id(3))
         self.assertTrue(len(user_with_new_role.get('roles'))==2)
 #+END_SRC
 
@@ -967,11 +965,19 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 **** Tests
-#+NAME: test_get_users
+#+NAME: test_persistent_get_users
 #+BEGIN_SRC python
     def test_get_users(self):
-         print "test_get_users"
-         self.assertEqual(len(self.obj_delegate.get_users()), 1)
+        print "test_get_users"
+        name = Name(name="some user")
+        name.save()
+        email = Email(email="tt@kk.com")
+        email.save()
+        user = User(name=name,
+                    email=email,
+                    roles=[Role.get_by_id(2)], user_status="active")
+        new_user = self.persistent_delegate.add_user(user)
+        self.assertEqual(len(self.persistent_delegate.get_users()), 2)
 
 #+END_SRC
 
@@ -1001,7 +1007,7 @@ class TestPersistentDelegate(TestCase):
 *** add_role
     Add a role to the system
     This function adds a user to the role-set maintained by the system.
-#+NAME: add_persistent_role
+#+NAME: persistent_add_role
 #+BEGIN_SRC python
     def add_role(self, role):
         role.save()
@@ -1010,13 +1016,32 @@ class TestPersistentDelegate(TestCase):
 #+END_SRC
 
 **** Tests
-#+NAME: test_add_persistent_role
+#+NAME: test_persistent_add_role
 #+BEGIN_SRC python
     def test_add_role(self):
          print "test_add_role"
          role = Role(name='user',centre_oc=None,centre_nc=None)
          role = self.persistent_delegate.add_role(role)
          self.assertEqual(self.persistent_delegate.role_exists(role), True)
+
+#+END_SRC
+
+*** get_roles
+
+    This return the role_set maintained by the system.
+#+NAME: persistent_get_roles
+#+BEGIN_SRC python
+    def get_roles(self):
+        self.role_set = Role.get_all()
+        return self.role_set
+
+#+END_SRC
+**** Tests
+#+NAME: test_persistent_get_roles
+#+BEGIN_SRC python
+    def test_get_roles(self):
+         print "test_get_roles"
+         self.assertEqual(len(self.persistent_delegate.get_roles()), 4)
 
 #+END_SRC
 
@@ -1091,7 +1116,7 @@ class TestPersistentDelegate(TestCase):
 *** add_institute
     Add an institute to the system
     This function adds an institute to the institute-set maintained by the system.
-#+NAME: add_persistent_institute
+#+NAME: persistent_add_institute
 #+BEGIN_SRC python
     def add_institute(self, institute):
         institute.save()
@@ -1100,7 +1125,7 @@ class TestPersistentDelegate(TestCase):
 #+END_SRC
 
 **** Tests
-#+NAME: test_add_persistent_institute
+#+NAME: test_persistent_add_institute
 #+BEGIN_SRC python
     def test_add_institute(self):
          print "test_add_institute"
@@ -1119,6 +1144,19 @@ class TestPersistentDelegate(TestCase):
         institute.save()
         return institute
 #+END_SRC
+**** Tests
+#+NAME: test_persistent_update_institute
+#+BEGIN_SRC python
+    def test_update_institute(self):
+         print "test_update_institute"
+         ins = Institute(name='IIIT',address='Hyderabad')
+         institute = self.persistent_delegate.add_institute(ins)
+         updated_institute = self.persistent_delegate.update_institute(ins, "IIT", "Madras")
+         self.assertEqual(self.persistent_delegate.institute_exists(institute), True)
+         self.assertEqual(updated_institute.get("name"), "IIT")
+         self.assertEqual(updated_institute.get("address"), "Madras")
+#+END_SRC
+
 *** get_institutes
     This return the institute_set maintained by the system.
 #+NAME: persistent_get_institutes
@@ -1130,13 +1168,13 @@ class TestPersistentDelegate(TestCase):
 #+END_SRC
 
 **** Tests
-#+NAME: test_get_institutes
+#+NAME: test_persistent_get_institutes
 #+BEGIN_SRC python
     def test_get_institutes(self):
          print "test_get_institutes"
          ins = Institute(name='IIIT',address='Hyderabad')
-         inst = self.obj_delegate.add_institute(ins)
-         self.assertEqual(len(self.obj_delegate.get_institutes()), 1)
+         inst = self.persistent_delegate.add_institute(ins)
+         self.assertEqual(len(self.persistent_delegate.get_institutes()), 1)
 
 #+END_SRC
 
@@ -1160,10 +1198,11 @@ class TestPersistentDelegate(TestCase):
          print "test_oc_exists"
          ins = Institute(name='IIIT',address='Hyderabad')
          ins.save()
-         oc1 = OC(institute=ins.get_by_id(1), spokes=[], oc_target = None)
-         oc1.save()
-#         oc = delegate.add_oc(oc1)
-         self.assertEqual(self.persistent_delegate.oc_exists(oc1), True)
+         spokes=[]
+         oc_target = None
+         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
+         self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
+
 #+END_SRC
 
 *** add_oc
@@ -1184,10 +1223,10 @@ class TestPersistentDelegate(TestCase):
          print "test_persistent_add_oc"
          ins = Institute(name='IIIT',address='Hyderabad')
          ins.save()
-         oc1 = OC(institute=ins.get_by_id(1),spokes=[], oc_target = None)
-         oc = self.persistent_delegate.add_oc(oc1)
+         spokes=[]
+         oc_target = None
+         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
          self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
-
 #+END_SRC
 
 *** add_nc
@@ -1196,27 +1235,30 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_add_nc
 #+BEGIN_SRC python
     def add_nc(self, institute, oc, nc_target, workshops):
-        self.new_nc = NC(institute=institute,hub=oc, nc_target = nc_target,
-                        workshops = workshops)
+        self.new_nc = NC(institute=institute, hub=oc, nc_target=nc_target,
+                         workshops=workshops)
         self.new_nc.save()
+        oc.append_spoke(self.new_nc)
         return self.new_nc
 #+END_SRC
 
 **** Tests
 #+NAME: test_persistent_add_nc
 #+BEGIN_SRC python
-    def test_add_oc(self):
+    def test_add_nc(self):
          print "test_persistent_add_nc"
          ins = Institute(name='IIIT',address='Hyderabad')
          ins.save()
-         oc1 = OC(institute=ins.get_by_id(1),spokes=[], oc_target = None)
-         oc = self.persistent_delegate.add_oc(oc1)
-         self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
+         institute=Institute.get_by_id(1)
+         spokes=[]
+         oc_target = None
+         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
+         nc_target=None
+         workshops=[]
+         nc = self.persistent_delegate.add_nc(institute, oc, nc_target, workshops)
+         self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 
 #+END_SRC
-
-
-
 
 *** get_ocs
 
@@ -1229,14 +1271,17 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-#+NAME: test_get_ocs
+#+NAME: test_persistent_get_ocs
 #+BEGIN_SRC python
     def test_get_ocs(self):
          print "test_get_ocs"
          ins = Institute(name='IIIT',address='Hyderabad')
-         oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
-         oc = self.obj_delegate.add_oc(oc1)
-         self.assertEqual(len(self.obj_delegate.get_ocs()), 1)
+         ins.save()
+         spokes=[]
+         oc_target = None
+         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
+
+         self.assertEqual(len(self.persistent_delegate.get_ocs()), 1)
 
 #+END_SRC
 
@@ -1259,12 +1304,14 @@ class TestPersistentDelegate(TestCase):
          print "test_persistent_nc_exists"
          ins = Institute(name='IIIT',address='Hyderabad')
          ins.save()
-         oc = OC(institute=ins, spokes=[], oc_target = None)
-         oc.save()
-         nc1 = NC(institute=ins, hub=oc, nc_target = None, workshops=[])
-         nc1.save()
-         self.assertEqual(self.persistent_delegate.nc_exists(nc1), True)
-
+         institute=Institute.get_by_id(1)
+         spokes=[]
+         oc_target = None
+         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
+         nc_target=None
+         workshops=[]
+         nc = self.persistent_delegate.add_nc(institute, oc, nc_target, workshops)
+         self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 #+END_SRC
 
 *** get_ncs
@@ -1278,15 +1325,20 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-#+NAME: test_get_ncs
+#+NAME: test_persistent_get_ncs
 #+BEGIN_SRC python
     def test_get_ncs(self):
          print "test_get_ncs"
          ins = Institute(name='IIIT',address='Hyderabad')
-         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-         nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-         nc = self.obj_delegate.add_nc(nc1)
-         self.assertEqual(len(self.obj_delegate.get_ncs()), 1)
+         ins.save()
+         institute=Institute.get_by_id(1)
+         spokes=[]
+         oc_target = None
+         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
+         nc_target=None
+         workshops=[]
+         nc = self.persistent_delegate.add_nc(institute, oc, nc_target, workshops)
+         self.assertEqual(len(self.persistent_delegate.get_ncs()), 1)
 
 #+END_SRC
 
@@ -1304,12 +1356,15 @@ class TestPersistentDelegate(TestCase):
 #+NAME: test_persistent_get_active_users
 #+BEGIN_SRC python
     def test_get_active_users(self):
-         print "test_get_active_users"
-         user = User(name=Name(name="some user"),
-                          email=Email(email="tt@kk.com"),
-                          roles=[Role.admin], user_status="active")
-
-         self.persistent_delegate.add_user(user)
+         name = Name(name="some user")
+         name.save()
+         email = Email(email="tt@kk.com")
+         email.save()
+         user = User(name=name,
+                     email=email,
+                     roles=[Role.get_by_id(1)], user_status="active")
+         user = self.persistent_delegate.add_user(user)
+         self.assertEqual(self.persistent_delegate.user_exists(user), True)
          active_user_list = self.persistent_delegate.get_active_users()
          self.assertEqual(len(active_user_list), 2)
 
@@ -1318,42 +1373,33 @@ class TestPersistentDelegate(TestCase):
 *** workshop_exists
     Check if =workshop= already exists
     This function checks if a workshop is already in the workshop-set of the =System=.
-#+NAME: workshop_exists
+#+NAME: persistent_workshop_exists
 #+BEGIN_SRC python
     def workshop_exists(self, workshop):
-        if workshop in self.workshop_set:
+        if workshop in Workshop.get_all():
             return True
         else:
             return False
-
 #+END_SRC
 
 **** Tests
-#+NAME: test_workshop_exists
+#+NAME: test_persistent_workshop_exists
 #+BEGIN_SRC python
     def test_workshop_exists(self):
         print "test_workshop_exists"
-        ins = Institute(name='IIIT',address='Hyderabad')
+        institute = Institute(name='IIIT',address='Hyderabad')
         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-        nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
         target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
         nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
-        workshop_name = Name(name = "New Workshop")
-        ws_status = Status(name = "pending")
-        workshop = Workshop(institute = ins, 
-                            nc = nc1, 
-                            artefacts = [], 
-                            ws_target = wstarget, 
-                            status = ws_status, 
-                            name = workshop_name, 
-                            a_date = None,
-                            a_participants = 0,
-                            a_experiments = 0,
-                            a_usage = 0)
-        workshop = self.obj_delegate.add_workshop(workshop)
-        self.assertEqual(self.obj_delegate.workshop_exists(workshop), True)
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        self.assertEqual(self.persistent_delegate.workshop_exists(workshop), True)
 
 #+END_SRC
 
@@ -1380,32 +1426,23 @@ class TestPersistentDelegate(TestCase):
 #+END_SRC
 
 **** Tests
-#+NAME: test_add_workshop
+#+NAME: test_persistent_add_workshop
 #+BEGIN_SRC python
     def test_add_workshop(self):
         print "test_add_workshop"
-        ins = Institute(name='IIIT',address='Hyderabad')
+        institute = Institute(name='IIIT',address='Hyderabad')
         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-        nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
         target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
         nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
-        workshop_name = Name(name = "New Workshop")
-        ws_status = Status(name = "pending")
-        workshop = Workshop(institute = ins, 
-                            nc = nc1, 
-                            artefacts = [], 
-                            ws_target = wstarget, 
-                            status = ws_status, 
-                            name = workshop_name, 
-                            a_date = None,
-                            a_participants = 0,
-                            a_experiments = 0,
-                            a_usage = 0)
-        workshop = self.obj_delegate.add_workshop(workshop)
-        self.assertEqual(self.obj_delegate.workshop_exists(workshop), True)
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
 
+        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        self.assertEqual(self.persistent_delegate.workshop_exists(workshop), True)
 #+END_SRC
 
 *** cancel_workshop
@@ -1415,6 +1452,28 @@ class TestPersistentDelegate(TestCase):
         workshop.set(status = Status.cancelled)
         workshop.save()
         return workshop
+#+END_SRC
+**** Tests 
+#+NAME: test_persistent_cancel_workshop
+#+BEGIN_SRC python
+    def test_cancel_workshop(self):
+        print "test_cancel_workshop"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+
+        cancelled_workshop = self.persistent_delegate.cancel_workshop(workshop)
+
+        self.assertEqual(cancelled_workshop.get("status"), Status.cancelled)
 #+END_SRC
 *** reschedule_workshop
 #+NAME: persistent_reschedule_workshop
@@ -1426,6 +1485,29 @@ class TestPersistentDelegate(TestCase):
         return workshop
 
 #+END_SRC
+**** Tests
+#+NAME: test_persistent_reschedule_workshop
+#+BEGIN_SRC python
+    def test_reschedule_workshop(self):
+        print "test_reschedule_workshop"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        ws_new_target = WSTarget(usage = 5000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        rescheduled_workshop = self.persistent_delegate.reschedule_workshop(workshop, ws_new_target)
+
+        self.assertEqual(rescheduled_workshop.get("status"), Status.pending)
+        self.assertEqual(rescheduled_workshop.get("ws_target").get("usage"), 5000)
+#+END_SRC
 
 *** conduct_workshop
 #+NAME: persistent_conduct_workshop
@@ -1434,6 +1516,28 @@ class TestPersistentDelegate(TestCase):
         workshop.set(status = Status.completed)
         workshop.save()
         return workshop
+#+END_SRC
+**** Tests
+#+NAME: test_persistent_conduct_workshop
+#+BEGIN_SRC python
+    def test_conduct_workshop(self):
+        print "test_conduct_workshop"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+
+        conducted_workshop = self.persistent_delegate.conduct_workshop(workshop)
+
+        self.assertEqual(conducted_workshop.get("status"), Status.completed)
 #+END_SRC
 
 *** upload_artefact
@@ -1447,6 +1551,33 @@ class TestPersistentDelegate(TestCase):
         workshop.save()
         return workshop
 #+END_SRC
+**** Tests
+#+NAME: test_persistent_upload_artefact
+#+BEGIN_SRC python
+    def test_upload_artefact(self):
+        print "test_upload_artefact"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        new_artefact = Artefact(name = "Photo", path = "/main/photos",
+                                a_type = Type.photo)
+
+        workshop = self.persistent_delegate.upload_artefact(workshop, new_artefact)
+
+        self.assertEqual(workshop.get("status"), Status.pending_approval)
+        self.assertEqual(len(self.persistent_delegate.get_artefacts_of_a_workshop(workshop)), 1)
+        self.assertEqual(len(self.persistent_delegate.get_artefacts()), 1)
+
+#+END_SRC
 
 *** approve_workshop
 #+NAME: persistent_approve_workshop
@@ -1456,6 +1587,29 @@ class TestPersistentDelegate(TestCase):
         workshop.save()
         return workshop
 #+END_SRC
+**** Tests
+#+NAME: test_persistent_approve_workshop
+#+BEGIN_SRC python
+    def test_approve_workshop(self):
+        print "test_approve_workshop"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+
+        approved_workshop = self.persistent_delegate.approve_workshop(workshop)
+
+        self.assertEqual(approved_workshop.get("status"), Status.approved)
+#+END_SRC
+
 *** reject_workshop
 #+NAME: persistent_reject_workshop
 #+BEGIN_SRC python
@@ -1463,6 +1617,28 @@ class TestPersistentDelegate(TestCase):
         workshop.set(status = Status.rejected)
         workshop.save()
         return workshop
+#+END_SRC
+**** Tests
+#+NAME: test_persistent_reject_workshop
+#+BEGIN_SRC python
+    def test_reject_workshop(self):
+        print "test_reject_workshop"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+
+        rejected_workshop = self.persistent_delegate.reject_workshop(workshop)
+
+        self.assertEqual(rejected_workshop.get("status"), Status.rejected)
 #+END_SRC
 
 *** delete_artefact
@@ -1478,6 +1654,33 @@ class TestPersistentDelegate(TestCase):
         workshop.save()
         return workshop
 #+END_SRC
+**** Tests
+#+NAME: test_persistent_delete_artefact
+#+BEGIN_SRC python
+    def test_delete_artefact(self):
+        print "test_delete_artefact"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        new_artefact = Artefact(name = "Photo", path = "/main/photos",
+                                a_type = Type.photo)
+
+        artefact_upload_workshop = self.persistent_delegate.upload_artefact(workshop, new_artefact)
+        artefact_delete_workshop = self.persistent_delegate.delete_artefact(workshop, new_artefact)
+
+        self.assertEqual(artefact_delete_workshop.get("status"), Status.pending_approval)
+        self.assertEqual(len(self.persistent_delegate.get_artefacts_of_a_workshop(artefact_delete_workshop)), 0)
+
+#+END_SRC
 
 *** get_workshops
 
@@ -1485,37 +1688,85 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_get_workshops
 #+BEGIN_SRC python
     def get_workshops(self):
-        self.workshop_set = Workshop.quer.all()
+        self.workshop_set = Workshop.get_all()
         return self.workshop_set
 
 #+END_SRC
-
-#+NAME: test_get_workshops
+**** Tests
+#+NAME: test_persistent_get_workshops
 #+BEGIN_SRC python
-    def test_get_workshops(self):
-         print "test_get_workshops"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-         nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-         target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
-         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-         nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-         wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
-         workshop_name = Name(name = "New Workshop")
-         ws_status = Status(name = "pending")
-         workshop = Workshop(institute = ins, 
-                            nc = nc1, 
-                            artefacts = [], 
-                            ws_target = wstarget, 
-                            status = ws_status, 
-                            name = workshop_name, 
-                            a_date = None,
-                            a_participants = 0,
-                            a_experiments = 0,
-                            a_usage = 0)
-         workshop = self.obj_delegate.add_workshop(workshop)
-         self.assertEqual(len(self.obj_delegate.get_workshops()), 1)
+    def test_get_all_workshops(self):
+        print "test_get_all_workshops"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
 
+        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        self.assertEqual(self.persistent_delegate.workshop_exists(workshop), True)
+        self.assertEqual(len(self.persistent_delegate.get_workshops()), 1)
+#+END_SRC
+
+*** get_artefacts
+
+    This return the artefact_set maintained by the system.
+#+NAME: persistent_get_artefacts
+#+BEGIN_SRC python
+    def get_artefacts(self):
+        self.artefact_set = Artefact.get_all()
+        return self.artefact_set
+
+#+END_SRC
+**** Tests
+#+NAME: test_persistent_get_artefacts
+#+BEGIN_SRC python
+    def test_get_artefacts(self):
+        new_artefact = Artefact(name = "Photo", path = "/main/photos",
+                                a_type = Type.photo)
+        new_artefact.save()
+        self.assertEqual(len(self.persistent_delegate.get_artefacts()), 1)
+
+#+END_SRC
+*** get_artefacts_of_a_workshop
+
+    This return the workshop_set maintained by the system.
+#+NAME: persistent_get_artefacts_of_a_workshop
+#+BEGIN_SRC python
+    def get_artefacts_of_a_workshop(self, workshop):
+        self.artefact_set = workshop.get("artefacts")
+        return self.artefact_set
+
+#+END_SRC
+**** Tests
+#+NAME: test_persistent_get_artefacts_of_a_workshop
+#+BEGIN_SRC python
+    def test_get_artefacts_of_a_workshop(self):
+        print "test_get_artefacts_of_a_workshop"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        new_artefact = Artefact(name = "Photo", path = "/main/photos",
+                                a_type = Type.photo)
+
+        workshop = self.persistent_delegate.upload_artefact(workshop, new_artefact)
+
+        self.assertEqual(len(self.persistent_delegate.get_artefacts_of_a_workshop(workshop)), 1)
+#+BEGIN_SRC python
 #+END_SRC
 
 
@@ -1616,33 +1867,23 @@ if __name__ == '__main__':
 <<get_active_users>>
 #+end_src
 
-
 #+BEGIN_SRC python :tangle persistent_delegates.py :eval no :noweb yes
 <<imports_for_persistent_delegates>>
 <<class_persistence_delegate>>
-<<initialize_persistent_role_set>>
-<<initialize_persistent_user_set>>
 <<persistent_user_exists>>
-<<add_persistent_user>>
+<<persistent_add_user>>
 <<persistent_update_user>>
 <<persistent_delete_user>>
 <<persistent_add_role_to_user>>
 <<persistent_get_users>>
-<<persistent_role_exists>>
-<<add_persistent_role>>
-<<persistent_oc_exists>>
-<<persistent_nc_exists>>
+<<persistent_get_active_users>>
 <<persistent_add_oc>>
 <<persistent_add_nc>>
-<<persistent_add_workshop>>
-<<persistent_workshop_exists>>
-<<persistent_institute_exists>>
-<<add_persistent_institute>>
-<<persistent_get_active_users>>
-<<persistent_get_institutes>>
 <<persistent_get_ocs>>
 <<persistent_get_ncs>>
-<<persistent_get_workshops>>
+<<persistent_oc_exists>>
+<<persistent_nc_exists>>
+<<persistent_role_exists>>
 <<persistent_add_role>>
 <<persistent_add_occ_role>>
 <<persistent_add_ncc_role>>
@@ -1650,16 +1891,19 @@ if __name__ == '__main__':
 <<persistent_add_institute>>
 <<persistent_update_institute>>
 <<persistent_get_institutes>>
-<<persistent_workshop_exists>>
+<<persistent_institute_exists>>
 <<persistent_add_workshop>>
 <<persistent_cancel_workshop>>
 <<persistent_reschedule_workshop>>
 <<persistent_conduct_workshop>>
-<<persistent_upload_artefact>>
 <<persistent_approve_workshop>>
 <<persistent_reject_workshop>>
+<<persistent_workshop_exists>>
+<<persistent_upload_artefact>>
 <<persistent_delete_artefact>>
 <<persistent_get_workshops>>
+<<persistent_get_artefacts>>
+<<persistent_get_artefacts_of_a_workshop>>
 <<persistent_get_active_users>>
 #+end_src
 ** tests
@@ -1687,29 +1931,49 @@ if __name__ == '__main__':
 <<test_get_active_users>>
 <<test_workshop_exists>>
 <<test_add_workshop>>
-
 <<test_get_workshops>>
-
 <<run_test_cases>>
 #+end_src
-
 #+BEGIN_SRC python :tangle test_persistent_delegates.py :eval no :noweb yes
 <<imports_for_tests_persistence>>
-<<test_initialize_persistent_delegate>>
+<<test_class_persistent_delegate>>
 <<test_persistent_user_exists>>
-<<test_add_persistent_user>>
+<<test_persistent_add_user>>
+<<test_persistent_update_user>>
+<<test_persistent_delete_user>>
+<<test_persistent_add_role_to_user>>
+<<test_persistent_get_users>>
+<<test_persistent_get_active_users>>
 <<test_persistent_add_oc>>
 <<test_persistent_oc_exists>>
 <<test_persistent_add_nc>>
 <<test_persistent_nc_exists>>
+<<test_persistent_get_ocs>>
+<<test_persistent_get_ncs>>
+<<test_persistent_role_exists>>
+<<test_persistent_add_role>>
+<<test_persistent_add_occ_role>>
+<<test_persistent_add_ncc_role>>
+<<test_persistent_get_roles>>
+<<test_persistent_institute_exists>>
+<<test_persistent_add_institute>>
+<<test_persistent_update_institute>>
+<<test_persistent_get_institutes>>
 <<test_persistent_add_workshop>>
 <<test_persistent_workshop_exists>>
-<<test_persistent_role_exists>>
-<<test_add_persistent_role>>
-<<test_persistent_institute_exists>>
-<<test_add_persistent_institute>>
-<<test_persistent_add_occ_role>>
-<<run_test_cases>>
-#+end_src
 
+<<test_persistent_cancel_workshop>>
+<<test_persistent_reschedule_workshop>>
+<<test_persistent_conduct_workshop>>
+<<test_persistent_upload_artefact>>
+<<test_persistent_approve_workshop>>
+<<test_persistent_reject_workshop>>
+<<test_persistent_delete_artefact>>
+<<test_persistent_get_workshops>>
+<<test_persistent_get_artefacts>>
+<<test_persistent_get_artefacts_of_a_workshop>>
+<<test_persistent_get_active_users>>
+<<run_test_cases>>
+
+#+end_src
 
