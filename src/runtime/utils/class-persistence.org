@@ -80,6 +80,18 @@ class ClassPersistenceTemplate():
         return fn
 
     @staticmethod
+    def mk_set_state(cls):
+        def fn(obj):
+            obj.state = {}
+            for key in cls.sorted_state_vars:
+                value = getattr(obj, key)
+                obj.state[key] = value
+                if hasattr(value.__class__, 'set_state'):
+                    value.__class__.set_state(value)
+
+        return staticmethod(fn)
+
+    @staticmethod
     def mk_get_by_id(cls):
         def fn(id):
             db.session.autoflush = False
@@ -91,6 +103,17 @@ class ClassPersistenceTemplate():
         def fn():
             db.session.autoflush = False
             return cls.query.all()
+        return staticmethod(fn)
+
+    @staticmethod
+    def mk_apply_filters(cls):
+        def fn(**kwargs):
+            db.session.autoflush = False
+            lst = cls.query.filter_by(**kwargs)
+            for obj in lst:
+                cls.set_state(obj)
+            return lst
+
         return staticmethod(fn)
 
     @staticmethod
@@ -109,6 +132,7 @@ class ClassPersistenceTemplate():
         ClassPersistenceTemplate.mk_save_handler(cls)
         cls.custom_handlers['persistence'] = True
         return cls
+
 
 #+END_SRC
 
@@ -151,7 +175,7 @@ class TestPersistence(TestCase):
 
  #+END_SRC
 
-
+ 
 * Infra                                                    :boilerplate:
 
 ** Source Infra
