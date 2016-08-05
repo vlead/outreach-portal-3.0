@@ -28,7 +28,7 @@ Virtual Labs are captured here.
    Realized in data model as
    [[../data-model/index.org::#primary_entity_sets][primary entity sets]]
 
-
+   
 * Role
 :PROPERTIES:
 :CUSTOM_ID: req_role
@@ -121,11 +121,11 @@ Virtual Labs are captured here.
 
    Realized in data model as an [[../data-model/index.org::#admin_user][admin user]]
 
-
+   
 * Outreach Center
 :PROPERTIES:
 :CUSTOM_ID: req_outreach_centre
-:END: 
+:END:      
 
   Coordination and delegation of outreach activity is carried by the Outreach
   Centers.  Each outreach center is a hub for outreach activity. 
@@ -147,12 +147,12 @@ Virtual Labs are captured here.
 ** Creation of an Outreach Center
    An =OC= is created by user while donning the role =admin=
 
-
+   
 * Nodal Centre
 :PROPERTIES:
 :CUSTOM_ID: req_nodal_centre
-:END: 
-
+:END:      
+  
   A nodal centre is one of the spokes of an outreach center (hub) that carries
   out the activity related to the outreach of Virtual Labs.
 ** Host of a Nodal Center
@@ -172,7 +172,7 @@ Virtual Labs are captured here.
    A =NCC= submits all the artifacts associated with an activity for approval
    by an =OCC=.
 
-
+   
 * Activities
 :PROPERTIES:
 :CUSTOM_ID: req_activities
