@@ -400,7 +400,48 @@ class TestObjectDelegate(TestCase):
          self.assertEqual(self.obj_delegate.oc_exists(oc), True)
 #+END_SRC
 
-     
+*** add_occ_role
+    Add occ role to the system
+    This function adds a user to the role-set maintained by the system.
+#+NAME: add_occ_role
+#+BEGIN_SRC python
+    def add_occ_role(self, name, new_oc, centre_nc):
+        self.role = Role(name=name,centre_oc=new_oc,centre_nc=centre_nc)
+        self.role_set.append(self.role)
+        return self.role
+#+END_SRC
+
+**** Tests
+#+NAME: test_add_occ_role
+#+BEGIN_SRC python
+    def test_add_occ_role(self):
+         print "test_add_occ_role"
+         role = self.obj_delegate.add_occ_role('OCC',None,None)
+         self.assertEqual(self.obj_delegate.role_exists(role), True)
+
+#+END_SRC
+
+*** add_ncc_role
+    Add ncc role to the system
+    This function adds a user to the role-set maintained by the system.
+#+NAME: add_ncc_role
+#+BEGIN_SRC python
+    def add_ncc_role(self, name, centre_oc, new_nc):
+        self.role = Role(name=name,centre_oc=centre_oc,centre_nc=new_nc)
+        self.role_set.append(self.role)
+        return self.role
+#+END_SRC
+
+**** Tests
+#+NAME: test_add_ncc_role
+#+BEGIN_SRC python
+    def test_add_ncc_role(self):
+         print "test_ncc_occ_role"
+         role = self.obj_delegate.add_occ_role('NCC',None,None)
+         self.assertEqual(self.obj_delegate.role_exists(role), True)
+
+#+END_SRC
+
 *** add_oc
     Add a oc to the system
     This function adds an outreach centre to the oc-set maintained by the system.
@@ -1771,7 +1812,7 @@ class TestPersistentDelegate(TestCase):
 
 
 
-
+	
 * Infra                                                         :boilerplate:
 
 ** sources
@@ -1849,6 +1890,8 @@ if __name__ == '__main__':
 <<update_institute>>
 <<get_institutes>>
 <<oc_exists>>
+<<add_occ_role>>
+<<add_ncc_role>>
 <<add_oc>>
 <<get_ocs>>
 <<nc_exists>>
@@ -1923,6 +1966,8 @@ if __name__ == '__main__':
 <<test_add_institute>>
 <<test_get_institutes>>
 <<test_oc_exists>>
+<<test_add_occ_role>>
+<<test_add_ncc_role>>
 <<test_add_oc>>
 <<test_get_ocs>>
 <<test_nc_exists>>
