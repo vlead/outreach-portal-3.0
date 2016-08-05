@@ -13,6 +13,31 @@
 class TestAddUser(TestCase):
     TESTING = True
     persistent_delegate = None
+
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -21,8 +46,8 @@ class TestAddUser(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         db.session.remove()
@@ -119,6 +144,30 @@ class TestAddUser(TestCase):
 #+BEGIN_SRC python
 class TestDeleteUser(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -127,8 +176,8 @@ class TestDeleteUser(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -266,6 +315,31 @@ class TestDeleteUser(TestCase):
 #+BEGIN_SRC python
 class TestUpdateUser(TestCase):
     TESTING = True
+
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -274,8 +348,8 @@ class TestUpdateUser(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -406,6 +480,30 @@ class TestUpdateUser(TestCase):
 #+BEGIN_SRC python
 class TestAddRole(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -414,8 +512,8 @@ class TestAddRole(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -436,6 +534,30 @@ class TestAddRole(TestCase):
 #+BEGIN_SRC python
 class Testlogin(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -444,8 +566,8 @@ class Testlogin(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -468,6 +590,30 @@ class Testlogin(TestCase):
 #+BEGIN_SRC python
 class Testlogout(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -476,8 +622,8 @@ class Testlogout(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -498,6 +644,30 @@ class Testlogout(TestCase):
 #+BEGIN_SRC python
 class TestCreateInstitute(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -506,8 +676,8 @@ class TestCreateInstitute(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -529,6 +699,30 @@ class TestCreateInstitute(TestCase):
 #+BEGIN_SRC python
 class TestCreateOC(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -537,8 +731,8 @@ class TestCreateOC(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -555,9 +749,7 @@ class TestCreateOC(TestCase):
         institute = System.do("create_institute",institute = inst,session=sess)
         oc = System.do("create_oc",institute=institute,spokes=[],
                         session=sess, oc_target = None)
-
-        self.assertEqual(OC.get_by_id(1).get('institute'),
-                         Institute.get_by_id(1))
+        self.assertEqual(OC.get_by_id(1).get("name"), Institute.get_by_id(1).get("name"))
 
 #+END_SRC
 
@@ -566,6 +758,30 @@ class TestCreateOC(TestCase):
 #+BEGIN_SRC python
 class TestCreateNC(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -574,8 +790,8 @@ class TestCreateNC(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -601,6 +817,30 @@ class TestCreateNC(TestCase):
 #+BEGIN_SRC python
 class TestUpdateInstitute(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -609,8 +849,8 @@ class TestUpdateInstitute(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -638,6 +878,30 @@ class TestUpdateInstitute(TestCase):
 #+BEGIN_SRC python
 class TestCreateWorkshop(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -646,8 +910,8 @@ class TestCreateWorkshop(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -719,6 +983,30 @@ class TestCreateWorkshop(TestCase):
 #+BEGIN_SRC python
 class TestCancelWorkshop(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -727,8 +1015,8 @@ class TestCancelWorkshop(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -738,33 +1026,34 @@ class TestCancelWorkshop(TestCase):
 
     def test_cancel_workshop(self):
         print "test_cancel_workshop"
-        admin_user=User.get_by_id(1)
-        session = Session(user=admin_user,role=Role.admin)
-        System.session_set.append(session)
+
+        login_user = User.get_by_id(1)
+        login_role = Role.get_by_id(1)
+        sess = System.do("login",user=login_user,role=login_role)
         inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute", institute = inst,session=session)
+        institute = System.do("create_institute",institute = inst, session=sess)
         inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst, session = session)
-        oc = System.do("create_oc", institute=institute,spokes=[],
-                        session=session, oc_target = None)
+        workshop_institute = System.do("create_institute", institute = inst, session = sess)
 
+        oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
+                        session=sess, oc_target = None)
 
-        nc = System.do("create_nc",institute=institute,hub=oc,
-                        session=session, nc_target = None, workshops = [])
+        nc = System.do("create_nc",institute= Institute.get_by_id(1),
+                        hub=oc,session=sess, nc_target = None, workshops = [])
 
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
         nc_target = NCTarget(usage = 200, date = target_date,
                              oc_target = oc_target, wstargets = [])
         wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
-                            date = target_date, nc_target = nc_target)
+                            date = target_date, nc_target = nc_target )
         oc_target.save()
         nc_target.save()
-        wstarget.save()
 
+        session = Session(user=login_user,role=Role.admin)
+        System.session_set.append(session)
         ws_status = Status(name = "pending")
         ws_status.save()
-
         name=Name(name="ncuser")
         email=Email(email="ncuser@gmail.com")
         name.save()
@@ -772,26 +1061,35 @@ class TestCancelWorkshop(TestCase):
         guest_role = Role.query.filter_by(name='guest').first()
         user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
                     user_status="active")
-        nc_user = System.do("add_user",user = user, session = session)
-        System.do("add_role", user = nc_user, role = ncc_role,
-                   session = session)
+
+        nc_user = System.do("add_user", user=user, session = sess)
+
+        ncc_role =  Role.get_by_id(6)
+        if ncc_role:
+            nc_user.append_role(ncc_role)
+
         nc_session = Session(user = nc_user, role = ncc_role)
         System.session_set.append(nc_session)
+        role_check = Role.get_by_id(6)
 
-        name1 = Name(name = "Lab Workshop")
-        name1.save()
         new_workshop = System.do("create_workshop",
-                                 institute = Institute.get_by_id(2),
-                                 name  = name1, ws_target = wstarget,
-                                 status = ws_status, artefacts = [],
-                                 nc = nc, session = nc_session) 
-        
+                                 institute = workshop_institute,
+                                 name = Name(name = "Lab Workshop"),
+                                 ws_target = wstarget,
+                                 status = ws_status,
+                                 artefacts = [],
+                                 nc = nc,
+                                 session = nc_session)
+
+        self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"), workshop_institute.get("name"))
+
+
         System.do("cancel_workshop", workshop = new_workshop,
                    session = nc_session)
-        self.assertEqual(new_workshop.get("status").get("name"),
+        self.assertEqual(Workshop.get_by_id(1).get("status").get("name"),
                          Status.cancelled.get("name"))
-        self.assertEqual(nc.get("workshops")[0].get("status").get("name"),
-                         Status.cancelled.get("name"))
+#        self.assertEqual(nc.get("workshops")[0].get("status").get("name"),
+#                         ws_status.cancelled.get("name"))
         
     #+END_SRC
 
@@ -800,6 +1098,30 @@ class TestCancelWorkshop(TestCase):
 #+BEGIN_SRC python
 class TestRescheduleWorkshop(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -808,8 +1130,8 @@ class TestRescheduleWorkshop(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -854,8 +1176,11 @@ class TestRescheduleWorkshop(TestCase):
         user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
                     user_status="active")
         nc_user = System.do("add_user",user = user, session = session)
-        System.do("add_role", user = nc_user, role = ncc_role,
-                   session = session)
+
+        ncc_role =  Role.get_by_id(6)
+        if ncc_role:
+            nc_user.append_role(ncc_role)
+
         nc_session = Session(user = nc_user, role = ncc_role)
         System.session_set.append(nc_session)
 
@@ -880,9 +1205,9 @@ class TestRescheduleWorkshop(TestCase):
                    session = nc_session, wstarget = new_wstarget)
 
         self.assertEqual(new_workshop.get("status").get("name"),
-                         Status.pending.get("name"))
-        self.assertEqual(nc.get("workshops")[0].get("status").get("name"),
-                         Status.pending.get("name"))
+                         ws_status.pending.get("name"))
+#        self.assertEqual(nc.get("workshops")[0].get("status").get("name"),
+#                         ws_status.pending.get("name"))
         self.assertEqual(new_workshop.get("ws_target").get("date"),
                          new_target_date)
         
@@ -893,6 +1218,30 @@ class TestRescheduleWorkshop(TestCase):
 #+BEGIN_SRC python
 class TestConductWorkshop(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -901,8 +1250,8 @@ class TestConductWorkshop(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -911,34 +1260,34 @@ class TestConductWorkshop(TestCase):
 
     def test_conduct_workshop(self):
         print "test_conduct_workshop"
-        admin_user=User.get_by_id(1)
-        session = Session(user=admin_user,role=Role.admin)
-        System.session_set.append(session)
+
+        login_user = User.get_by_id(1)
+        login_role = Role.get_by_id(1)
+        sess = System.do("login",user=login_user,role=login_role)
         inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute",institute = inst,session=session)
+        institute = System.do("create_institute",institute = inst, session=sess)
         inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst, session = session)
+        workshop_institute = System.do("create_institute", institute = inst, session = sess)
 
-        oc = System.do("create_oc",institute=institute,spokes=[],
-                        session=session, oc_target = None)
+        oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
+                        session=sess, oc_target = None)
 
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
-                        nc_target = None, workshops = [])
+        nc = System.do("create_nc",institute= Institute.get_by_id(1),
+                        hub=oc,session=sess, nc_target = None, workshops = [])
 
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        oc_target.save()
-        nc_target = NCTarget(usage = 200, date = target_date, wstargets = [],
-                             oc_target = oc_target)
-        nc_target.save()
+        nc_target = NCTarget(usage = 200, date = target_date,
+                             oc_target = oc_target, wstargets = [])
         wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
-                            date = target_date, nc_target = nc_target)
-        
-        wstarget.save()
+                            date = target_date, nc_target = nc_target )
+        oc_target.save()
+        nc_target.save()
 
+        session = Session(user=login_user,role=Role.admin)
+        System.session_set.append(session)
         ws_status = Status(name = "pending")
         ws_status.save()
-
         name=Name(name="ncuser")
         email=Email(email="ncuser@gmail.com")
         name.save()
@@ -946,28 +1295,35 @@ class TestConductWorkshop(TestCase):
         guest_role = Role.query.filter_by(name='guest').first()
         user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
                     user_status="active")
-        nc_user = System.do("add_user",user = user, session = session)
-        System.do("add_role", user = nc_user, role = ncc_role,
-                   session = session)
+
+        nc_user = System.do("add_user", user=user, session = sess)
+
+        ncc_role =  Role.get_by_id(6)
+        if ncc_role:
+            nc_user.append_role(ncc_role)
+
         nc_session = Session(user = nc_user, role = ncc_role)
         System.session_set.append(nc_session)
+        role_check = Role.get_by_id(6)
 
-        name1 = Name(name = "Lab Workshop")
-        name1.save()
         new_workshop = System.do("create_workshop",
-                                 institute = Institute.get_by_id(2),
-                                 name  = name1, ws_target = wstarget,
-                                 status = ws_status, artefacts = [],
-                                 nc = nc, session = nc_session) 
+                                 institute = workshop_institute,
+                                 name = Name(name = "Lab Workshop"),
+                                 ws_target = wstarget,
+                                 status = ws_status,
+                                 artefacts = [],
+                                 nc = nc,
+                                 session = nc_session)
+
+        self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"), workshop_institute.get("name"))
+
 
         System.do("conduct_workshop", workshop = new_workshop,
                    session = nc_session)
         self.assertEqual(new_workshop.get("status").get("name"),
-                         Status.completed.get("name"))
-        self.assertEqual(nc.get("workshops")[0].get("status").get("name"),
-                         Status.completed.get("name"))
-        
-
+                         ws_status.completed.get("name"))
+#        self.assertEqual(nc.get("workshops")[0].get("status").get("name"),
+#                         ws_status.completed.get("name"))
  #+END_SRC
 
 * Test UploadArtefact
@@ -975,6 +1331,30 @@ class TestConductWorkshop(TestCase):
 #+BEGIN_SRC python
 class TestUploadArtefact(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -983,8 +1363,8 @@ class TestUploadArtefact(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -1028,8 +1408,11 @@ class TestUploadArtefact(TestCase):
         user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
                     user_status="active")
         nc_user = System.do("add_user",user = user, session = session)
-        System.do("add_role", user = nc_user, role = ncc_role,
-                   session = session)
+
+        ncc_role =  Role.get_by_id(6)
+        if ncc_role:
+            nc_user.append_role(ncc_role)
+
         nc_session = Session(user = nc_user, role = ncc_role)
         System.session_set.append(nc_session)
 
@@ -1065,6 +1448,30 @@ class TestUploadArtefact(TestCase):
 #+BEGIN_SRC python
 class TestApproveWorkshop(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -1073,16 +1480,154 @@ class TestApproveWorkshop(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
         db.session.remove()
         db.drop_all()
 
+
     def test_approve_workshop(self):
         print "test_approve_workshop"
+
+        login_user = User.get_by_id(1)
+        login_role = Role.get_by_id(1)
+        sess = System.do("login",user=login_user,role=login_role)
+        inst = Institute(name="IIIT",address="Hyderabad")
+        institute = System.do("create_institute",institute = inst, session=sess)
+        inst = Institute(name="NITK",address="Surathkal")
+        workshop_institute = System.do("create_institute", institute = inst, session = sess)
+
+        oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
+                        session=sess, oc_target = None)
+
+        nc = System.do("create_nc",institute= Institute.get_by_id(1),
+                        hub=oc,session=sess, nc_target = None, workshops = [])
+
+        target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date,
+                             oc_target = oc_target, wstargets = [])
+        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
+                            date = target_date, nc_target = nc_target )
+        oc_target.save()
+        nc_target.save()
+
+        session = Session(user=login_user,role=Role.admin)
+        System.session_set.append(session)
+        ws_status = Status(name = "pending")
+        ws_status.save()
+        name=Name(name="ncuser")
+        email=Email(email="ncuser@gmail.com")
+        name.save()
+        email.save()
+        guest_role = Role.query.filter_by(name='guest').first()
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+                    user_status="active")
+
+        nc_user = System.do("add_user", user=user, session = sess)
+
+        ncc_role =  Role.get_by_id(6)
+        if ncc_role:
+            nc_user.append_role(ncc_role)
+
+        nc_session = Session(user = nc_user, role = ncc_role)
+        System.session_set.append(nc_session)
+        role_check = Role.get_by_id(6)
+
+        new_workshop = System.do("create_workshop",
+                                 institute = workshop_institute,
+                                 name = Name(name = "Lab Workshop"),
+                                 ws_target = wstarget,
+                                 status = ws_status,
+                                 artefacts = [],
+                                 nc = nc,
+                                 session = nc_session)
+
+        self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"), workshop_institute.get("name"))
+
+
+
+        name = Name(name="ocuser")
+        name.save()
+        email = Email(email="mary@gmail.com")
+        email.save()
+        guest_role = Role.query.filter_by(name='guest').first()
+
+        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3), roles= [guest_role],
+                    user_status="active")
+        oc_user= System.do("add_user", user=user, session=sess)
+
+        occ_role =  Role(name="OCC",centre_oc=oc,centre_nc=None)
+        if occ_role:
+            nc_user.append_role(occ_role)
+
+        oc_session = Session(user = oc_user, role = occ_role)
+        System.session_set.append(oc_session)
+
+        System.do("conduct_workshop", workshop = new_workshop,
+                   session = nc_session)
+        self.assertEqual(new_workshop.get("status").get("name"),
+                         ws_status.completed.get("name"))
+
+        System.do("approve_workshop", workshop = new_workshop,
+                   session = oc_session)
+
+        self.assertEqual(new_workshop.get("status").get("name"),
+                         Status.approved.get("name"))
+
+    #+END_SRC
+
+* Test RejectWorkshop
+#+NAME: test_RejectWorkshop
+#+BEGIN_SRC python
+class TestRejectWorkshop(TestCase):
+    TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
+    def create_app(self):
+        app = create_app(config)
+        return app
+
+    def setUp(self):
+        db.create_all()
+        System.initialize_system(PersistenceDelegate)
+        self.persistent_delegate = PersistenceDelegate()
+        self.initialize_role_set()
+        self.initialize_user_set()
+
+    def tearDown(self):
+        System.session_set = []
+        db.session.remove()
+        db.drop_all()
+
+    def test_reject_workshop(self):
+        print "test_reject_workshop"
+
         admin_user=User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
@@ -1104,7 +1649,7 @@ class TestApproveWorkshop(TestCase):
         nc_target.save()
         wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
                             date = target_date, nc_target = nc_target)
-        
+
         wstarget.save()
 
         ws_status = Status(name = "pending")
@@ -1118,8 +1663,11 @@ class TestApproveWorkshop(TestCase):
         user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
                     user_status="active")
         nc_user = System.do("add_user",user = user, session = session)
-        System.do("add_role", user = nc_user, role = ncc_role,
-                   session = session)
+
+        ncc_role =  Role.get_by_id(6)
+        if ncc_role:
+            nc_user.append_role(ncc_role)
+
         nc_session = Session(user = nc_user, role = ncc_role)
         System.session_set.append(nc_session)
 
@@ -1128,15 +1676,17 @@ class TestApproveWorkshop(TestCase):
 
         name1=Name(name="ocuser")
         name1.save()
-     
+
         email1=Email(email="ocuser@gmail.com")
         email1.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3), roles= [guest_role],
                     user_status="active")
         oc_user = System.do("add_user",user = user, session = session)
-        System.do("add_role", user = oc_user, role = occ_role,
-                   session = session)
+        occ_role =  Role(name="OCC",centre_oc=oc,centre_nc=None)
+        if occ_role:
+            oc_user.append_role(occ_role)
+
         oc_session = Session(user = nc_user, role = occ_role)
         System.session_set.append(oc_session)
 
@@ -1144,138 +1694,25 @@ class TestApproveWorkshop(TestCase):
                                  institute = Institute.get_by_id(2),
                                  name  = workshop_name, ws_target = wstarget,
                                  status = ws_status, artefacts = [],
-                                 nc = nc, session = nc_session) 
-          
+                                 nc = nc, session = nc_session)
+
 
         System.do("conduct_workshop", workshop = new_workshop,
                   session = nc_session)
 
-        new_artefact = Artefact(name = "Photo", 
-                                path = "/main/photos", 
+        new_artefact = Artefact(name = "Photo",
+                                path = "/main/photos",
                                 a_type = Type.photo)
 
         new_artefact.save()
 
         System.do("upload_artefact", workshop = new_workshop,
                   session = nc_session, artefact = Artefact.get_by_id(1))
-        
-        System.do("approve_workshop", workshop = new_workshop,
-                   session = oc_session)
 
-        self.assertEqual(new_workshop.get("status").get("name"),
-                         Status.approved.get("name"))
-        
-        
-
-    #+END_SRC
-
-* Test RejectWorkshop
-#+NAME: test_RejectWorkshop
-#+BEGIN_SRC python
-class TestRejectWorkshop(TestCase):
-    TESTING = True
-    def create_app(self):
-        app = create_app(config)
-        return app
-
-    def setUp(self):
-        db.create_all()
-        System.initialize_system(PersistenceDelegate)
-        self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
-
-    def tearDown(self):
-        System.session_set = []
-        db.session.remove()
-        db.drop_all()
-
-
-    def test_reject_workshop(self):
-        print "test_reject_workshop"
-        admin_user= User.get_by_id(1)
-        session = Session(user=admin_user,role=Role.admin)
-        System.session_set.append(session)
-        inst = Institute(name = "IIIT", address = "Hyderabad")
-        institute = System.do("create_institute", institute = inst, session=session)
-        inst = Institute(name = "NITK", address = "Surathkal")
-        workshop_institute = System.do("create_institute", institute=inst, session = session)
-        oc = System.do("create_oc",institute=institute,spokes=[],
-                        session=session, oc_target = None)
-
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
-                        nc_target = None, workshops = [])
-
-        target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        oc_target.save()
-        nc_target = NCTarget(usage = 200, date = target_date,
-                             oc_target = oc_target, wstargets = [])
-        nc_target.save()
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
-                            date = target_date, nc_target = nc_target)
-        wstarget.save()
-        
-        ws_status = Status(name = "pending")
-        ws_status.save()
-
-        name=Name(name="ncuser")
-        email=Email(email="ncuser@gmail.com")
-        name.save()
-        email.save()
-        guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
-                    user_status="active")
-        nc_user = System.do("add_user",user = user, session = session)
-        System.do("add_role", user = nc_user, role = ncc_role,
-                   session = session)
-        nc_session = Session(user = nc_user, role = ncc_role)
-        System.session_set.append(nc_session)
-
-        name1=Name(name="ocuser")
-        name1.save()
-     
-        email1=Email(email="ocuser@gmail.com")
-        email1.save()
-        guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
-                    user_status="active")
-        oc_user = System.do("add_user", user=user, session = session)
-        System.do("add_role", user = oc_user, role = occ_role,
-                   session = session)
-        oc_session = Session(user = nc_user, role = occ_role)
-        System.session_set.append(oc_session)
-
-        workshop_name = Name(name = "Lab Workshop")
-        workshop_name.save()
-
-
-        new_workshop = System.do("create_workshop",
-                                 institute = Institute.get_by_id(2),
-                                 name  = workshop_name, ws_target = wstarget,
-                                 status = ws_status, artefacts = [],
-                                 nc = nc, session = nc_session) 
-          
-
-        System.do("conduct_workshop", workshop = new_workshop,
-                  session = nc_session)
-
-        new_artefact = Artefact(name = "Photo", 
-                                path = "/main/photos", 
-                                a_type = Type.photo)
-
-        new_artefact.save()
-
-        System.do("upload_artefact", workshop = new_workshop,
-                  session = nc_session, artefact = Artefact.get_by_id(1))
-        
-        
         System.do("reject_workshop", workshop = new_workshop,
                    session = oc_session)
         self.assertEqual(new_workshop.get("status").get("name"),
                          Status.rejected.get("name"))
-        
-        
 
     #+END_SRC
 * Test DeleteArtefact
@@ -1283,6 +1720,30 @@ class TestRejectWorkshop(TestCase):
 #+BEGIN_SRC python
 class TestDeleteArtefact(TestCase):
     TESTING = True
+    def initialize_role_set(self):
+        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.admin_role.save()
+        self.guest_role.save()
+        self.reviewer_role.save()
+        self.noc_role.save()
+        return Role.query.all()
+
+    def initialize_user_set(self):
+        admin_name = Name(name=Config.admin_name)
+        admin_email = Email(email=Config.admin_email)
+        admin_name.save()
+        admin_email.save()
+        role_admin = Role.get_by_id(1)
+        role_guest = Role.get_by_id(2)
+        self.admin_user = User(name=admin_name,
+                          email=admin_email,
+                          roles=[role_admin, role_guest], user_status="active")
+        self.admin_user.save()
+        return User.get_all()
+
     def create_app(self):
         app = create_app(config)
         return app
@@ -1291,8 +1752,8 @@ class TestDeleteArtefact(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.persistent_delegate.initialize_role_set()
-        self.persistent_delegate.initialize_user_set()
+        self.initialize_role_set()
+        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -1323,8 +1784,10 @@ class TestDeleteArtefact(TestCase):
         user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
                     user_status="active")
         nc_user = System.do("add_user",user = user, session = session)
-        System.do("add_role", user = nc_user, role = ncc_role,
-                   session = session)
+        ncc_role =  Role.get_by_id(6)
+        if ncc_role:
+            nc_user.append_role(ncc_role)
+
         nc_session = Session(user = nc_user, role = ncc_role)
         System.session_set.append(nc_session)
 

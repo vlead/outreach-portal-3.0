@@ -850,7 +850,7 @@ class CancelWorkshop():
         workshop = args["workshop"]
         session = args["session"]
         workshop_status = workshop.get("status")
-        if Status.is_pending == workshop_status:
+        if workshop_status == "pending":
             raise StateError("cannot cancel workshop")
         
                     
@@ -890,7 +890,7 @@ class RescheduleWorkshop():
         session = args["session"]
         wstarget = args['wstarget']
         workshop_status = workshop.get("status")
-        if Status.is_cancelled == workshop_status:
+        if workshop_status == "cancelled":
             raise StateError("cannot reschedule workshop")
         
                     
@@ -929,7 +929,7 @@ class ConductWorkshop():
         workshop = args["workshop"]
         session = args["session"]
         workshop_status = workshop.get("status")
-        if Status.is_pending == workshop_status:
+        if workshop_status == "pending":
             raise StateError("cannot conduct workshop")
         
                     
@@ -971,10 +971,10 @@ class UploadArtefact():
         workshop = args["workshop"]
         session = args["session"]
         workshop_status = workshop.get("status")
-        if (Status.is_completed == workshop_status or
-            Status.is_pending_approval == workshop_status or
-            Status.is_rejected == workshop_status or
-            Status.is_approved == workshop_status):
+        if (workshop_status == "completed" or
+            workshop_status == "pending for approval" or
+            workshop_status == "rejected" or
+            workshop_status == "approved"):
             raise StateError("cannot upload artefact")
         
                     
@@ -1015,7 +1015,7 @@ class ApproveWorkshop():
         workshop = args["workshop"]
         session = args["session"]
         workshop_status = workshop.get("status")
-        if Status.is_pending_approval == workshop_status:
+        if workshop_status == "pending for approval":
             raise StateError("cannot approve workshop")
         
                     
@@ -1053,7 +1053,7 @@ class RejectWorkshop():
         workshop = args["workshop"]
         session = args["session"]
         workshop_status = workshop.get("status")
-        if Status.is_pending_approval == workshop_status:
+        if workshop_status == "pending for approval":
             raise StateError("cannot reject workshop")
         
                     
@@ -1092,10 +1092,11 @@ class DeleteArtefact():
         workshop = args["workshop"]
         session = args["session"]
         workshop_status = workshop.get("status")
-        if (Status.is_completed == workshop_status or
-            Status.is_pending_approval == workshop_status or
-            Status.is_rejected == workshop_status or
-            Status.is_approved == workshop_status):
+        if (workshop_status == "completed" or
+            workshop_status == "pending for approval" or
+            workshop_status == "rejected" or
+            workshop_status == "approved"):
+
             raise StateError("cannot upload artefact")
         
                     
