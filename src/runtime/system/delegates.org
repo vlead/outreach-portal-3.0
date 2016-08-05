@@ -612,24 +612,15 @@ class TestObjectDelegate(TestCase):
         print "test_workshop_exists"
         ins = Institute(name='IIIT',address='Hyderabad')
         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-        nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
         target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
         nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
         workshop_name = Name(name = "New Workshop")
         ws_status = Status(name = "pending")
-        workshop = Workshop(institute = ins, 
-                            nc = nc1, 
-                            artefacts = [], 
-                            ws_target = wstarget, 
-                            status = ws_status, 
-                            name = workshop_name, 
-                            a_date = None,
-                            a_participants = 0,
-                            a_experiments = 0,
-                            a_usage = 0)
-        workshop = self.obj_delegate.add_workshop(workshop)
+        artefacts = []
+        workshop = self.obj_delegate.add_workshop(ins, workshop_name, ws_target, artefacts, ws_status, nc)
         self.assertEqual(self.obj_delegate.workshop_exists(workshop), True)
 
 #+END_SRC
@@ -639,9 +630,19 @@ class TestObjectDelegate(TestCase):
     This function adds a workshop to the workshop-set maintained by the system.
 #+NAME: add_workshop
 #+BEGIN_SRC python
-    def add_workshop(self, workshop):
-        self.workshop_set.append(workshop)
-        return workshop
+    def add_workshop(self, institute, name, ws_target, artefacts, status, nc):
+        new_workshop = Workshop(institute = institute,
+                                name = name,
+                                ws_target = ws_target,
+                                artefacts = artefacts,
+                                status = status,
+                                nc = nc,
+                                a_date = None,
+                                a_participants = 0,
+                                a_experiments = 0,
+                                a_usage = 0)
+        self.workshop_set.append(new_workshop)
+        return new_workshop
 
 #+END_SRC
 
@@ -652,24 +653,15 @@ class TestObjectDelegate(TestCase):
         print "test_add_workshop"
         ins = Institute(name='IIIT',address='Hyderabad')
         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-        nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
         target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
         nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
         workshop_name = Name(name = "New Workshop")
         ws_status = Status(name = "pending")
-        workshop = Workshop(institute = ins, 
-                            nc = nc1, 
-                            artefacts = [], 
-                            ws_target = wstarget, 
-                            status = ws_status, 
-                            name = workshop_name, 
-                            a_date = None,
-                            a_participants = 0,
-                            a_experiments = 0,
-                            a_usage = 0)
-        workshop = self.obj_delegate.add_workshop(workshop)
+        artefacts = []
+        workshop = self.obj_delegate.add_workshop(ins, workshop_name, ws_target, artefacts, ws_status, nc)
         self.assertEqual(self.obj_delegate.workshop_exists(workshop), True)
 
 #+END_SRC
@@ -681,6 +673,29 @@ class TestObjectDelegate(TestCase):
         workshop.set(status = Status.cancelled)
         return workshop
 #+END_SRC
+**** Tests
+#+NAME: test_cancel_workshop
+#+BEGIN_SRC python
+    def test_cancel_workshop(self):
+        print "test_cancel_workshop"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.obj_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+
+        cancelled_workshop = self.obj_delegate.cancel_workshop(workshop)
+
+        self.assertEqual(cancelled_workshop.get("status"), Status.cancelled)
+#+END_SRC
+
 *** reschedule_workshop
 #+NAME: reschedule_workshop
 #+BEGIN_SRC python
@@ -690,6 +705,29 @@ class TestObjectDelegate(TestCase):
         return workshop
 
 #+END_SRC
+**** Tests
+#+NAME: test_reschedule_workshop
+#+BEGIN_SRC python
+    def test_reschedule_workshop(self):
+        print "test_reschedule_workshop"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.obj_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        ws_new_target = WSTarget(usage = 5000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        rescheduled_workshop = self.obj_delegate.reschedule_workshop(workshop, ws_new_target)
+
+        self.assertEqual(rescheduled_workshop.get("status"), Status.pending)
+        self.assertEqual(rescheduled_workshop.get("ws_target").get("usage"), 5000)
+#+END_SRC
 
 *** conduct_workshop
 #+NAME: conduct_workshop
@@ -697,6 +735,28 @@ class TestObjectDelegate(TestCase):
     def conduct_workshop(self, workshop):
         workshop.set(status = Status.completed)
         return workshop
+#+END_SRC
+**** Tests
+#+NAME: test_conduct_workshop
+#+BEGIN_SRC python
+    def test_conduct_workshop(self):
+        print "test_conduct_workshop"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.obj_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+
+        conducted_workshop = self.obj_delegate.conduct_workshop(workshop)
+
+        self.assertEqual(conducted_workshop.get("status"), Status.completed)
 #+END_SRC
 
 *** upload_artefact
@@ -709,6 +769,32 @@ class TestObjectDelegate(TestCase):
         workshop.set(status = Status.pending_approval)
         return workshop
 #+END_SRC
+**** Tests
+#+NAME: test_upload_artefact
+#+BEGIN_SRC python
+    def test_upload_artefact(self):
+        print "test_upload_artefact"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.obj_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        new_artefact = Artefact(name = "Photo", path = "/main/photos",
+                                a_type = Type.photo)
+
+        workshop = self.obj_delegate.upload_artefact(workshop, new_artefact)
+
+        self.assertEqual(workshop.get("status"), Status.pending_approval)
+        self.assertEqual(len(self.obj_delegate.get_artefacts_of_a_workshop(workshop)), 1)
+        self.assertEqual(len(self.obj_delegate.get_artefacts()), 1)
+#+END_SRC
 
 *** approve_workshop
 #+NAME: approve_workshop
@@ -717,12 +803,57 @@ class TestObjectDelegate(TestCase):
         workshop.set(status = Status.approved)
         return workshop
 #+END_SRC
+**** Tests
+#+NAME: test_approve_workshop
+#+BEGIN_SRC python
+    def test_approve_workshop(self):
+        print "test_approve_workshop"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.obj_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+
+        approved_workshop = self.obj_delegate.approve_workshop(workshop)
+
+        self.assertEqual(approved_workshop.get("status"), Status.approved)
+#+END_SRC
+
 *** reject_workshop
 #+NAME: reject_workshop
 #+BEGIN_SRC python
     def reject_workshop(self, workshop):
         workshop.set(status = Status.rejected)
         return workshop
+#+END_SRC
+**** Tests
+#+NAME: test_reject_workshop
+#+BEGIN_SRC python
+    def test_reject_workshop(self):
+        print "test_reject_workshop"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.obj_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+
+        rejected_workshop = self.obj_delegate.reject_workshop(workshop)
+
+        self.assertEqual(rejected_workshop.get("status"), Status.rejected)
 #+END_SRC
 
 *** delete_artefact
@@ -737,6 +868,33 @@ class TestObjectDelegate(TestCase):
         workshop.set(status = Status.pending_approval)
         return workshop
 #+END_SRC
+**** Tests
+#+NAME: test_delete_artefact
+#+BEGIN_SRC python
+    def test_delete_artefact(self):
+        print "test_delete_artefact"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.obj_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        new_artefact = Artefact(name = "Photo", path = "/main/photos",
+                                a_type = Type.photo)
+
+        artefact_upload_workshop = self.obj_delegate.upload_artefact(workshop, new_artefact)
+        artefact_delete_workshop = self.obj_delegate.delete_artefact(workshop, new_artefact)
+
+        self.assertEqual(artefact_delete_workshop.get("status"), Status.pending_approval)
+        self.assertEqual(len(self.obj_delegate.get_artefacts_of_a_workshop(artefact_delete_workshop)), 0)
+
+#+END_SRC
 
 *** get_workshops
 
@@ -747,39 +905,59 @@ class TestObjectDelegate(TestCase):
         return self.workshop_set
 
 #+END_SRC
-
+**** Tests
 #+NAME: test_get_workshops
 #+BEGIN_SRC python
-    def test_get_workshops(self):
-         print "test_get_workshops"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-         nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-         target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
-         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-         nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-         wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
-         workshop_name = Name(name = "New Workshop")
-         ws_status = Status(name = "pending")
-         workshop = Workshop(institute = ins, 
-                            nc = nc1, 
-                            artefacts = [], 
-                            ws_target = wstarget, 
-                            status = ws_status, 
-                            name = workshop_name, 
-                            a_date = None,
-                            a_participants = 0,
-                            a_experiments = 0,
-                            a_usage = 0)
-         workshop = self.obj_delegate.add_workshop(workshop)
-         self.assertEqual(len(self.obj_delegate.get_workshops()), 1)
+    def test_get_all_workshops(self):
+        print "test_get_all_workshops"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
 
+        workshop = self.obj_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        self.assertEqual(self.obj_delegate.workshop_exists(workshop), True)
+        self.assertEqual(len(self.obj_delegate.get_workshops()), 1)
 #+END_SRC
+     
+*** get_artefacts_of_workshop
+#+NAME: get_artifacts
+#+BEGIN_SRC python
+    def get_artefacts_of_a_workshop(self, workshop):
+        self.artefact_set = workshop.get("artefacts")
+        return self.artefact_set     
+#+END_SRC
+**** Tests
+#+NAME: test_get_artifacts
+#+BEGIN_SRC python
 
+    def test_get_artefacts_of_a_workshop(self):
+        print "test_get_artefacts_of_a_workshop"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
 
+        workshop = self.obj_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        new_artefact = Artefact(name = "Photo", path = "/main/photos",
+                                a_type = Type.photo)
 
+        workshop = self.obj_delegate.upload_artefact(workshop, new_artefact)
 
-
+        self.assertEqual(len(self.obj_delegate.get_artefacts_of_a_workshop(workshop)), 1)
+#+END_SRC
 * Persistence Delegate
   Persistence Delegate encapsulates a set of functions where each function performs a
   specific task.  With the use of these delegates, the core implementation of
@@ -1696,7 +1874,7 @@ class TestPersistentDelegate(TestCase):
         return workshop
 #+END_SRC
 **** Tests
-#+NAME: test_persistent_delete_artefact
+#+NAME: test_delete_artefact
 #+BEGIN_SRC python
     def test_delete_artefact(self):
         print "test_delete_artefact"
@@ -1765,7 +1943,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 **** Tests
-#+NAME: test_persistent_get_artefacts
+#+NAME: test_get_artefacts
 #+BEGIN_SRC python
     def test_get_artefacts(self):
         new_artefact = Artefact(name = "Photo", path = "/main/photos",
@@ -1777,7 +1955,7 @@ class TestPersistentDelegate(TestCase):
 *** get_artefacts_of_a_workshop
 
     This return the workshop_set maintained by the system.
-#+NAME: persistent_get_artefacts_of_a_workshop
+#+NAME: get_artefacts_of_a_workshop
 #+BEGIN_SRC python
     def get_artefacts_of_a_workshop(self, workshop):
         self.artefact_set = workshop.get("artefacts")
@@ -1785,7 +1963,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 **** Tests
-#+NAME: test_persistent_get_artefacts_of_a_workshop
+#+NAME: test_get_artefacts_of_a_workshop
 #+BEGIN_SRC python
     def test_get_artefacts_of_a_workshop(self):
         print "test_get_artefacts_of_a_workshop"
@@ -1869,7 +2047,7 @@ if __name__ == '__main__':
 
 
 * Tangling                                                      :boilerplate:
-
+  
 ** sources
 #+BEGIN_SRC python :tangle object_delegates.py :eval no :noweb yes
 <<imports_for_object_delegates>>
@@ -1906,6 +2084,8 @@ if __name__ == '__main__':
 <<approve_workshop>>
 <<reject_workshop>>
 <<delete_artefact>>
+<<get_artefacts_of_a_workshop>>
+<<get_artefacts>>
 <<get_workshops>>
 <<get_active_users>>
 #+end_src
@@ -1977,7 +2157,18 @@ if __name__ == '__main__':
 <<test_workshop_exists>>
 <<test_add_workshop>>
 <<test_get_workshops>>
+<<test_cancel_workshop>>
+<<test_get_workshops>>
+<<test_reschedule_workshop>>
+<<test_conduct_workshop>>
+<<test_upload_artefact>>
+<<test_get_artefacts_of_a_workshop>>
+<<test_get_artefact>>
+<<test_approve_workshop>>
+<<test_reject_workshop>>
+<<test_delete_artefact>>
 <<run_test_cases>>
+
 #+end_src
 #+BEGIN_SRC python :tangle test_persistent_delegates.py :eval no :noweb yes
 <<imports_for_tests_persistence>>
