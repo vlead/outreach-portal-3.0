@@ -425,7 +425,7 @@ def are_roles(rls):
 Role.admin = Role(name="admin",centre_oc=None,centre_nc=None)
 Role.reviewer = Role(name="reviewer",centre_oc=None,centre_nc=None)
 Role.guest = Role(name="guest",centre_oc=None,centre_nc=None)
-Role.noc = Role(name="NOC",centre_oc=None,centre_nc=None)
+Role.noc = Role(name="noc",centre_oc=None,centre_nc=None)
 Role.is_admin = lambda role: role.name == 'admin'
 Role.is_reviewer = lambda role: role.name == 'reviewer'
 Role.is_guest = lambda role: role.guest == 'guest'

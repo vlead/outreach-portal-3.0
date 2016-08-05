@@ -894,8 +894,6 @@ if __name__ == '__main__':
 #+BEGIN_SRC python :tangle entities.py :eval no :noweb yes
 <<imports_for_sources>>
 <<class_Institute>>
-
-
 <<class_OCTarget>>
 <<class_NCTarget>>
 <<class_WSTarget>>
