@@ -385,10 +385,11 @@ class TestObjectDelegate(TestCase):
     def test_oc_exists(self):
          print "test_oc_exists"
          ins = Institute(name='IIIT',address='Hyderabad')
-         oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
-         oc = self.obj_delegate.add_oc(oc1)
+         spokes=[]
+         oc_target = None
+         oc = self.obj_delegate.add_oc(ins, spokes, oc_target)
          self.assertEqual(self.obj_delegate.oc_exists(oc), True)
-#+END_SRC
+ #+END_SRC
 
 *** add_occ_role
     Add occ role to the system
@@ -437,20 +438,21 @@ class TestObjectDelegate(TestCase):
     This function adds an outreach centre to the oc-set maintained by the system.
 #+NAME: add_oc
 #+BEGIN_SRC python
-    def add_oc(self, oc):
-        self.oc_set.append(oc)
-        return oc
-
+    def add_oc(self, institute, spokes, oc_target):
+        self.new_oc = OC(institute=institute, spokes=spokes, oc_target = oc_target)
+        self.oc_set.append(self.new_oc)
+        return self.new_oc
 #+END_SRC
 
 **** Tests
 #+NAME: test_add_oc
 #+BEGIN_SRC python
     def test_add_oc(self):
-         print "test_add_oc"
+         print "test_persistent_add_oc"
          ins = Institute(name='IIIT',address='Hyderabad')
-         oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
-         oc = self.obj_delegate.add_oc(oc1)
+         spokes=[]
+         oc_target = None
+         oc = self.obj_delegate.add_oc(ins, spokes, oc_target)
          self.assertEqual(self.obj_delegate.oc_exists(oc), True)
 
 #+END_SRC
@@ -470,8 +472,10 @@ class TestObjectDelegate(TestCase):
     def test_get_ocs(self):
          print "test_get_ocs"
          ins = Institute(name='IIIT',address='Hyderabad')
-         oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
-         oc = self.obj_delegate.add_oc(oc1)
+         spokes=[]
+         oc_target = None
+         oc = self.obj_delegate.add_oc(ins, spokes, oc_target)
+
          self.assertEqual(len(self.obj_delegate.get_ocs()), 1)
 
 #+END_SRC
@@ -493,11 +497,14 @@ class TestObjectDelegate(TestCase):
 #+NAME: test_nc_exists
 #+BEGIN_SRC python
     def test_nc_exists(self):
-         print "test_nc_exists"
+         print "test_persistent_nc_exists"
          ins = Institute(name='IIIT',address='Hyderabad')
-         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-         nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-         nc = self.obj_delegate.add_nc(nc1)
+         spokes=[]
+         oc_target = None
+         oc = self.obj_delegate.add_oc(ins, spokes, oc_target)
+         nc_target=None
+         workshops=[]
+         nc = self.obj_delegate.add_nc(ins, oc, nc_target, workshops)
          self.assertEqual(self.obj_delegate.nc_exists(nc), True)
 
 #+END_SRC
@@ -507,23 +514,27 @@ class TestObjectDelegate(TestCase):
     This function adds a nodal centre to the nc-set maintained by the system.
 #+NAME: add_nc
 #+BEGIN_SRC python
-    def add_nc(self, nc):
-        self.nc_set.append(nc)
-        return nc
-
+    def add_nc(self, institute, oc, nc_target, workshops):
+        self.new_nc = NC(institute=institute, hub=oc, nc_target=nc_target,
+                         workshops=workshops)
+        oc.append_spoke(self.new_nc)
+        self.nc_set.append(self.new_nc)
+        return self.new_nc
 #+END_SRC
 
 **** Tests
 #+NAME: test_add_nc
 #+BEGIN_SRC python
     def test_add_nc(self):
-         print "test_add_nc"
+         print "test_persistent_add_nc"
          ins = Institute(name='IIIT',address='Hyderabad')
-         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-         nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-         nc = self.obj_delegate.add_nc(nc1)
+         spokes=[]
+         oc_target = None
+         oc = self.obj_delegate.add_oc(ins, spokes, oc_target)
+         nc_target=None
+         workshops=[]
+         nc = self.obj_delegate.add_nc(ins, oc, nc_target, workshops)
          self.assertEqual(self.obj_delegate.nc_exists(nc), True)
-
 #+END_SRC
 
 *** get_ncs
@@ -541,11 +552,13 @@ class TestObjectDelegate(TestCase):
     def test_get_ncs(self):
          print "test_get_ncs"
          ins = Institute(name='IIIT',address='Hyderabad')
-         oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-         nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-         nc = self.obj_delegate.add_nc(nc1)
+         spokes=[]
+         oc_target = None
+         oc = self.obj_delegate.add_oc(ins, spokes, oc_target)
+         nc_target=None
+         workshops=[]
+         nc = self.obj_delegate.add_nc(ins, oc, nc_target, workshops)
          self.assertEqual(len(self.obj_delegate.get_ncs()), 1)
-
 #+END_SRC
 
 *** get_active_users

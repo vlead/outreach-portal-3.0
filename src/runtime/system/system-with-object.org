@@ -1240,7 +1240,6 @@ if __name__ == '__main__':
 ** tests
 #+BEGIN_SRC python :tangle test_object_system.py :eval no :noweb yes 
 <<imports_for_tests>>
-
 <<test_system_constructor>>
 <<test_arity_and_types>>
 <<test_adduser>>
