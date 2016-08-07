@@ -31,7 +31,8 @@ class ObjectDelegate():
         self.oc_set = []
         self.nc_set = []
         self.workshop_set = []
-
+        self.artefact_set = []
+        
         self.role_set = self.initialize_role_set()
         self.user_set = self.initialize_user_set()
 
@@ -117,7 +118,6 @@ class TestObjectDelegate(TestCase):
 
 #+END_SRC
 
-
 *** add_user
     Add a user to the system
     This function adds a user to the user-set maintained by the system.
@@ -142,7 +142,6 @@ class TestObjectDelegate(TestCase):
          self.assertEqual(self.obj_delegate.user_exists(user), True)
 
 #+END_SRC
-
 
 *** update_user
 #+NAME: update_user
@@ -191,7 +190,6 @@ class TestObjectDelegate(TestCase):
 	self.assertEqual(del_user.get("user_status") , "inactive")
 #+END_SRC
 
-
 *** add_role_to_user
 #+NAME: add_role_to_user
 #+BEGIN_SRC python 
@@ -213,14 +211,12 @@ class TestObjectDelegate(TestCase):
         self.assertTrue(len(user_with_new_role.get('roles'))==2)
 #+END_SRC
 
-
 *** get_users
 
     This return the user_set maintained by the system.
 #+NAME: get_users
 #+BEGIN_SRC python
     def get_users(self):
-        
         return self.get_active_users()
 
 #+END_SRC
@@ -256,7 +252,6 @@ class TestObjectDelegate(TestCase):
 
 #+END_SRC
 
-
 *** add_role
     Add a role to the system
     This function adds a user to the role-set maintained by the system.
@@ -279,8 +274,6 @@ class TestObjectDelegate(TestCase):
 
 #+END_SRC
 
-
-     
 *** get_roles
 
     This return the role_set maintained by the system.
@@ -298,7 +291,6 @@ class TestObjectDelegate(TestCase):
          self.assertEqual(len(self.obj_delegate.get_roles()), 4)
 
 #+END_SRC
-
 
 *** institute_exists
     Check if =institute= already exists
@@ -324,7 +316,6 @@ class TestObjectDelegate(TestCase):
 
 #+END_SRC
 
-
 *** add_institute
     Add an institute to the system
     This function adds an institute to the institute-set maintained by the system.
@@ -346,7 +337,6 @@ class TestObjectDelegate(TestCase):
          self.assertEqual(self.obj_delegate.institute_exists(inst), True)
 
 #+END_SRC
-
 
 *** update_institute
 #+NAME: update_institute
@@ -465,8 +455,6 @@ class TestObjectDelegate(TestCase):
 
 #+END_SRC
 
-
-
 *** get_ocs
 
     This return the oc_set maintained by the system.
@@ -487,7 +475,6 @@ class TestObjectDelegate(TestCase):
          self.assertEqual(len(self.obj_delegate.get_ocs()), 1)
 
 #+END_SRC
-
 
 *** nc_exists
     Check if =nc= already exists
@@ -515,7 +502,6 @@ class TestObjectDelegate(TestCase):
 
 #+END_SRC
 
-
 *** add_nc
     Add a nc to the system
     This function adds a nodal centre to the nc-set maintained by the system.
@@ -540,8 +526,6 @@ class TestObjectDelegate(TestCase):
 
 #+END_SRC
 
-
-
 *** get_ncs
 
     This return the nc_set maintained by the system.
@@ -563,9 +547,6 @@ class TestObjectDelegate(TestCase):
          self.assertEqual(len(self.obj_delegate.get_ncs()), 1)
 
 #+END_SRC
-
-
-
 
 *** get_active_users
     This function returns All the active users from the user_set.
@@ -590,7 +571,6 @@ class TestObjectDelegate(TestCase):
          self.assertEqual(len(active_user_list), 2)
 
 #+END_SRC
-
 
 *** workshop_exists
     Check if =workshop= already exists
@@ -926,15 +906,34 @@ class TestObjectDelegate(TestCase):
         self.assertEqual(len(self.obj_delegate.get_workshops()), 1)
 #+END_SRC
      
-*** get_artefacts_of_workshop
-#+NAME: get_artifacts
+*** get_artefacts
+
+    This return the artefact_set maintained by the system.
+#+NAME: get_artefacts
+#+BEGIN_SRC python
+    def get_artefacts(self):
+        return self.artefact_set
+
+#+END_SRC
+**** Tests
+#+NAME: test_get_artefacts
+#+BEGIN_SRC python
+    def test_get_artefacts(self):
+        new_artefact = Artefact(name = "Photo", path = "/main/photos",
+                                a_type = Type.photo)
+        self.obj_delegate.artefact_set.append(new_artefact)
+        self.assertEqual(len(self.obj_delegate.get_artefacts()), 1)
+
+#+END_SRC
+*** get_artefacts_of_a_workshop
+#+NAME: get_artefacts_of_a_workshop
 #+BEGIN_SRC python
     def get_artefacts_of_a_workshop(self, workshop):
         self.artefact_set = workshop.get("artefacts")
         return self.artefact_set     
 #+END_SRC
 **** Tests
-#+NAME: test_get_artifacts
+#+NAME: test_get_artifacts_artefacts_of_a_workshop
 #+BEGIN_SRC python
 
     def test_get_artefacts_of_a_workshop(self):
@@ -958,6 +957,8 @@ class TestObjectDelegate(TestCase):
 
         self.assertEqual(len(self.obj_delegate.get_artefacts_of_a_workshop(workshop)), 1)
 #+END_SRC
+
+
 * Persistence Delegate
   Persistence Delegate encapsulates a set of functions where each function performs a
   specific task.  With the use of these delegates, the core implementation of
@@ -1874,7 +1875,7 @@ class TestPersistentDelegate(TestCase):
         return workshop
 #+END_SRC
 **** Tests
-#+NAME: test_delete_artefact
+#+NAME: test_persistent_delete_artefact
 #+BEGIN_SRC python
     def test_delete_artefact(self):
         print "test_delete_artefact"
@@ -1943,7 +1944,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 **** Tests
-#+NAME: test_get_artefacts
+#+NAME: test_persistent_get_artefacts
 #+BEGIN_SRC python
     def test_get_artefacts(self):
         new_artefact = Artefact(name = "Photo", path = "/main/photos",
@@ -1955,7 +1956,7 @@ class TestPersistentDelegate(TestCase):
 *** get_artefacts_of_a_workshop
 
     This return the workshop_set maintained by the system.
-#+NAME: get_artefacts_of_a_workshop
+#+NAME: persistent_get_artefacts_of_a_workshop
 #+BEGIN_SRC python
     def get_artefacts_of_a_workshop(self, workshop):
         self.artefact_set = workshop.get("artefacts")
@@ -1963,7 +1964,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 **** Tests
-#+NAME: test_get_artefacts_of_a_workshop
+#+NAME: test_persistent_get_artefacts_of_a_workshop
 #+BEGIN_SRC python
     def test_get_artefacts_of_a_workshop(self):
         print "test_get_artefacts_of_a_workshop"
@@ -2163,7 +2164,7 @@ if __name__ == '__main__':
 <<test_conduct_workshop>>
 <<test_upload_artefact>>
 <<test_get_artefacts_of_a_workshop>>
-<<test_get_artefact>>
+<<test_get_artefacts>>
 <<test_approve_workshop>>
 <<test_reject_workshop>>
 <<test_delete_artefact>>
