@@ -22,17 +22,15 @@
 #+NAME: class_object_delegate
 #+BEGIN_SRC python
 class ObjectDelegate():
-   
     def __init__(self):
         self.role_set = []
         self.user_set = []
-        self.active_user_set=[]
+        self.active_user_set = []
         self.institute_set = []
         self.oc_set = []
         self.nc_set = []
         self.workshop_set = []
         self.artefact_set = []
-        
         self.role_set = self.initialize_role_set()
         self.user_set = self.initialize_user_set()
 
@@ -133,13 +131,12 @@ class TestObjectDelegate(TestCase):
 #+NAME: test_add_user
 #+BEGIN_SRC python
     def test_add_user(self):
-         print "test_add_user"
-         user = User(name=Name(name="some user"),
-                          email=Email(email="tt@kk.com"),
-                          roles=[Role.admin], user_status="active")
-
-         user = self.obj_delegate.add_user(user)
-         self.assertEqual(self.obj_delegate.user_exists(user), True)
+        print "test_add_user"
+        user = User(name=Name(name="some user"),
+                        email=Email(email="tt@kk.com"),
+                        roles=[Role.admin], user_status="active")
+        user = self.obj_delegate.add_user(user)
+        self.assertEqual(self.obj_delegate.user_exists(user), True)
 
 #+END_SRC
 
@@ -158,15 +155,16 @@ class TestObjectDelegate(TestCase):
 
     def test_update_user(self):
         print "test_update_user"
-	name=Name(name="test")
-	email=Email(email="test@gmail.com")
-	user = User(name=name, email=email, roles= [Role.guest],
-		    user_status="active")
-	user = self.obj_delegate.add_user(user)
-	user_name1=Name(name="alaska")
-	user_email1=Email(email="alaska@gmail.com")
-	user = self.obj_delegate.update_user(user_name1, user_email1, user)
-	self.assertEqual(user.get("name").get("name"), "alaska")
+        name=Name(name="test")
+        email=Email(email="test@gmail.com")
+        user = User(name=name, email=email, roles= [Role.guest],
+                user_status="active")
+        user = self.obj_delegate.add_user(user)
+        user_name1=Name(name="alaska")
+        user_email1=Email(email="alaska@gmail.com")
+        user = self.obj_delegate.update_user(user_name1, user_email1, user)
+        self.assertEqual(user.get("name").get("name"), "alaska")
+        
 #+END_SRC
 
 *** delete_user
@@ -181,13 +179,13 @@ class TestObjectDelegate(TestCase):
 #+BEGIN_SRC python
     def test_delete_user(self):
         print "test_delete_user"
-	name = Name(name="test")
-	email = Email(email="test@gmail.com")
-	user = User(name=name, email=email, roles= [Role.guest],
-		    user_status="active")
-	new_user = self.obj_delegate.add_user(user)
+        name = Name(name="test")
+        email = Email(email="test@gmail.com")
+        user = User(name=name, email=email, roles= [Role.guest],
+                user_status="active")
+        new_user = self.obj_delegate.add_user(user)
         del_user = self.obj_delegate.delete_user(new_user)
-	self.assertEqual(del_user.get("user_status") , "inactive")
+        self.assertEqual(del_user.get("user_status") , "inactive")
 #+END_SRC
 
 *** add_role_to_user
@@ -202,11 +200,11 @@ class TestObjectDelegate(TestCase):
 #+BEGIN_SRC python
     def test_add_role_to_user(self):
         print "test_add_role_to_user"
-	name = Name(name="test")
-	email = Email(email="test@gmail.com")
-	user = User(name=name, email=email, roles= [Role.guest],
-		    user_status="active")
-	new_user = self.obj_delegate.add_user(user)
+        name = Name(name="test")
+        email = Email(email="test@gmail.com")
+        user = User(name=name, email=email, roles= [Role.guest],
+                user_status="active")
+        new_user = self.obj_delegate.add_user(user)
         user_with_new_role = self.obj_delegate.add_role_to_user(new_user, Role.noc)
         self.assertTrue(len(user_with_new_role.get('roles'))==2)
 #+END_SRC
@@ -952,17 +950,24 @@ class TestObjectDelegate(TestCase):
     def test_get_artefacts_of_a_workshop(self):
         print "test_get_artefacts_of_a_workshop"
         institute = Institute(name='IIIT',address='Hyderabad')
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),
+                    spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc,
+                    nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016",
+                                                     '%d-%m-%Y').date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        nc_target = NCTarget(usage = 200, date = target_date,
+                                 oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200,
+                                 experiments = 20, date = target_date,
+                                 nc_target = nc_target )
         name = Name(name = "New Workshop")
         status = Status(name = "pending")
         artefacts = []
 
-        workshop = self.obj_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        workshop = self.obj_delegate.add_workshop(institute, name, ws_target,
+                                                      artefacts, status, nc)
         new_artefact = Artefact(name = "Photo", path = "/main/photos",
                                 a_type = Type.photo)
 
