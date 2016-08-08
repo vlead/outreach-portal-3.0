@@ -7,73 +7,74 @@
 | Task                        | Estimated time | Actual time | Assignee(s) | Status |
 |                             |      (in mins) | (in mins)   |             |        |
 |-----------------------------+----------------+-------------+-------------+--------|
-| user_exists                 |             20 |             |             |        |
+| user_exists                 |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| add_user                    |             20 |             |             |        |
+| add_user                    |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| update_user                 |             20 |             |             |        |
+| update_user                 |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| delete_user                 |             20 |             |             |        |
+| delete_user                 |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| add_role_to_user            |             20 |             |             |        |
+| add_role_to_user            |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| get_users                   |             20 |             |             |        |
+| get_users                   |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| role_exists                 |             20 |             |             |        |
+| role_exists                 |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| add_role                    |             20 |             |             |        |
+| add_role                    |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| get_roles                   |             20 |             |             |        |
+| get_roles                   |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| institute_exists            |             20 |             |             |        |
+| institute_exists            |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| add_institute               |             20 |             |             |        |
+| add_institute               |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| update_institute            |             20 |             |             |        |
+| update_institute            |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| get_institutes              |             20 |             |             |        |
+| get_institutes              |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| oc_exists                   |             20 |             |             |        |
+| oc_exists                   |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| add_occ_role                |             20 |             |             |        |
+| add_occ_role                |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| add_ncc_role                |             20 |             |             |        |
+| add_ncc_role                |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| add_oc                      |             20 |             |             |        |
+| add_oc                      |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| get_ocs                     |             20 |             |             |        |
+| get_ocs                     |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| nc_exists                   |             20 |             |             |        |
+| nc_exists                   |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| add_nc                      |             20 |             |             |        |
+| add_nc                      |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| get_ncs                     |             20 |             |             |        |
+| get_ncs                     |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| workshop_exists             |             20 |             |             |        |
+| workshop_exists             |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| add_workshop                |             20 |             |             |        |
+| add_workshop                |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| cancel_workshop             |             20 |             |             |        |
+| cancel_workshop             |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| reschedule_workshop         |             20 |             |             |        |
+| reschedule_workshop         |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| conduct_workshop            |             20 |             |             |        |
+| conduct_workshop            |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| upload_artefact             |             20 |             |             |        |
+| upload_artefact             |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| approve_workshop            |             20 |             |             |        |
+| approve_workshop            |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| reject_workshop             |             20 |             |             |        |
+| reject_workshop             |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| delete_artefact             |             20 |             |             |        |
+| delete_artefact             |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| get_artefacts_of_a_workshop |             20 |             |             |        |
+| get_artefacts_of_a_workshop |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| get_artefacts               |             20 |             |             |        |
+| get_artefacts               |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| get_workshops               |             20 |             |             |        |
+| get_workshops               |             20 |             | Sripathi    | DONE   |
 |-----------------------------+----------------+-------------+-------------+--------|
-| get_active_users            |                |             |             |        |
+| get_active_users            |                |             | Sripathi    | DONE   |
+|                             |                |             |             |        |
 |-----------------------------+----------------+-------------+-------------+--------|
 
 * Test Cases for Object Delegates 
@@ -81,73 +82,74 @@
 | Task                             | Estimated time | Actual time | Assignee(s) | Status |
 |                                  | (in mins)      | (in mins)   |             |        |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_user_exists                 |                |             |             |        |
+| test_user_exists                 |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_add_user                    |                |             |             |        |
+| test_add_user                    |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_update_user                 |                |             |             |        |
+| test_update_user                 |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_delete_user                 |                |             |             |        |
+| test_delete_user                 |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_get_users                   |                |             |             |        |
+| test_get_users                   |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_role_exists                 |                |             |             |        |
+| test_role_exists                 |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_add_role_to_user            |                |             |             |        |
+| test_add_role_to_user            |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_add_role                    |                |             |             |        |
+| test_add_role                    |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_get_roles                   |                |             |             |        |
+| test_get_roles                   |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_institute_exists            |                |             |             |        |
+| test_institute_exists            |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_add_institute               |                |             |             |        |
+| test_add_institute               |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_get_institutes              |                |             |             |        |
+| test_get_institutes              |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_oc_exists                   |                |             |             |        |
+| test_oc_exists                   |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_add_occ_role                |                |             |             |        |
+| test_add_occ_role                |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_add_ncc_role                |                |             |             |        |
+| test_add_ncc_role                |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_add_oc                      |                |             |             |        |
+| test_add_oc                      |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_get_ocs                     |                |             |             |        |
+| test_get_ocs                     |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_nc_exists                   |                |             |             |        |
+| test_nc_exists                   |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_add_nc                      |                |             |             |        |
+| test_add_nc                      |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_get_ncs                     |                |             |             |        |
+| test_get_ncs                     |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_get_active_users            |                |             |             |        |
+| test_get_active_users            |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_workshop_exists             |                |             |             |        |
+| test_workshop_exists             |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_add_workshop                |                |             |             |        |
+| test_add_workshop                |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_get_workshops               |                |             |             |        |
+| test_get_workshops               |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_cancel_workshop             |                |             |             |        |
+| test_cancel_workshop             |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_get_workshops               |                |             |             |        |
+| test_get_workshops               |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_reschedule_workshop         |                |             |             |        |
+| test_reschedule_workshop         |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_conduct_workshop            |                |             |             |        |
+| test_conduct_workshop            |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_upload_artefact             |                |             |             |        |
+| test_upload_artefact             |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_get_artefacts_of_a_workshop |                |             |             |        |
+| test_get_artefacts_of_a_workshop |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_get_artefacts               |                |             |             |        |
+| test_get_artefacts               |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_approve_workshop            |                |             |             |        |
+| test_approve_workshop            |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_reject_workshop             |                |             |             |        |
+| test_reject_workshop             |                |             | Sripathi    | DONE   |
 |----------------------------------+----------------+-------------+-------------+--------|
-| test_delete_artefact             |                |             |             |        |
+| test_delete_artefact             |                |             | Sripathi    | DONE   |
+|                                  |                |             |             |        |
 |----------------------------------+----------------+-------------+-------------+--------|
 
 * Persistent Delegates
@@ -156,75 +158,76 @@
 | Task                                   | Estimated time | Actual time | Assignee(s) | Status |
 |                                        | (in mins)      | (in mins)   |             |        |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_user_exists                 |                |             |             |        |
+| persistent_user_exists                 |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_add_user                    |                |             |             |        |
+| persistent_add_user                    |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_update_user                 |                |             |             |        |
+| persistent_update_user                 |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_delete_user                 |                |             |             |        |
+| persistent_delete_user                 |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_add_role_to_user            |                |             |             |        |
+| persistent_add_role_to_user            |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_get_users                   |                |             |             |        |
+| persistent_get_users                   |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_get_active_users            |                |             |             |        |
+| persistent_get_active_users            |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_add_oc                      |                |             |             |        |
+| persistent_add_oc                      |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_add_nc                      |                |             |             |        |
+| persistent_add_nc                      |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_get_ocs                     |                |             |             |        |
+| persistent_get_ocs                     |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_get_ncs                     |                |             |             |        |
+| persistent_get_ncs                     |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_oc_exists                   |                |             |             |        |
+| persistent_oc_exists                   |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_nc_exists                   |                |             |             |        |
+| persistent_nc_exists                   |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_role_exists                 |                |             |             |        |
+| persistent_role_exists                 |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_add_role                    |                |             |             |        |
+| persistent_add_role                    |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_add_occ_role                |                |             |             |        |
+| persistent_add_occ_role                |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_add_ncc_role                |                |             |             |        |
+| persistent_add_ncc_role                |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_get_roles                   |                |             |             |        |
+| persistent_get_roles                   |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_add_institute               |                |             |             |        |
+| persistent_add_institute               |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_update_institute            |                |             |             |        |
+| persistent_update_institute            |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_get_institutes              |                |             |             |        |
+| persistent_get_institutes              |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_institute_exists            |                |             |             |        |
+| persistent_institute_exists            |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_add_workshop                |                |             |             |        |
+| persistent_add_workshop                |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_cancel_workshop             |                |             |             |        |
+| persistent_cancel_workshop             |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_reschedule_workshop         |                |             |             |        |
+| persistent_reschedule_workshop         |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_conduct_workshop            |                |             |             |        |
+| persistent_conduct_workshop            |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_approve_workshop            |                |             |             |        |
+| persistent_approve_workshop            |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_reject_workshop             |                |             |             |        |
+| persistent_reject_workshop             |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_workshop_exists             |                |             |             |        |
+| persistent_workshop_exists             |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_upload_artefact             |                |             |             |        |
+| persistent_upload_artefact             |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_delete_artefact             |                |             |             |        |
+| persistent_delete_artefact             |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_get_workshops               |                |             |             |        |
+| persistent_get_workshops               |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_get_artefacts               |                |             |             |        |
+| persistent_get_artefacts               |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_get_artefacts_of_a_workshop |                |             |             |        |
+| persistent_get_artefacts_of_a_workshop |                |             | Madhavi     | DONE   |
 |----------------------------------------+----------------+-------------+-------------+--------|
-| persistent_get_active_users            |                |             |             |        |
+| persistent_get_active_users            |                |             | Madhavi     | DONE   |
+|                                        |                |             |             |        |
 |----------------------------------------+----------------+-------------+-------------+--------|
 
 * Test Cases for Persistent Delegates 
@@ -233,75 +236,76 @@
 | Task                                        | Estimated time | Actual time | Assignee(s) | Status |
 |                                             | (in mins)      | (in mins)   |             |        |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_user_exists                 |                |             |             |        |
+| test_persistent_user_exists                 |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_add_user                    |                |             |             |        |
+| test_persistent_add_user                    |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_update_user                 |                |             |             |        |
+| test_persistent_update_user                 |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_delete_user                 |                |             |             |        |
+| test_persistent_delete_user                 |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_add_role_to_user            |                |             |             |        |
+| test_persistent_add_role_to_user            |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_get_users                   |                |             |             |        |
+| test_persistent_get_users                   |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_get_active_users            |                |             |             |        |
+| test_persistent_get_active_users            |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_add_oc                      |                |             |             |        |
+| test_persistent_add_oc                      |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_oc_exists                   |                |             |             |        |
+| test_persistent_oc_exists                   |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_add_nc                      |                |             |             |        |
+| test_persistent_add_nc                      |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_nc_exists                   |                |             |             |        |
+| test_persistent_nc_exists                   |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_get_ocs                     |                |             |             |        |
+| test_persistent_get_ocs                     |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_get_ncs                     |                |             |             |        |
+| test_persistent_get_ncs                     |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_role_exists                 |                |             |             |        |
+| test_persistent_role_exists                 |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_add_role                    |                |             |             |        |
+| test_persistent_add_role                    |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_add_occ_role                |                |             |             |        |
+| test_persistent_add_occ_role                |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_add_ncc_role                |                |             |             |        |
+| test_persistent_add_ncc_role                |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_get_roles                   |                |             |             |        |
+| test_persistent_get_roles                   |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_institute_exists            |                |             |             |        |
+| test_persistent_institute_exists            |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_add_institute               |                |             |             |        |
+| test_persistent_add_institute               |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_update_institute            |                |             |             |        |
+| test_persistent_update_institute            |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_get_institutes              |                |             |             |        |
+| test_persistent_get_institutes              |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_add_workshop                |                |             |             |        |
+| test_persistent_add_workshop                |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_workshop_exists             |                |             |             |        |
+| test_persistent_workshop_exists             |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_cancel_workshop             |                |             |             |        |
+| test_persistent_cancel_workshop             |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_reschedule_workshop         |                |             |             |        |
+| test_persistent_reschedule_workshop         |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_conduct_workshop            |                |             |             |        |
+| test_persistent_conduct_workshop            |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_upload_artefact             |                |             |             |        |
+| test_persistent_upload_artefact             |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_approve_workshop            |                |             |             |        |
+| test_persistent_approve_workshop            |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_reject_workshop             |                |             |             |        |
+| test_persistent_reject_workshop             |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_delete_artefact             |                |             |             |        |
+| test_persistent_delete_artefact             |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_get_workshops               |                |             |             |        |
+| test_persistent_get_workshops               |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_get_artefacts               |                |             |             |        |
+| test_persistent_get_artefacts               |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_get_artefacts_of_a_workshop |                |             |             |        |
+| test_persistent_get_artefacts_of_a_workshop |                |             | Madhavi     | DONE   |
 |---------------------------------------------+----------------+-------------+-------------+--------|
-| test_persistent_get_active_users            |                |             |             |        |
+| test_persistent_get_active_users            |                |             | Madhavi     | DONE   |
+|                                             |                |             |             |        |
 |---------------------------------------------+----------------+-------------+-------------+--------|
 
 * System Operations
@@ -310,41 +314,42 @@
 | Task                     | Estimated time | Actual time | Assignee(s) | Status |
 |                          | (in mins)      | (in mins)   |             |        |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_adduser            |                |             |             |        |
+| class_adduser            |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_login              |                |             |             |        |
+| class_login              |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_logout             |                |             |             |        |
+| class_logout             |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_updateuser         |                |             |             |        |
+| class_updateuser         |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_deleteuser         |                |             |             |        |
+| class_deleteuser         |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_CreateInstitute    |                |             |             |        |
+| class_CreateInstitute    |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_CreateOC           |                |             |             |        |
+| class_CreateOC           |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_AddRole            |                |             |             |        |
+| class_AddRole            |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_CreateNC           |                |             |             |        |
+| class_CreateNC           |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_UpdateInstitute    |                |             |             |        |
+| class_UpdateInstitute    |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_CreateWorkshop     |                |             |             |        |
+| class_CreateWorkshop     |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_CancelWorkshop     |                |             |             |        |
+| class_CancelWorkshop     |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_RescheduleWorkshop |                |             |             |        |
+| class_RescheduleWorkshop |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_ConductWorkshop    |                |             |             |        |
+| class_ConductWorkshop    |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_UploadArtefact     |                |             |             |        |
+| class_UploadArtefact     |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_ApproveWorkshop    |                |             |             |        |
+| class_ApproveWorkshop    |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_RejectWorkshop     |                |             |             |        |
+| class_RejectWorkshop     |                |             | Madhavi     | DONE   |
 |--------------------------+----------------+-------------+-------------+--------|
-| class_DeleteArtefact     |                |             |             |        |
+| class_DeleteArtefact     |                |             | Madhavi     | DONE   |
+|                          |                |             |             |        |
 |--------------------------+----------------+-------------+-------------+--------|
 
 * Test Cases for System with Object Delgate
@@ -353,41 +358,42 @@
 | Task                    | Estimated time | Actual time | Assignee(s) | Status |
 |                         | (in mins)      | (in mins)   |             |        |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_adduser            |                |             |             |        |
+| test_adduser            |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_updateuser         |                |             |             |        |
+| test_updateuser         |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_deleteuser         |                |             |             |        |
+| test_deleteuser         |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_login              |                |             |             |        |
+| test_login              |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_logout             |                |             |             |        |
+| test_logout             |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_CreateInstitute    |                |             |             |        |
+| test_CreateInstitute    |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_CreateOC           |                |             |             |        |
+| test_CreateOC           |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_CreateNC           |                |             |             |        |
+| test_CreateNC           |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_AddRole            |                |             |             |        |
+| test_AddRole            |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_UpdateInstitute    |                |             |             |        |
+| test_UpdateInstitute    |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_CreateWorkshop     |                |             |             |        |
+| test_CreateWorkshop     |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_CancelWorkshop     |                |             |             |        |
+| test_CancelWorkshop     |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_RescheduleWorkshop |                |             |             |        |
+| test_RescheduleWorkshop |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_ConductWorkshop    |                |             |             |        |
+| test_ConductWorkshop    |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_UploadArtefact     |                |             |             |        |
+| test_UploadArtefact     |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_ApproveWorkshop    |                |             |             |        |
+| test_ApproveWorkshop    |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_RejectWorkshop     |                |             |             |        |
+| test_RejectWorkshop     |                |             | Sripathi    | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_DeleteArtefact     |                |             |             |        |
+| test_DeleteArtefact     |                |             | Sripathi    | DONE   |
+|                         |                |             |             |        |
 |-------------------------+----------------+-------------+-------------+--------|
 
 * Test Cases for System with Persistent Delgate
@@ -396,38 +402,39 @@
 | Task                    | Estimated time | Actual time | Assignee(s) | Status |
 |                         | (in mins)      | (in mins)   |             |        |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_adduser            |                |             |             |        |
+| test_adduser            |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_login              |                |             |             |        |
+| test_login              |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_logout             |                |             |             |        |
+| test_logout             |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_updateuser         |                |             |             |        |
+| test_updateuser         |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_CreateInstitute    |                |             |             |        |
+| test_CreateInstitute    |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_CreateOC           |                |             |             |        |
+| test_CreateOC           |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_CreateNC           |                |             |             |        |
+| test_CreateNC           |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_AddRole            |                |             |             |        |
+| test_AddRole            |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_UpdateInstitute    |                |             |             |        |
+| test_UpdateInstitute    |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_CreateWorkshop     |                |             |             |        |
+| test_CreateWorkshop     |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_CancelWorkshop     |                |             |             |        |
+| test_CancelWorkshop     |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_RescheduleWorkshop |                |             |             |        |
+| test_RescheduleWorkshop |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_ConductWorkshop    |                |             |             |        |
+| test_ConductWorkshop    |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_UploadArtefact     |                |             |             |        |
+| test_UploadArtefact     |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_ApproveWorkshop    |                |             |             |        |
+| test_ApproveWorkshop    |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_RejectWorkshop     |                |             |             |        |
+| test_RejectWorkshop     |                |             | Madhavi     | DONE   |
 |-------------------------+----------------+-------------+-------------+--------|
-| test_DeleteArtefact     |                |             |             |        |
+| test_DeleteArtefact     |                |             | Madhavi     | DONE   |
+|                         |                |             |             |        |
 |-------------------------+----------------+-------------+-------------+--------|
 
