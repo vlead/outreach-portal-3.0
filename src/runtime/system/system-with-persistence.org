@@ -64,7 +64,8 @@ class TestAddUser(TestCase):
         user_email = Email(email="abc@gmail.com")
         user_email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
 
         user = System.do("add_user", user=user, session=session)
@@ -108,15 +109,18 @@ class TestAddUser(TestCase):
         email = Email(email="abc@gmail.com")
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
         noc_user= System.do("add_user", user=user, session=session)
 
         session_noc = Session(user=noc_user,role=Role.get_by_id(4))
         System.session_set.append(session_noc)
         inst = Institute(name = "NITK", address = "Surathkal")
-        institute = System.do("create_institute", institute = inst, session=session)
-        oc = System.do("create_oc", institute = institute, session = session,
+        institute = System.do("create_institute", institute = inst,
+                               session=session)
+        oc = System.do("create_oc", institute = institute,
+                        session = session,
                         spokes = [], oc_target = None)
 
         name = Name(name="ocuser")
@@ -124,7 +128,8 @@ class TestAddUser(TestCase):
         email = Email(email="mary@gmail.com")
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3), roles= [guest_role],
+        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3),
+                    roles= [guest_role],
                     user_status="active")
         oc_user= System.do("add_user", user=user, session=session_noc)
 
@@ -148,7 +153,8 @@ class TestDeleteUser(TestCase):
         self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
         self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
         self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None,
+                                  centre_nc=None)
         self.admin_role.save()
         self.guest_role.save()
         self.reviewer_role.save()
@@ -164,7 +170,8 @@ class TestDeleteUser(TestCase):
         role_guest = Role.get_by_id(2)
         self.admin_user = User(name=admin_name,
                           email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
+                          roles=[role_admin, role_guest],
+                          user_status="active")
         self.admin_user.save()
         return User.get_all()
 
@@ -196,7 +203,8 @@ class TestDeleteUser(TestCase):
         name.save()
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
 
         other_admin_user = System.do("add_user", user=user, session = session)
@@ -204,7 +212,7 @@ class TestDeleteUser(TestCase):
         System.do("add_role", user = other_admin_user,
                     role = Role.get_by_id(1),
                     session = session)
-        #other_admin_user.append_role(Role.admin)
+
         System.do("delete_user", user=other_admin_user, session=session)
         self.assertEqual(other_admin_user.get("user_status"),"inactive")
         
@@ -214,7 +222,8 @@ class TestDeleteUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         inst = Institute(name="IIT",address="Delhi")
-        institute = System.do("create_institute", institute = inst, session=session)
+        institute = System.do("create_institute", institute = inst,
+                               session=session)
         oc = System.do("create_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
 
@@ -224,7 +233,8 @@ class TestDeleteUser(TestCase):
         email.save()
 
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
 
         oc_user= System.do("add_user", user=user, session=session)
@@ -247,7 +257,8 @@ class TestDeleteUser(TestCase):
                         workshops = [], nc_target = None)
 
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3), roles= [guest_role],
+        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3),
+                    roles= [guest_role],
                     user_status="active")
 
         nc_user= System.do("add_user", user=user, session=session)
@@ -269,7 +280,8 @@ class TestDeleteUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         inst = Institute(name="IIT",address="Delhi")
-        institute = System.do("create_institute", institute = inst, session=session)
+        institute = System.do("create_institute", institute = inst,
+                               session=session)
         oc = System.do("create_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
         
@@ -278,7 +290,8 @@ class TestDeleteUser(TestCase):
         name.save()
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
 
         oc_user= System.do("add_user", user = user, session=session)
@@ -295,7 +308,8 @@ class TestDeleteUser(TestCase):
         email1 = Email(email="xyz@gmail.com")
         email1.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3), roles= [guest_role],
+        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3),
+                    roles= [guest_role],
                     user_status="active")
         noc_user=System.do("add_user", user = user, session=session)
 
@@ -367,7 +381,8 @@ class TestUpdateUser(TestCase):
         name.save()
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
         other_user=System.do("add_user", user = user, session=session)
         name3 = Name(name="john")
@@ -382,7 +397,8 @@ class TestUpdateUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         inst = Institute(name="IIT",address="Madras")
-        institute = System.do("create_institute", institute = inst, session=session)
+        institute = System.do("create_institute", institute = inst,
+                               session=session)
         oc = System.do("create_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
 
@@ -391,7 +407,8 @@ class TestUpdateUser(TestCase):
         name.save()
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
         oc_user=System.do("add_user", user = user, session=session)
         oc_role = filter(lambda x:x.get('name') == "OCC" and
@@ -411,7 +428,8 @@ class TestUpdateUser(TestCase):
         name1.save()
         email1.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3), roles= [guest_role],
+        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3),
+                    roles= [guest_role],
                     user_status="active")
         nc_user= System.do("add_user", user=user, session=session)
         nc_role = filter(lambda x:x.get('name') == "NCC" and
@@ -435,7 +453,8 @@ class TestUpdateUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         inst = Institute(name="IIT",address="Madras")
-        institute = System.do("create_institute", institute = inst, session=session)
+        institute = System.do("create_institute", institute = inst,
+                               session=session)
         oc = System.do("create_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
         name = Name(name="useroc")
@@ -443,7 +462,8 @@ class TestUpdateUser(TestCase):
         email = Email(email="useroc@gmail.com")
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
         oc_user= System.do("add_user", user = user, session=session)
         oc_role = filter(lambda x:x.get('name') == "OCC" and
@@ -457,7 +477,8 @@ class TestUpdateUser(TestCase):
         email1= Email(email="usernoc@gmail.com")
         email1.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3), roles= [guest_role],
+        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3),
+                    roles= [guest_role],
                     user_status="active")
         noc_user=System.do("add_user", user=user, session=session)
         System.do("add_role",user=noc_user,role=Role.get_by_id(4),
@@ -648,7 +669,8 @@ class TestCreateInstitute(TestCase):
         self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
         self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
         self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None,
+                                  centre_nc=None)
         self.admin_role.save()
         self.guest_role.save()
         self.reviewer_role.save()
@@ -703,7 +725,8 @@ class TestCreateOC(TestCase):
         self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
         self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
         self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        self.reviewer_role = Role(name="reviewer", centre_oc=None,
+                                  centre_nc=None)
         self.admin_role.save()
         self.guest_role.save()
         self.reviewer_role.save()
@@ -927,9 +950,11 @@ class TestCreateWorkshop(TestCase):
         login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
         inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute",institute = inst, session=sess)
+        institute = System.do("create_institute",institute = inst,
+                                session=sess)
         inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst, session = sess)
+        workshop_institute = System.do("create_institute", institute = inst,
+                                        session = sess)
         
         oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
                         session=sess, oc_target = None)
@@ -955,7 +980,8 @@ class TestCreateWorkshop(TestCase):
         name.save()
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
 
         nc_user = System.do("add_user", user=user, session = sess)
@@ -977,7 +1003,8 @@ class TestCreateWorkshop(TestCase):
                                  nc = nc, 
                                  session = nc_session) 
         
-        self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"), workshop_institute.get("name"))
+        self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"),
+                         workshop_institute.get("name"))
 #+END_SRC
 
 * Test CancelWorkshop
@@ -1061,7 +1088,8 @@ class TestCancelWorkshop(TestCase):
         name.save()
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
 
         nc_user = System.do("add_user", user=user, session = sess)
@@ -1083,7 +1111,8 @@ class TestCancelWorkshop(TestCase):
                                  nc = nc,
                                  session = nc_session)
 
-        self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"), workshop_institute.get("name"))
+        self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"),
+                         workshop_institute.get("name"))
 
 
         System.do("cancel_workshop", workshop = new_workshop,
@@ -1120,7 +1149,8 @@ class TestRescheduleWorkshop(TestCase):
         role_guest = Role.get_by_id(2)
         self.admin_user = User(name=admin_name,
                           email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
+                          roles=[role_admin, role_guest], 
+                          user_status="active")
         self.admin_user.save()
         return User.get_all()
 
@@ -1148,7 +1178,8 @@ class TestRescheduleWorkshop(TestCase):
         inst = Institute(name="IIIT",address="Hyderabad")
         institute = System.do("create_institute",institute = inst,session=session)
         inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst, session = session)
+        workshop_institute = System.do("create_institute", institute = inst, 
+                                        session = session)
         oc = System.do("create_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
 
@@ -1175,7 +1206,8 @@ class TestRescheduleWorkshop(TestCase):
         name.save()
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
         nc_user = System.do("add_user",user = user, session = session)
 
@@ -1269,7 +1301,8 @@ class TestConductWorkshop(TestCase):
         inst = Institute(name="IIIT",address="Hyderabad")
         institute = System.do("create_institute",institute = inst, session=sess)
         inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst, session = sess)
+        workshop_institute = System.do("create_institute", institute = inst,
+                                        session = sess)
 
         oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
                         session=sess, oc_target = None)
@@ -1295,7 +1328,8 @@ class TestConductWorkshop(TestCase):
         name.save()
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
 
         nc_user = System.do("add_user", user=user, session = sess)
@@ -1317,7 +1351,8 @@ class TestConductWorkshop(TestCase):
                                  nc = nc,
                                  session = nc_session)
 
-        self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"), workshop_institute.get("name"))
+        self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"),
+                         workshop_institute.get("name"))
 
 
         System.do("conduct_workshop", workshop = new_workshop,
@@ -1381,7 +1416,8 @@ class TestUploadArtefact(TestCase):
         inst = Institute(name="IIIT",address="Hyderabad")
         institute = System.do("create_institute", institute = inst, session=session)
         inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst, session = session)
+        workshop_institute = System.do("create_institute", institute = inst,
+                                        session = session)
         oc = System.do("create_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
 
@@ -1407,7 +1443,8 @@ class TestUploadArtefact(TestCase):
         name.save()
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
         nc_user = System.do("add_user",user = user, session = session)
 
@@ -1500,7 +1537,8 @@ class TestApproveWorkshop(TestCase):
         inst = Institute(name="IIIT",address="Hyderabad")
         institute = System.do("create_institute",institute = inst, session=sess)
         inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst, session = sess)
+        workshop_institute = System.do("create_institute", institute = inst,
+                                        session = sess)
 
         oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
                         session=sess, oc_target = None)
@@ -1526,7 +1564,8 @@ class TestApproveWorkshop(TestCase):
         name.save()
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
 
         nc_user = System.do("add_user", user=user, session = sess)
@@ -1548,9 +1587,8 @@ class TestApproveWorkshop(TestCase):
                                  nc = nc,
                                  session = nc_session)
 
-        self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"), workshop_institute.get("name"))
-
-
+        self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"),
+                         workshop_institute.get("name"))
 
         name = Name(name="ocuser")
         name.save()
@@ -1636,7 +1674,8 @@ class TestRejectWorkshop(TestCase):
         inst = Institute(name = "IIIT", address = "Hyderabad")
         institute = System.do("create_institute", institute = inst, session=session)
         inst = Institute(name = "NITK", address = "Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst, session = session)
+        workshop_institute = System.do("create_institute", institute = inst,
+                                        session = session)
         oc = System.do("create_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
 
@@ -1662,7 +1701,8 @@ class TestRejectWorkshop(TestCase):
         name.save()
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
         nc_user = System.do("add_user",user = user, session = session)
 
@@ -1682,7 +1722,8 @@ class TestRejectWorkshop(TestCase):
         email1=Email(email="ocuser@gmail.com")
         email1.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3), roles= [guest_role],
+        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3),
+                    roles= [guest_role],
                     user_status="active")
         oc_user = System.do("add_user",user = user, session = session)
         occ_role =  Role(name="OCC",centre_oc=oc,centre_nc=None)
@@ -1770,7 +1811,8 @@ class TestDeleteArtefact(TestCase):
         inst = Institute(name = "IIIT", address = "Hyderabad")
         institute = System.do("create_institute", institute = inst, session=session)
         inst = Institute(name = "NITK", address = "Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst, session = session)
+        workshop_institute = System.do("create_institute", institute = inst, 
+                                        session = session)
             
         oc = System.do("create_oc",institute=institute,spokes=[],
                        session=session, oc_target = None)
@@ -1783,7 +1825,8 @@ class TestDeleteArtefact(TestCase):
         name.save()
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
+        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
+                    roles= [guest_role],
                     user_status="active")
         nc_user = System.do("add_user",user = user, session = session)
         ncc_role =  Role.get_by_id(6)
