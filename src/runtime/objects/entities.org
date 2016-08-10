@@ -201,6 +201,13 @@ def are_wstargets(wstargets):
 
 
 NCTarget = ClassTemplate.mk_class("NCTarget", usage = is_int, date = is_date, wstargets = are_wstargets, oc_target = is_octarget )
+NCTarget.__eq__ = lambda self, other: \
+                  isinstance(other, self.__class__) and \
+                  self.get("usage") == other.get("usage") and \
+                  self.get("oc_target") == other.get("oc_target") and \
+                  self.get("date") == other.get("date") and \
+                  self.get("wstargets") == other.get("wstargets")
+
 is_nct = is_inst(NCTarget)
 check_nctarget = check_pred(is_nct)
 
@@ -216,10 +223,21 @@ class TestNCTarget(TestCase):
         print "test_instantiate_nctarget"
         date_check = "30-06-2016"
         date_format = "%d-%m-%Y"
-        nctarget_check = NCTarget(usage=300, wstargets = [],  date = datetime.datetime.strptime(date_check, date_format).date(), oc_target = None)
+        nctarget_check = NCTarget(usage = 300, wstargets = [],  date = datetime.datetime.strptime(date_check, date_format).date(), oc_target = None)
         self.assertEqual(is_nct(nctarget_check), True)
         self.assertEqual(nctarget_check.get("usage"), 300)
         self.assertRaises(TypeError, NCTarget, usage = "abc")
+ 
+    def test_equality_of_nctarget(self):
+        print "test_equality_of_nctarget"
+        date_check = "30-06-2016"
+        date_format = "%d-%m-%Y"
+        nctarget1 = NCTarget(usage=300, wstargets = [],  date = datetime.datetime.strptime(date_check, date_format).date(), oc_target = None)
+        nctarget2 = NCTarget(usage=300, wstargets = [],  date = datetime.datetime.strptime(date_check, date_format).date(), oc_target = None)
+        nctarget3 = NCTarget(usage=301, wstargets = [],  date = datetime.datetime.strptime(date_check, date_format).date(), oc_target = None)
+        self.assertEqual(nctarget1 == nctarget2, True)
+        self.assertEqual(nctarget1 == nctarget3, False)
+
 
 #+END_SRC
 
@@ -242,6 +260,11 @@ def are_nctargets(nctargets):
     return ret_val
 
 OCTarget = ClassTemplate.mk_class("OCTarget", usage = is_int, date = is_date, nctargets = are_nctargets )
+OCTarget.__eq__ = lambda self, other: \
+                  isinstance(other, self.__class__) and \
+                  self.get("usage") == other.get("usage") and \
+                  self.get("nc_targets") == other.get("nc_targets") and \
+                  self.get("date") == other.get("date")
 
 is_oct = is_inst(OCTarget)
 check_octarget = check_pred(is_oct)
@@ -263,12 +286,17 @@ class TestOCTarget(TestCase):
         self.assertEqual(octarget_check.get("usage"), 300)
         self.assertRaises(TypeError, OCTarget, usage = "abc")
 
+    def test_equality_of_octarget(self):
+        print "test_equality_of_octarget"
+        date_check = "30-06-2016"
+        date_format = "%d-%m-%Y"
+        octarget1 = OCTarget(usage=300, nctargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
+        octarget2 = OCTarget(usage=300, nctargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
+        octarget3 = OCTarget(usage=3001, nctargets = [],  date = datetime.datetime.strptime(date_check, date_format).date())
+        self.assertEqual(octarget1 == octarget2, True)
+        self.assertEqual(octarget1 == octarget3, False)
+
 #+END_SRC
-
-
-
-
-
 * OC
   A =OC= entity has fields =name= of type =Name=,
   institute of type =Institute=.
@@ -291,7 +319,9 @@ OC= ClassTemplate.mk_class("OC",institute=is_institute,spokes=are_spokes, oc_tar
 
 OC.__eq__ = lambda self,other: \
 	    isinstance(other, self.__class__) and \
-	    self.get("institute") == other.get("institute")
+	    self.get("institute") == other.get("institute") and \
+            self.get("spokes") == other.get("spokes") and \
+            self.get("oc_target") == other.get("oc_target")
 
 def append_spoke(self,spoke):
     if is_nc(spoke):
@@ -314,10 +344,6 @@ def to_client(self):
     return {
 	'institute': self.get("institute").to_client()
     }
-#+END_SRC
-
-
-       
 #+END_SRC
 
 ** Test OC
@@ -354,8 +380,15 @@ class TestOC(TestCase):
 
         self.assertEqual("IIITH", oc_dict['institute']['name'])
         self.assertEqual("Hyderabad", oc_dict['institute']['address'])
-
-
+    
+    def test_equality_of_oc(self):
+        print "test_equality_of_oc"
+        oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
+        oc2 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
+        oc3 = OC(institute=Institute(name="IIT-D",address="Delhi"),spokes=[], oc_target = None)
+        self.assertEqual(oc1 == oc2, True)
+        self.assertEqual(oc1 == oc3, False)
+        
 #+END_SRC
 
 
@@ -383,7 +416,10 @@ NC= ClassTemplate.mk_class("NC", institute=is_institute, hub=is_oc, nc_target = 
 
 NC.__eq__ = lambda self,other: \
 	    isinstance(other, self.__class__) and \
-	    self.get("institute") == other.get("institute")
+	    self.get("institute") == other.get("institute")and \
+            self.get("hub") == other.get("hub")and \
+            self.get("nc_target") == other.get("nc_target")and \
+            self.get("workshops") == other.get("workshops")
 
 def add_nc_target( self, nc_target):
     if is_nctarget(nc_target):
@@ -414,7 +450,14 @@ class TestNC(TestCase):
         nc = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[], oc_target = None), nc_target = None, workshops = [])
 
         self.assertEqual(is_nc(nc), True)
-
+        
+    def test_equality_of_nc(self):
+        print "test_equality_of_nc"
+        nc1 = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[], oc_target = None), nc_target = None, workshops = [])
+        nc2 = NC(institute=Institute(name="HCU",address="Hyderabad"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[], oc_target = None), nc_target = None, workshops = [])
+        nc3 = NC(institute=Institute(name="NITK",address="karnataka"), hub=OC(institute=Institute(name="IIITH", address="Hyderabad"),spokes=[], oc_target = None), nc_target = None, workshops = [])
+        self.assertEqual(nc1 == nc2, True)
+        self.assertEqual(nc1 == nc3, False)
 #+END_SRC
 
 
@@ -531,7 +574,10 @@ User = ClassTemplate.mk_class("User",
 
 User.__eq__ = lambda self, other: \
                   isinstance(other, self.__class__) and \
-                  self.get("email") == other.get("email")
+                  self.get("email") == other.get("email") and \
+                  self.get("name") == other.get("name") and \
+                  self.get("roles") == other.get("roles") and \
+                  self.get("user_status") == other.get("user_status")
 
 def append_role(self,role):
     if is_role(role):
@@ -576,7 +622,16 @@ class TestUser(TestCase):
                      email=Email(email="jimi@gnu.org"),
                      roles=[],user_status="active"
                     )
-        self.assertEqual(user1 == user1, True)
+        user2 = User(name=Name(name="Jimi Hendrix"),
+                     email=Email(email="jimi@gnu.org"),
+                     roles=[],user_status="active"
+                    )
+        user3 = User(name=Name(name="John Roy"),
+                     email=Email(email="jimi@gnu.org"),
+                     roles=[],user_status="active"
+                    )
+        self.assertEqual(user1 == user2, True)
+        self.assertEqual(user1 == user3, True)
         
     def test_append_role(self):
         print "test_append_role"
@@ -629,6 +684,14 @@ class TestInstitute(TestCase):
         self.assertEqual(check_institute(institute_ex), institute_ex)
         self.assertEqual(check_institute(institute_ex).get("name"), "IIIT")
         self.assertRaises(TypeError, Institute, name="IIIT123")
+
+    def test_equality_on_institute(self):
+        print "test_equality_on_institute"
+        institute1 = Institute(name="IIIT",address="Hyderabad")
+        institute2 = Institute(name="IIIT",address="Hyderabad")
+        institute3 = Institute(name="IIT-D",address="Delhi")
+        self.assertEqual(institute1 == institute2, True)
+        self.assertEqual(institute1 == institute3, True)
 #+END_SRC
    
 
