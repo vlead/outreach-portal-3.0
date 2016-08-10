@@ -126,4 +126,7 @@ class Error(Exception):
 <<class_ConstraintError>>
 <<class_NotAuthorizedError>>
 <<class_ArityError>>
+<<class_StateError>>
+<<class_NotFoundError>>
+<<class_Error>>
 #+END_SRC

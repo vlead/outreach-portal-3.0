@@ -751,6 +751,7 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(cancelled_workshop.get("status"), Status.cancelled)
 #+END_SRC
 
+
 ***  Reschedule Workshop
 #+NAME: persistent_reschedule_workshop
 #+BEGIN_SRC python
@@ -1017,6 +1018,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Get all artefacts of a workshop
 
     This return the workshop_set maintained by the system.
@@ -1055,7 +1057,137 @@ class TestPersistentDelegate(TestCase):
 
 
 
+
+*** Get an object
+    A generic function to find an object of type =cls= matching a given a criteria
+
+#+NAME: persistent_get_object
+#+BEGIN_SRC python
+    def get_object(self, cls, **kwargs):
+        ret_val = None
+        try:
+            ret_val = cls.apply_filters(**kwargs)[0]
+        except NotFoundError as e:
+            ret_val = None
+        
+        return ret_val
+
+#+END_SRC
 	
+
+*** Get Name 
+    This function returns a Name object from the database based on the name
+    string provided.
+
+#+NAME: persistent_get_name
+#+BEGIN_SRC python
+    def get_name(self, **kwargs):
+        return self.get_object(Name, **kwargs)
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_get_name
+#+BEGIN_SRC python
+    def test_get_name(self):
+         print "test_get_name"
+         name_obj = self.persistent_delegate.get_name(name=Config.admin_name)
+         self.assertEqual(name_obj.get("name"),  Config.admin_name)
+
+#+END_SRC
+
+
+*** Get Email
+    This function returns an Email object from the database based on the email
+    string provided.
+
+#+NAME: persistent_get_email
+#+BEGIN_SRC python
+    def get_email(self, **kwargs):
+        return self.get_object(Email, **kwargs)
+    
+#+END_SRC
+
+**** Tests
+#+NAME: test_get_email
+#+BEGIN_SRC python
+    def test_persistent_get_email(self):
+         print "test_get_email"
+         email_obj = self.persistent_delegate.get_email(email=Config.admin_email)
+         self.assertEqual(email_obj.get("email"), Config.admin_email)
+
+#+END_SRC
+
+
+*** Get User
+    This function returns a user if present in the database.  If the user is
+    not present, =None= type is returned.
+#+NAME: persistent_get_user
+#+BEGIN_SRC python
+    def get_user(self, **kwargs):
+        return self.get_object(User, **kwargs)
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_get_user
+#+BEGIN_SRC python
+    def test_get_user(self):
+         print "test_get_user"
+         email = Email(email=Config.admin_email)
+         user_obj = self.persistent_delegate.get_user(email=email)
+         self.assertEqual(user_obj.get("email").get("email"), 
+                              Config.admin_email)
+
+#+END_SRC
+
+
+*** Get Role
+    This function returns either admin or user role from the roles in database
+#+NAME: persistent_get_role
+#+BEGIN_SRC python
+    def get_role(self, **kwargs):
+        return self.get_object(Role, **kwargs)
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_get_role
+#+BEGIN_SRC python
+    def test_get_role(self):
+         print "test_get_role"
+         role_obj = self.persistent_delegate.get_role(name=Config.admin_role)
+         self.assertEqual(role_obj.get("name"), Config.admin_role)
+
+#+END_SRC
+
+
+*** Get user by Email
+    This function returns the user by email from the database
+#+NAME: get_user_by_email
+#+BEGIN_SRC python
+    def get_user_by_email(self, email):
+        return self.get_user(email=email)
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_get_user_by_email
+#+BEGIN_SRC python
+    def test_get_user_by_email(self):
+        print "test_get_user_by_email"
+        email = Email(email=Config.admin_email)
+        user = self.persistent_delegate.get_user_by_email(email)
+        self.assertEqual(user.get("email"), email)
+
+        email = Email(email="tt@kk.com")
+        email.save()
+        user = self.persistent_delegate.get_user_by_email(email)
+        self.assertEqual(user, None)
+
+#+END_SRC
+
+
 * Infra                                                         :boilerplate:
 
 ** sources
@@ -1066,7 +1198,7 @@ class TestPersistentDelegate(TestCase):
 # -*- coding: utf-8 -*-
 from runtime.persistence.entities import *
 from runtime.config.config import Config
-#from runtime.exceptions.custom_exceptions import *
+from runtime.exceptions.custom_exceptions import *
 #+end_src
 
 ** Tests
@@ -1078,7 +1210,7 @@ from runtime.config.config import Config
 import unittest
 from flask_testing import TestCase
 from runtime.rest.app import create_app
-from persistent_delegates import *
+from runtime.system.persistent_delegates import *
 
 
 config = {
@@ -1102,12 +1234,17 @@ if __name__ == '__main__':
 #+BEGIN_SRC python :tangle persistent_delegates.py :eval no :noweb yes
 <<imports_for_persistent_delegates>>
 <<class_persistence_delegate>>
+<<persistent_get_object>>
 <<persistent_user_exists>>
 <<persistent_add_user>>
+<<persistent_get_user>>
+<<persistent_get_email>>
+<<persistent_get_name>>
 <<persistent_update_user>>
 <<persistent_delete_user>>
 <<persistent_add_role_to_user>>
 <<persistent_get_users>>
+<<persistent_get_role>>
 <<persistent_get_active_users>>
 <<persistent_add_oc>>
 <<persistent_add_nc>>
@@ -1143,7 +1280,11 @@ if __name__ == '__main__':
 <<imports_for_tests_persistence>>
 <<test_class_persistent_delegate>>
 <<test_persistent_user_exists>>
+<<test_persistent_get_name>>
 <<test_persistent_add_user>>
+<<test_persistent_get_user>>
+<<test_persistent_get_role>>
+<<test_persistent_get_email>>
 <<test_persistent_update_user>>
 <<test_persistent_delete_user>>
 <<test_persistent_add_role_to_user>>

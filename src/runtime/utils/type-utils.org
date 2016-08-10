@@ -245,6 +245,7 @@ def check_inst(cls):
 
 check_function =  check_inst(types.FunctionType)
 check_dict = check_inst(dict)
+check_list = check_inst(list)
 check_str = check_inst(str)
 check_int = check_inst(int)
 check_pos_int = check_pred(lambda arg: check_int(arg) and arg > 0)
