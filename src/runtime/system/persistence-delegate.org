@@ -89,8 +89,7 @@ class TestPersistentDelegate(TestCase):
 ** Other functions
    Other functions that help =System= perform the operations. 
    
-*** user_exists
-    Check if =user= already exists
+***  Check if =user= already exists
     This function checks if a user is already in the user-set of the =System=.
 #+NAME: persistent_user_exists
 #+BEGIN_SRC python
@@ -112,8 +111,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** add_user
-    Add a user to the system
+
+***  Add a user to the system
     This function adds a user to the user-set maintained by the system.
 #+NAME: persistent_add_user
 #+BEGIN_SRC python
@@ -140,7 +139,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** update_user
+
+***  Update a user in the system
 #+NAME: persistent_update_user
 #+BEGIN_SRC python 
     def update_user(self, name, email, user):
@@ -173,7 +173,8 @@ class TestPersistentDelegate(TestCase):
  
 #+END_SRC
 
-*** delete_user
+
+***  Delete a user from the system
 #+NAME: persistent_delete_user
 #+BEGIN_SRC python 
     def delete_user(self, user):
@@ -197,7 +198,8 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(del_user.get("user_status") , "inactive")
 #+END_SRC
 
-*** add_role_to_user
+
+***  Add a role to the user in the system
 #+NAME: persistent_add_role_to_user
 #+BEGIN_SRC python 
     def add_role_to_user(self, user, role):
@@ -221,7 +223,8 @@ class TestPersistentDelegate(TestCase):
         self.assertTrue(len(user_with_new_role.get('roles'))==2)
 #+END_SRC
 
-*** get_users
+
+***  Get all Active users from the system
 
     This return the user_set maintained by the system.
 #+NAME: persistent_get_users
@@ -247,8 +250,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** role_exists
-    Check if =role= already exists
+
+***  Check if =role= already exists
     This function checks if a user is already in the role-set of the =System=.
 #+NAME: persistent_role_exists
 #+BEGIN_SRC python
@@ -270,8 +273,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** add_role
-    Add a role to the system
+
+***  Add a role to the system
     This function adds a user to the role-set maintained by the system.
 #+NAME: persistent_add_role
 #+BEGIN_SRC python
@@ -292,8 +295,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** get_roles
 
+***  Get all roles from the System
     This return the role_set maintained by the system.
 #+NAME: persistent_get_roles
 #+BEGIN_SRC python
@@ -311,8 +314,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** add_occ_role
-    Add occ role to the system
+
+***  Add occ role to the system
     This function adds a user to the role-set maintained by the system.
 #+NAME: persistent_add_occ_role
 #+BEGIN_SRC python
@@ -333,8 +336,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** add_ncc_role
-    Add ncc role to the system
+
+***  Add ncc role to the system
     This function adds a user to the role-set maintained by the system.
 #+NAME: persistent_add_ncc_role
 #+BEGIN_SRC python
@@ -355,8 +358,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** institute_exists
-    Check if =institute= already exists
+
+***  Check if =institute= already exists
     This function checks if a user is already in the institute-set of the =System=.
 #+NAME: persistent_institute_exists
 #+BEGIN_SRC python
@@ -379,8 +382,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** add_institute
-    Add an institute to the system
+
+***  Add an institute to the system
     This function adds an institute to the institute-set maintained by the system.
 #+NAME: persistent_add_institute
 #+BEGIN_SRC python
@@ -401,7 +404,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** update_institute
+
+***  Update an institute in the system
 #+NAME: persistent_update_institute
 #+BEGIN_SRC python
     def update_institute(self, institute, name, address):
@@ -423,7 +427,8 @@ class TestPersistentDelegate(TestCase):
          self.assertEqual(updated_institute.get("address"), "Madras")
 #+END_SRC
 
-*** get_institutes
+
+***  Get all institutes from the system
     This return the institute_set maintained by the system.
 #+NAME: persistent_get_institutes
 #+BEGIN_SRC python
@@ -444,8 +449,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** oc_exists
-    Check if =oc= already exists
+
+***  Check if =oc= already exists
     This function checks if an outreach-centre is already in the oc-set of the =System=.
 #+NAME: persistent_oc_exists
 #+BEGIN_SRC python
@@ -471,8 +476,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** add_oc
-    Add a oc to the system
+
+***  Add a oc to the system
     This function adds an outreach centre to the oc-set maintained by the system.
 #+NAME: persistent_add_oc
 #+BEGIN_SRC python
@@ -495,8 +500,8 @@ class TestPersistentDelegate(TestCase):
          self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 #+END_SRC
 
-*** add_nc
-    Add a nc to the system
+
+***  Add a nc to the system
     This function adds an outreach centre to the oc-set maintained by the system.
 #+NAME: persistent_add_nc
 #+BEGIN_SRC python
@@ -526,7 +531,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** get_ocs
+
+***  Get ocs from system
 
     This return the oc_set maintained by the system.
 #+NAME: persistent_get_ocs
@@ -551,8 +557,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** nc_exists
-    Check if =nc= already exists
+
+***  Check if =nc= already exists
     This function checks if a nodal-centre is already in the nc-set of the =System=.
 #+NAME: persistent_nc_exists
 #+BEGIN_SRC python
@@ -580,7 +586,8 @@ class TestPersistentDelegate(TestCase):
          self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 #+END_SRC
 
-*** get_ncs
+
+***  Get ncs from system
 
     This return the nc_set maintained by the system.
 #+NAME: persistent_get_ncs
@@ -608,7 +615,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** get_active_users
+
+***  Get all active_users from system
     This function returns All the active users from the user_set.
 #+NAME: persistent_get_active_users
 #+BEGIN_SRC python
@@ -636,8 +644,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** workshop_exists
-    Check if =workshop= already exists
+
+***  Check if =workshop= already exists
     This function checks if a workshop is already in the workshop-set of the =System=.
 #+NAME: persistent_workshop_exists
 #+BEGIN_SRC python
@@ -669,8 +677,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** add_workshop
-    Add a workshop to the system
+
+***  Add a workshop to the system
     This function adds a workshop to the workshop-set maintained by the system.
 #+NAME: persistent_add_workshop
 #+BEGIN_SRC python
@@ -711,7 +719,8 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(self.persistent_delegate.workshop_exists(workshop), True)
 #+END_SRC
 
-*** cancel_workshop
+
+***  Cancel workshop
 #+NAME: persistent_cancel_workshop
 #+BEGIN_SRC python
     def cancel_workshop(self, workshop):
@@ -741,7 +750,8 @@ class TestPersistentDelegate(TestCase):
 
         self.assertEqual(cancelled_workshop.get("status"), Status.cancelled)
 #+END_SRC
-*** reschedule_workshop
+
+***  Reschedule Workshop
 #+NAME: persistent_reschedule_workshop
 #+BEGIN_SRC python
     def reschedule_workshop(self, workshop, wstarget):
@@ -775,7 +785,8 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(rescheduled_workshop.get("ws_target").get("usage"), 5000)
 #+END_SRC
 
-*** conduct_workshop
+
+***  Conduct Workshop
 #+NAME: persistent_conduct_workshop
 #+BEGIN_SRC python
     def conduct_workshop(self, workshop):
@@ -806,7 +817,8 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(conducted_workshop.get("status"), Status.completed)
 #+END_SRC
 
-*** upload_artefact
+
+***  Upload Artefact
 #+NAME: persistent_upload_artefact
 #+BEGIN_SRC python
     def upload_artefact(self, workshop, new_artefact):
@@ -845,7 +857,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** approve_workshop
+
+***  Approve Workshop
 #+NAME: persistent_approve_workshop
 #+BEGIN_SRC python
     def approve_workshop(self, workshop):
@@ -876,7 +889,8 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(approved_workshop.get("status"), Status.approved)
 #+END_SRC
 
-*** reject_workshop
+
+***  Reject Workshop
 #+NAME: persistent_reject_workshop
 #+BEGIN_SRC python
     def reject_workshop(self, workshop):
@@ -907,7 +921,8 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(rejected_workshop.get("status"), Status.rejected)
 #+END_SRC
 
-*** delete_artefact
+
+***  Delete Artefact
 #+NAME: persistent_delete_artefact
 #+BEGIN_SRC python
     def delete_artefact(self, workshop, artefact):
@@ -948,7 +963,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-*** get_workshops
+
+***  Get all workshops from the system
 
     This return the workshop_set maintained by the system.
 #+NAME: persistent_get_workshops
@@ -979,7 +995,8 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(len(self.persistent_delegate.get_workshops()), 1)
 #+END_SRC
 
-*** get_artefacts
+
+***  Get all artefacts from the system
 
     This return the artefact_set maintained by the system.
 #+NAME: persistent_get_artefacts
@@ -999,7 +1016,8 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(len(self.persistent_delegate.get_artefacts()), 1)
 
 #+END_SRC
-*** get_artefacts_of_a_workshop
+
+***  Get all artefacts of a workshop
 
     This return the workshop_set maintained by the system.
 #+NAME: persistent_get_artefacts_of_a_workshop
