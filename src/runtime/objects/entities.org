@@ -60,6 +60,16 @@ class TestName(TestCase):
         self.assertEqual(Name(name="Jimi Hendrix").get("name"), "Jimi Hendrix")
         self.assertRaises(TypeError, Name, name="Jimi 123 Hendrix")
 
+    def test_name_equality(self):
+        print "test_name_equality"
+        self.assertEqual(Name(name="Jimi Hendrix") == 
+                         Name(name="Jimi Hendrix"), 
+                         True)
+
+        self.assertEqual(Name(name="Jimi Hendrix") == 
+                         Name(name="Bo Didley"), 
+                         False)
+
 #+END_SRC
 
 
@@ -88,17 +98,17 @@ class TestEmail(TestCase):
         print "test_instantiate_email"
         self.assertEqual(is_email(Email(email="jimi@gnu.org")), True)
         self.assertEqual(Email(email="jimi@gnu.org").get("email"),
-                         "jimi@gnu.org")
+                             "jimi@gnu.org")
         self.assertRaises(TypeError, Name, name="jimi@@gnu.org")
 
 
     def test_equality_of_email(self):
         print "test_equality_of_email"
-        em1 = Email(email="jimi@gnu.org")
-        self.assertEqual(em1 == em1, True)
-
-        em2 = Email(email="didley@gnu.org")
-        self.assertEqual(em1 == em2, False)
+        self.assertEqual(Email(email="jimi@gnu.org") ==
+                             Email(email="jimi@gnu.org"), True)
+        
+        self.assertEqual(Email(email="didley@gnu.org") ==
+                             Email(email="jimi@gnu.org"), False)
 
 #+END_SRC
 
@@ -126,6 +136,15 @@ def is_octarget(value):
 #+BEGIN_SRC python
 WSTarget = ClassTemplate.mk_class("WSTarget", usage = is_int, participants = is_int, experiments = is_int, date = is_date, nc_target = is_nctarget)
 
+WSTarget.__eq__ = lambda self, other: \
+                  isinstance(other, self.__class__) and \
+                  self.get("usage") == other.get("usage") and \
+                  self.get("participants") == other.get("participants") and \
+                  self.get("experiments") == other.get("experiments") and \
+                  self.get("date") == other.get("date") and \
+                  self.get("nc_target") == other.get("nc_target")
+                  
+
 is_wst = is_inst(WSTarget)
 check_wstarget = check_pred(is_wst)
 
@@ -139,10 +158,29 @@ class TestWSTarget(TestCase):
 
     def test_instantiate_wstarget(self):
         print "test_instantiate_wstarget"
-        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nc_target = None)
+        wstarget_check = WSTarget(usage = 4000, participants = 200,
+        experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nc_target = None)
         self.assertEqual(is_wst(wstarget_check), True)
         self.assertEqual(wstarget_check.get("participants"), 200)
         self.assertRaises(TypeError, WSTarget, participants="123")
+
+    def test_equality_of_wstarget(self):
+        print "test_equality_of_wstarget"
+        wstarget1 = WSTarget(usage = 4000, participants = 200,
+                                 experiments = 20,
+                                 date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(),
+                                 nc_target = None)
+        wstarget2 = WSTarget(usage = 4000, participants = 200,
+                                 experiments = 20,
+                                 date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(),
+                                 nc_target = None)
+        wstarget3 = WSTarget(usage = 4001,
+                                 participants = 200,
+                                 experiments = 20,
+                                 date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(),
+                                 nc_target = None)
+        self.assertEqual(wstarget1 == wstarget2, True)
+        self.assertEqual(wstarget1 == wstarget3, False)
 
 #+END_SRC
 
