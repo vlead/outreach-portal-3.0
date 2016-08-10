@@ -27,6 +27,7 @@ class AttributeRequired(Exception):
 
 #+END_SRC
 
+
 *** Constraint Error
 #+name: class_ConstraintError
 #+BEGIN_SRC python
@@ -40,6 +41,7 @@ class ConstraintError(Exception):
         return repr(self.str)
 
 #+END_SRC
+
 
 *** NotAuthorized Error
 #+name: class_NotAuthorizedError
@@ -70,6 +72,51 @@ class ArityError(Exception):
 
 #+END_SRC
 
+
+
+*** State Error
+#+name: class_StateError
+#+BEGIN_SRC python
+class StateError(Exception):
+    str = None
+
+    def __init__(self, str):
+        self.str = str
+
+    def __str__(self):
+        return repr(self.str)
+
+#+END_SRC
+
+
+*** NotFound Error
+#+name: class_NotFoundError
+#+BEGIN_SRC python
+class NotFoundError(Exception):
+    str = None
+
+    def __init__(self, str):
+        self.str = str
+
+    def __str__(self):
+        return repr(self.str)
+
+#+END_SRC
+
+
+*** Error
+#+name: class_Error
+#+BEGIN_SRC python
+class Error(Exception):
+    str = None
+
+    def __init__(self, str):
+        self.str = str
+
+    def __str__(self):
+        return repr(self.str)
+
+#+END_SRC
 
 
 * Tangling                                        :boilerplate:
