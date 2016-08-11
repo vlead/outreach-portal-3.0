@@ -263,7 +263,7 @@ OCTarget = ClassTemplate.mk_class("OCTarget", usage = is_int, date = is_date, nc
 OCTarget.__eq__ = lambda self, other: \
                   isinstance(other, self.__class__) and \
                   self.get("usage") == other.get("usage") and \
-                  self.get("nc_targets") == other.get("nc_targets") and \
+                  self.get("nctargets") == other.get("nctargets") and \
                   self.get("date") == other.get("date")
 
 is_oct = is_inst(OCTarget)
@@ -639,7 +639,6 @@ class TestUser(TestCase):
                      email=Email(email="jimi@gnu.org"),
                      roles=[],user_status="active")
         user.append_role(Role(name="guest",centre_oc=None,centre_nc=None))
-        print user.to_client()
         self.assertTrue(len(user.get('roles'))==1)
 
 #+END_SRC
@@ -960,31 +959,41 @@ class TestWorkshop(TestCase):
     
     def test_equality_on_workshop(self):
         print "test_equality_on_workshop"
+        status = Status(name = "pending")
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), oc_target = None, spokes = [])
+        nc1 = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        oc_target = OCTarget(usage = 400, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nctargets = [])
+        nc_target = NCTarget(usage = 400, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), oc_target = oc_target, wstargets = [])
+        wstarget_check = WSTarget(usage = 4000, participants = 200, experiments = 20, date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date(), nc_target = nc_target)
+
         workshop1 = Workshop(name=Name(name="Test workshop"),
-                                 institute=Institute(name="IIITH",address="Hyderabad"), 
-                                 nc = nc1, 
-                                 ws_target = wstarget_check, 
-                                 status = status, 
-                                 artefacts = [],
-                                 a_date = None,
-                                 a_participants = 0,
-                                 a_experiments = 0,
-                                 a_usage = 0)
+                            institute=Institute(name="IIITH",address="Hyderabad"),
+                            nc = nc1,
+                            ws_target = wstarget_check,
+                            status = status,
+                            artefacts = [],
+                            a_date = None,
+                            a_participants = 0,
+                            a_experiments = 0,
+                            a_usage = 0)
+
+
         workshop2 = Workshop(name=Name(name="Test workshop"),
-                                 institute=Institute(name="IIITH",address="Hyderabad"), 
-                                 nc = nc1, 
-                                 ws_target = wstarget_check, 
-                                 status = status, 
+                                 institute=Institute(name="IIITH",address="Hyderabad"),
+                                 nc = nc1,
+                                 ws_target = wstarget_check,
+                                 status = status,
                                  artefacts = [],
                                  a_date = None,
                                  a_participants = 0,
                                  a_experiments = 0,
                                  a_usage = 0)
-        workshop3 = Workshop(name=Name(name="Test1 workshop1"),
-                                 institute=Institute(name="IIT-D",address="Delhi"), 
-                                 nc = nc1, 
-                                 ws_target = wstarget_check, 
-                                 status = status, 
+
+        workshop3 = Workshop(name=Name(name="Test workshop Three"),
+                                 institute=Institute(name="IITD",address="Delhi"),
+                                 nc = nc1,
+                                 ws_target = wstarget_check,
+                                 status = status,
                                  artefacts = [],
                                  a_date = None,
                                  a_participants = 0,
@@ -992,6 +1001,7 @@ class TestWorkshop(TestCase):
                                  a_usage = 0)
         self.assertEqual(workshop1 == workshop2, True)
         self.assertEqual(workshop1 == workshop3, False)
+
         
 #+END_SRC
   
