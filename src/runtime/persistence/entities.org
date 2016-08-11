@@ -23,7 +23,7 @@ args = {"__tablename__": "names",
         "users": db.relationship('User', backref='name')
         }
 
-Name = ClassPersistenceTemplate.mk_persistent(Name, **args)
+Name = ClassPersistenceTemplate.mk_persistent(Name, [], **args)
 is_name = is_inst(Name)
 check_name = check_pred(is_name)
 #+end_src
@@ -84,7 +84,7 @@ args = {"__tablename__": "emails",
         "user": db.relationship('User', backref=db.backref('email', uselist=False))
         }
 
-Email = ClassPersistenceTemplate.mk_persistent(Email, **args)
+Email = ClassPersistenceTemplate.mk_persistent(Email, [], **args)
 
 is_email = is_inst(Email)
 check_email = check_pred(is_email)
@@ -157,7 +157,7 @@ args = {"__tablename__": "institutes",
         "nc": db.relationship('NC', backref='institute')
         }
 
-Institute = ClassPersistenceTemplate.mk_persistent(Institute, **args)
+Institute = ClassPersistenceTemplate.mk_persistent(Institute, [], **args)
 
 is_institute = is_inst(Institute)
 check_institute = check_pred(is_institute)
@@ -203,7 +203,7 @@ args = {"__tablename__": "wstargets",
         "nctarget_id": db.Column(db.Integer, db.ForeignKey('nctargets.id'))
         }
 
-WSTarget = ClassPersistenceTemplate.mk_persistent(WSTarget, **args)
+WSTarget = ClassPersistenceTemplate.mk_persistent(WSTarget, [], **args)
 
 is_wst = is_inst(WSTarget)
 check_wstarget = check_pred(is_wst)
@@ -254,7 +254,7 @@ args = {"__tablename__": "nctargets",
         "wstargets": db.relationship('WSTarget', backref='nctarget')
         }
 
-NCTarget = ClassPersistenceTemplate.mk_persistent(NCTarget, **args)
+NCTarget = ClassPersistenceTemplate.mk_persistent(NCTarget, [], **args)
 
 is_nct = is_inst(NCTarget)
 check_nctarget = check_pred(is_nct)
@@ -301,7 +301,7 @@ args = {"__tablename__": "octargets",
         "nctargets": db.relationship('NCTarget', backref='octarget')
         }
 
-OCTarget = ClassPersistenceTemplate.mk_persistent(OCTarget, **args)
+OCTarget = ClassPersistenceTemplate.mk_persistent(OCTarget, [], **args)
 
 is_oct = is_inst(OCTarget)
 check_octarget = check_pred(is_oct)
@@ -344,7 +344,7 @@ args = {"__tablename__": "status",
         "name": db.Column(db.String)
         }
 
-Status = ClassPersistenceTemplate.mk_persistent(Status, **args)
+Status = ClassPersistenceTemplate.mk_persistent(Status, [], **args)
 
 is_status = is_inst(Status)
 check_status = check_pred(is_status)
@@ -386,7 +386,7 @@ args = {"__tablename__": "types",
         "name": db.Column(db.String)
         }
 
-Type = ClassPersistenceTemplate.mk_persistent(Type, **args)
+Type = ClassPersistenceTemplate.mk_persistent(Type, [], **args)
 
 is_type = is_inst(Type)
 check_type = check_pred(is_type)
@@ -432,7 +432,7 @@ args = {"__tablename__": "artefacts",
         "a_type_id": db.Column(db.Integer, db.ForeignKey('types.id'))
         }
 
-Artefact = ClassPersistenceTemplate.mk_persistent(Artefact, **args)
+Artefact = ClassPersistenceTemplate.mk_persistent(Artefact, [], **args)
 
 is_artefact = is_inst(Artefact)
 check_artefact = check_pred(is_artefact)
@@ -489,7 +489,7 @@ args = {"__tablename__": "workshops",
         "a_usage": db.Column(db.Integer)
         }
 
-Workshop = ClassPersistenceTemplate.mk_persistent(Workshop, **args)
+Workshop = ClassPersistenceTemplate.mk_persistent(Workshop, [], **args)
 
 
 is_wkshp = is_inst(Workshop)
@@ -566,7 +566,7 @@ args = {"__tablename__": "ocs",
         "oc_target_id": db.Column(db.Integer, db.ForeignKey('octargets.id'))
 	}
 
-OC = ClassPersistenceTemplate.mk_persistent(OC, **args)
+OC = ClassPersistenceTemplate.mk_persistent(OC, [], **args)
 
 is_oc = is_inst(OC)
 check_oc = check_pred(is_oc)
@@ -644,7 +644,7 @@ args = {"__tablename__": "ncs",
 	"workshops": db.relationship('Workshop', backref = 'nc')
         }
 
-NC = ClassPersistenceTemplate.mk_persistent(NC, **args)
+NC = ClassPersistenceTemplate.mk_persistent(NC, [], **args)
 
 is_nc = is_inst(NC)
 check_nc = check_pred(is_nc)
@@ -704,7 +704,7 @@ args = {"__tablename__": "roles",
         "centre_nc_id": db.Column(db.Integer, db.ForeignKey('ncs.id'), nullable=True),
 	}
 
-Role = ClassPersistenceTemplate.mk_persistent(Role, **args)
+Role = ClassPersistenceTemplate.mk_persistent(Role, [], **args)
 
 is_role = is_inst(Role)
 check_role = check_pred(is_role)
@@ -799,7 +799,7 @@ args = {"__tablename__": "users",
         }
 
 
-User = ClassPersistenceTemplate.mk_persistent(User, **args)
+User = ClassPersistenceTemplate.mk_persistent(User, [], **args)
 
 is_user = is_inst(User)
 check_user = check_pred(is_user)
