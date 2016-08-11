@@ -631,7 +631,7 @@ class TestUser(TestCase):
                      roles=[],user_status="active"
                     )
         self.assertEqual(user1 == user2, True)
-        self.assertEqual(user1 == user3, True)
+        self.assertEqual(user1 == user3, False)
         
     def test_append_role(self):
         print "test_append_role"
@@ -691,7 +691,7 @@ class TestInstitute(TestCase):
         institute2 = Institute(name="IIIT",address="Hyderabad")
         institute3 = Institute(name="IIT-D",address="Delhi")
         self.assertEqual(institute1 == institute2, True)
-        self.assertEqual(institute1 == institute3, True)
+        self.assertEqual(institute1 == institute3, False)
 #+END_SRC
    
 
@@ -701,6 +701,9 @@ class TestInstitute(TestCase):
 #+NAME: class_Status
 #+BEGIN_SRC python
 Status = ClassTemplate.mk_class("Status", name=is_alphabetic_str)
+Status.__eq__ = lambda self, other: \
+                  isinstance(other, self.__class__) and \
+                  self.get("name") == other.get("name")
 
 Status.pending = Status(name="pending")
 Status.cancelled = Status(name="cancelled")
@@ -715,6 +718,7 @@ Status.is_completed = lambda status: status.get('name') == 'completed'
 Status.is_pending_approval = lambda status: status.get('name') == 'pending for approval'
 Status.is_rejected = lambda status: status.get('name') == 'rejected'
 Status.is_approved = lambda status: status.get('name') == 'approved'
+
 
 is_status = is_inst(Status)
 check_status = check_pred(is_status)
@@ -741,7 +745,11 @@ class TestStatus(TestCase):
         self.assertEqual(u_status.get("name"), "completed")
         u_status.set(name="pending for approval")
         self.assertEqual(u_status.get("name"), "pending for approval")
-    
+
+    def test_equality_on_status(self):
+        print "test_equality_on_status"
+        self.assertEqual(Status(name="completed") == Status(name="completed"), True)
+        self.assertEqual(Status(name="completed") == Status(name="pending"), False)
 #+END_SRC
 
 
@@ -752,6 +760,9 @@ class TestStatus(TestCase):
 #+NAME: class_Type
 #+BEGIN_SRC python
 Type = ClassTemplate.mk_class("Type", name=is_alphabetic_str)
+Type.__eq__ = lambda self, other: \
+                  isinstance(other, self.__class__) and \
+                  self.get("name") == other.get("name")
 
 Type.photo = Type(name="photo")
 Type.feedback = Type(name="feedback")
@@ -789,6 +800,11 @@ class TestType(TestCase):
         self.assertEqual(u_type.get("name"), "feedback")
         u_type.set(name="photo")
         self.assertEqual(u_type.get("name"), "photo")
+
+    def test_equality_on_type(self):
+        print "test_equality_on_type"
+        self.assertEqual(Type(name="feedback") == Type(name="feedback"), True)
+        self.assertEqual(Type(name="feedback") == Type(name="complaines"), False)
     
 #+END_SRC
 
@@ -800,6 +816,13 @@ Artefact = ClassTemplate.mk_class("Artefact",
                                   name = is_alphabetic_str, 
                                   path = is_string,
                                   a_type = is_type )
+
+Artefact.__eq__ = lambda self, other: \
+                  isinstance(other, self.__class__) and \
+                  self.get("name") == other.get("name") and \
+                  self.get("path") == other.get("path") and \
+                  self.get("a_type") == other.get("a_type")
+                  
 
 is_artefact = is_inst(Artefact)
 check_artefact = check_pred(is_artefact)
@@ -823,6 +846,14 @@ class TestArtefact(TestCase):
                          "attendance")
         self.assertRaises(TypeError, Artefact, name="123")
 
+    def test_equality_on_artefact(self):
+        print "test_equality_on_artefact"
+        artefact1 = Artefact(name="attendance", path="/home", a_type = Type(name = "attendance"))
+        artefact2 = Artefact(name="attendance", path="/home", a_type = Type(name = "attendance"))
+        artefact3 = Artefact(name="college report", path="/home/vlead", a_type = Type(name = "attendance"))
+        self.assertEqual(artefact1 == artefact2, True)
+        self.assertEqual(artefact1 == artefact3, False)
+        
 #+END_SRC
 
 
@@ -863,6 +894,19 @@ Workshop = ClassTemplate.mk_class("Workshop",
                                   a_usage = is_int,
                                   a_participants = is_int,
                                   a_experiments = is_int)
+
+Workshop.__eq__ = lambda self, other: \
+                  isinstance(other, self.__class__) and \
+                  self.get("name") == other.get("name") and \
+                  self.get("institute") == other.get("institute") and \
+                  self.get("ws_target") == other.get("ws_target") and \
+                  self.get("nc") == other.get("nc") and \
+                  self.get("artefacts") == other.get("artefacts") and \
+                  self.get("status") == other.get("status") and \
+                  self.get("a_date") == other.get("a_date") and \
+                  self.get("a_usage") == other.get("a_usage") and \
+                  self.get("a_participants") == other.get("a_participants") and \
+                  self.get("a_experiments") == other.get("a_experiments")
 
 is_wkshp = is_inst(Workshop)
 check_workshop = check_pred(is_wkshp)
@@ -914,7 +958,41 @@ class TestWorkshop(TestCase):
                             a_usage = 0)
         self.assertEqual(is_wkshp(workshop), True)
     
-
+    def test_equality_on_workshop(self):
+        print "test_equality_on_workshop"
+        workshop1 = Workshop(name=Name(name="Test workshop"),
+                                 institute=Institute(name="IIITH",address="Hyderabad"), 
+                                 nc = nc1, 
+                                 ws_target = wstarget_check, 
+                                 status = status, 
+                                 artefacts = [],
+                                 a_date = None,
+                                 a_participants = 0,
+                                 a_experiments = 0,
+                                 a_usage = 0)
+        workshop2 = Workshop(name=Name(name="Test workshop"),
+                                 institute=Institute(name="IIITH",address="Hyderabad"), 
+                                 nc = nc1, 
+                                 ws_target = wstarget_check, 
+                                 status = status, 
+                                 artefacts = [],
+                                 a_date = None,
+                                 a_participants = 0,
+                                 a_experiments = 0,
+                                 a_usage = 0)
+        workshop3 = Workshop(name=Name(name="Test1 workshop1"),
+                                 institute=Institute(name="IIT-D",address="Delhi"), 
+                                 nc = nc1, 
+                                 ws_target = wstarget_check, 
+                                 status = status, 
+                                 artefacts = [],
+                                 a_date = None,
+                                 a_participants = 0,
+                                 a_experiments = 0,
+                                 a_usage = 0)
+        self.assertEqual(workshop1 == workshop2, True)
+        self.assertEqual(workshop1 == workshop3, False)
+        
 #+END_SRC
   
 
@@ -925,7 +1003,10 @@ class TestWorkshop(TestCase):
 #+NAME: class_Session
 #+BEGIN_SRC python
 Session = ClassTemplate.mk_class("Session", user=is_user, role=is_role)
-
+Session.__eq__ = lambda self, other: \
+                  isinstance(other, self.__class__) and \
+                  self.get("user") == other.get("user") and \
+                  self.get("role") == other.get("role")
 is_session = is_inst(Session)
 check_session = check_pred(is_session)
 
@@ -966,6 +1047,20 @@ class TestSession(TestCase):
         session.set(user=user)
         self.assertEqual(session.get("user").get("email").get("email"),
                          "didley@gnu.org")
+
+    def test_equality_on_session(self):
+        print "test_equality_on_session"
+        user = User(name=Name(name="Jimi Hendrix"),
+                    email=Email(email="jimi@gnu.org"),
+                    roles=[],user_status="active"
+                   )
+        role = Role(name="admin", centre_oc=None,centre_nc=None)
+        role1 = Role(name="occ(oc)", centre_oc=None,centre_nc=None)
+        session1 = Session(user=user, role=role)
+        session2 = Session(user=user, role=role)
+        session3 = Session(user=user, role=role1)
+        self.assertEqual(session1 == session2, True)
+        self.assertEqual(session1 == session3, False)                         
 
 #+END_SRC
 
