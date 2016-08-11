@@ -385,7 +385,7 @@ class TestOC(TestCase):
         print "test_equality_of_oc"
         oc1 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
         oc2 = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
-        oc3 = OC(institute=Institute(name="IIT-D",address="Delhi"),spokes=[], oc_target = None)
+        oc3 = OC(institute=Institute(name="IITD",address="Delhi"),spokes=[], oc_target = None)
         self.assertEqual(oc1 == oc2, True)
         self.assertEqual(oc1 == oc3, False)
         
@@ -689,7 +689,7 @@ class TestInstitute(TestCase):
         print "test_equality_on_institute"
         institute1 = Institute(name="IIIT",address="Hyderabad")
         institute2 = Institute(name="IIIT",address="Hyderabad")
-        institute3 = Institute(name="IIT-D",address="Delhi")
+        institute3 = Institute(name="IITD",address="Delhi")
         self.assertEqual(institute1 == institute2, True)
         self.assertEqual(institute1 == institute3, False)
 #+END_SRC
@@ -1005,8 +1005,8 @@ class TestWorkshop(TestCase):
 Session = ClassTemplate.mk_class("Session", user=is_user, role=is_role)
 Session.__eq__ = lambda self, other: \
                   isinstance(other, self.__class__) and \
-                  self.get("user") == other.get("user") and \
-                  self.get("role") == other.get("role")
+                  self.get("user") == other.get("user") 
+
 is_session = is_inst(Session)
 check_session = check_pred(is_session)
 
@@ -1048,19 +1048,28 @@ class TestSession(TestCase):
         self.assertEqual(session.get("user").get("email").get("email"),
                          "didley@gnu.org")
 
+
     def test_equality_on_session(self):
         print "test_equality_on_session"
-        user = User(name=Name(name="Jimi Hendrix"),
-                    email=Email(email="jimi@gnu.org"),
-                    roles=[],user_status="active"
-                   )
         role = Role(name="admin", centre_oc=None,centre_nc=None)
-        role1 = Role(name="occ(oc)", centre_oc=None,centre_nc=None)
-        session1 = Session(user=user, role=role)
-        session2 = Session(user=user, role=role)
-        session3 = Session(user=user, role=role1)
+        role1 = Role(name="occ", centre_oc=None,centre_nc=None)
+
+        user1 = User(name=Name(name="Jimi Hendrix"),
+                    email=Email(email="jimi@gnu.org"),
+                    roles=[role],user_status="active"
+                   )
+        user2 = User(name=Name(name="Jimi Hendrix"),
+                    email=Email(email="jimi@gmail.org"),
+                    roles=[role1],user_status="active"
+                   )
+
+        session1 = Session(user=user1, role=role)
+        session2 = Session(user=user1, role=role)
+        session3 = Session(user=user2, role=role1)
         self.assertEqual(session1 == session2, True)
-        self.assertEqual(session1 == session3, False)                         
+        self.assertEqual(session1 == session3, False)
+
+
 
 #+END_SRC
 
