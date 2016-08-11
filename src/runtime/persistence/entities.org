@@ -24,6 +24,7 @@ args = {"__tablename__": "names",
         }
 
 Name = ClassPersistenceTemplate.mk_persistent(Name, [], **args)
+
 is_name = is_inst(Name)
 check_name = check_pred(is_name)
 #+end_src
