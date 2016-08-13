@@ -91,10 +91,8 @@ def is_email_str(value):
 #+name: def_is_date
 #+BEGIN_SRC  python
 def is_date(value):
-    if ( isinstance(value, datetime.date) or value == None) :
-        return True
-    else:
-        return False
+    return isinstance(value, datetime.date)
+
 #+END_SRC
 
 
@@ -307,6 +305,7 @@ def check_inv(inv, *name):
 import re
 import types
 import datetime
+
 #+END_SRC
 
 
@@ -318,9 +317,9 @@ import datetime
 # -*- coding: utf-8 -*-
 import unittest
 from unittest import TestCase
-import datetime
 from type_utils import *
 import types
+
 #+end_src
 
 ** Running tests
