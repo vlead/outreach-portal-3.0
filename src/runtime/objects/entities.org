@@ -49,9 +49,10 @@ FileType = ClassTemplate.mk_class("FileType")
 Artefact = ClassTemplate.mk_class("Artefact")
 OCTarget = ClassTemplate.mk_class("OCTarget")
 NCTarget = ClassTemplate.mk_class("NCTarget")
-WSTarget = ClassTemplate.mk_class("NCTarget")
+WSTarget = ClassTemplate.mk_class("WSTarget")
 
 #+END_SRC
+
 
 * Type Predicates
 #+NAME: type_predicates
@@ -88,6 +89,9 @@ check_status = check_pred(is_status)
 
 is_file_type = is_inst(FileType)
 check_file_type = check_pred(is_file_type)
+
+is_artefact = is_inst(Artefact)
+check_artefact = check_pred(is_artefact)
 
 is_oc_target = is_inst(OCTarget)
 check_oc_target = check_pred(is_oc_target)
@@ -225,6 +229,7 @@ def are_ws_targets_or_empty_list(ws_targets):
 
 #+END_SRC
 
+
 * Name
 =Name= is a value class with type =is_alphabetic_str=.
 
@@ -354,6 +359,84 @@ class TestRole(TestCase):
 #+END_SRC
 
 
+* User
+  A =User= entity has fields =name= of type =Name=, =email= of type =Email= and
+  role of type =Role=.
+
+#+NAME: class_User
+#+BEGIN_SRC python
+User.add_attributes(name=is_name, 
+                    email=is_email,
+                    roles=are_roles_or_empty_list)
+
+User.__eq__ = lambda self, other: \
+                  isinstance(other, self.__class__) and \
+                  self.get("email") == other.get("email")
+
+def append_role(self,role):
+    if is_role(role):
+        roles = self.get('roles')
+        roles.append(role)
+        self.set(roles=roles)
+
+User.append_role = append_role
+
+#+END_SRC
+
+** Test User
+#+Name: class_TestUser
+#+BEGIN_SRC python
+class TestUser(TestCase):
+    TESTING = True
+
+    def test_instantiate_user(self):
+        print "test_instantiate_user"
+        user = User(name=Name(name="Jimi Hendrix"),
+                    email=Email(email="jimi@gnu.org"),
+                    roles=[])
+
+        self.assertEqual(is_user(user), True)
+
+    def test_sets_on_user(self):
+        print "test_sets_on_user"
+        user = User(name=Name(name="Jimi Hendrix"),
+                    email=Email(email="jimi@gnu.org"),
+                    roles=[Role(name="guest", centre_oc=None, centre_nc=None)]
+                    )
+
+        self.assertEqual(user.get("name").get("name"), "Jimi Hendrix")
+        self.assertEqual(user.get("email").get("email"), "jimi@gnu.org")
+        self.assertEqual(user.get("roles")[0].get("name"), "guest")
+
+    def test_equality_on_user(self):
+        print "test_equality_on_user"
+        user1 = User(name=Name(name="Jimi Hendrix"),
+                     email=Email(email="jimi@gnu.org"),
+                     roles=[])
+
+        user2 = User(name=Name(name="Jimi Hendrix"),
+                     email=Email(email="jimi@gnu.org"),
+                     roles=[]) 
+
+        user3 = User(name=Name(name="John Roy"),
+                     email=Email(email="roy@gnu.org"),
+                     roles=[])
+
+        self.assertEqual(user1 == user2, True)
+        self.assertEqual(user1 == user3, False)
+        
+    def test_append_role(self):
+        print "test_append_role"
+        user = User(name=Name(name="Jimi Hendrix"),
+                     email=Email(email="jimi@gnu.org"),
+                     roles=[])
+
+        user.append_role(Role(name="guest", centre_oc=None, centre_nc=None))
+        self.assertTrue(len(user.get('roles')) == 1)
+
+#+END_SRC
+
+
 * Session
     A session stores the user information.  The session object defines the set
     of operations allowed by the system.
@@ -381,8 +464,7 @@ class TestSession(TestCase):
         print "test_instantiate_user"
         user = User(name=Name(name="Jimi Hendrix"),
                     email=Email(email="jimi@gnu.org"),
-                    roles=[],
-                    user_status="active")
+                    roles=[])
 
         role = Role(name="admin", centre_oc=None, centre_nc=None)
         session = Session(user=user, role=role)
@@ -392,15 +474,14 @@ class TestSession(TestCase):
         print "test_sets_on_session"
         user = User(name=Name(name="Jimi Hendrix"),
                     email=Email(email="jimi@gnu.org"),
-                    roles=[],
-                    user_status="active")
+                    roles=[])
+
         role = Role(name="admin", centre_oc=None, centre_nc=None)
         session = Session(user=user, role=role)
 
         user = User(name=Name(name="Bo Didley"),
                     email=Email(email="didley@gnu.org"),
-                    roles=[],
-                    user_status="active")
+                    roles=[])
 
         session.set(user=user)
         self.assertEqual(session.get("user").get("email").get("email"),
@@ -413,103 +494,17 @@ class TestSession(TestCase):
 
         user1 = User(name=Name(name="Jimi Hendrix"),
                     email=Email(email="jimi@gnu.org"),
-                    roles=[role1], 
-                    user_status="active")
+                    roles=[role1])
+
         user2 = User(name=Name(name="Jimi Hendrix"),
                     email=Email(email="jimi@gmail.org"),
-                    roles=[role1], 
-                    user_status="active")
+                    roles=[role1])
 
         session1 = Session(user=user1, role=role1)
         session2 = Session(user=user1, role=role1)
         session3 = Session(user=user2, role=role1)
         self.assertEqual(session1 == session2, True)
         self.assertEqual(session1 == session3, False)
-
-#+END_SRC
-
-
-* User
-  A =User= entity has fields =name= of type =Name=, =email= of type =Email= and
-  role of type =Role=.
-
-#+NAME: class_User
-#+BEGIN_SRC python
-User.add_attributes(name=is_name, 
-                    email=is_email,
-                    roles=are_roles_or_empty_list,
-                    user_status=is_user_status)
-
-User.__eq__ = lambda self, other: \
-                  isinstance(other, self.__class__) and \
-                  self.get("email") == other.get("email") and \
-                  self.get("user_status") == other.get("user_status")
-
-def append_role(self,role):
-    if is_role(role):
-        roles = self.get('roles')
-        roles.append(role)
-        self.set(roles=roles)
-
-User.append_role = append_role
-
-#+END_SRC
-
-** Test User
-#+Name: class_TestUser
-#+BEGIN_SRC python
-class TestUser(TestCase):
-    TESTING = True
-
-    def test_instantiate_user(self):
-        print "test_instantiate_user"
-        user = User(name=Name(name="Jimi Hendrix"),
-                    email=Email(email="jimi@gnu.org"),
-                    roles=[], 
-                    user_status="active")
-
-        self.assertEqual(is_user(user), True)
-
-    def test_sets_on_user(self):
-        print "test_sets_on_user"
-        user = User(name=Name(name="Jimi Hendrix"),
-                    email=Email(email="jimi@gnu.org"),
-                    roles=[Role(name="guest", centre_oc=None, centre_nc=None)],
-                    user_status="active"
-                   )
-
-        self.assertEqual(user.get("name").get("name"), "Jimi Hendrix")
-        self.assertEqual(user.get("email").get("email"), "jimi@gnu.org")
-        self.assertEqual(user.get("roles")[0].get("name"), "guest")
-        self.assertEqual(user.get("user_status"),"active")
-
-    def test_equality_on_user(self):
-        print "test_equality_on_user"
-        user1 = User(name=Name(name="Jimi Hendrix"),
-                     email=Email(email="jimi@gnu.org"),
-                     roles=[],user_status="active")
-
-        user2 = User(name=Name(name="Jimi Hendrix"),
-                     email=Email(email="jimi@gnu.org"),
-                     roles=[], 
-                     user_status="active")
-
-        user3 = User(name=Name(name="John Roy"),
-                     email=Email(email="roy@gnu.org"),
-                     roles=[], 
-                     user_status="active")
-
-        self.assertEqual(user1 == user2, True)
-        self.assertEqual(user1 == user3, False)
-        
-    def test_append_role(self):
-        print "test_append_role"
-        user = User(name=Name(name="Jimi Hendrix"),
-                     email=Email(email="jimi@gnu.org"),
-                     roles=[], user_status="active")
-
-        user.append_role(Role(name="guest", centre_oc=None, centre_nc=None))
-        self.assertTrue(len(user.get('roles')) == 1)
 
 #+END_SRC
 
@@ -601,43 +596,45 @@ class TestOC(TestCase):
         self.assertEqual(is_oc(oc), True)
         self.assertEqual(oc.get("institute").get("name"), "IIITH")
 
-    # def test_set_spokes_on_OC(self):
-    #     print "test_set_spokes_on_oc"
-    #     oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),
-    #             spokes=[], 
-    #             oc_target = None)
+    def test_set_spokes_on_OC(self):
+        print "test_set_spokes_on_oc"
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),
+                spokes=[], 
+                oc_targets=[])
 
-    #     nc = NC(institute=Institute(name="HCU",address="Hyderabad"),
-    #                 hub=oc, nc_target=None, workshops=[])
+        nc = NC(institute=Institute(name="HCU",address="Hyderabad"),
+                    hub=oc, nc_targets=[], workshops=[])
         
-    #     self.assertEqual((nc.get("institute")).get("name"), "HCU")
+        self.assertEqual((nc.get("institute")).get("name"), "HCU")
 
-    #     oc.append_spoke(nc)
+        oc.append_spoke(nc)
 
-    #     self.assertEqual(oc.get('spokes')[0].get("institute").get("name"),
-    #                          "HCU")
+        self.assertEqual(oc.get('spokes')[0].get("institute").get("name"),
+                             "HCU")
 
-    # def test_add_oc_target_to_OC(self):
-    #     print "test_add_oc_target_to_OC"
-    #     oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),
-    #                 spokes=[], oc_target = None)
+    def test_add_oc_target_to_OC(self):
+        print "test_add_oc_target_to_OC"
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),
+                spokes=[], 
+                oc_targets=[])
+        date_check = "2016-06-12"
+        date_format = "%Y-%m-%d"
+        date = datetime.datetime.strptime(date_check, date_format).date()
+        oc_target = OCTarget(usage=300, oc=oc, nc_targets=[], date=date)
 
-    #     date_check = "30-06-2016"
-    #     date_format = "%d-%m-%Y"
-    #     date = datetime.datetime.strptime(date_check, date_format).date()
-    #     octarget_check = OCTarget(usage=300, nctargets=[], date=date)
+        oc.add_oc_target(oc_target)
+        self.assertEqual(oc.get("oc_targets")[0].get("usage"), 300)
 
-    #     oc.add_oc_target(octarget_check)
-    #     self.assertEqual(oc.get("oc_target").get("usage"), 300)
+    def test_to_client_OC(self):
+        print "test_to_client_oc"
 
-    # def test_to_client_OC(self):
-    #     print "test_to_client_oc"
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),
+                spokes=[], 
+                oc_targets=[])
+        oc_dict = oc.to_client()
 
-    #     oc = OC(institute=Institute(name="IIITH",address="Hyderabad"),spokes=[], oc_target = None)
-    #     oc_dict = oc.to_client()
-
-    #     self.assertEqual("IIITH", oc_dict['institute']['name'])
-    #     self.assertEqual("Hyderabad", oc_dict['institute']['address'])
+        self.assertEqual("IIITH", oc_dict['institute']['name'])
+        self.assertEqual("Hyderabad", oc_dict['institute']['address'])
     
     def test_equality_of_oc(self):
         print "test_equality_of_oc"
@@ -785,9 +782,9 @@ class TestStatus(TestCase):
 
 #+NAME: class_Workshop
 #+BEGIN_SRC python
-Workshop.add_attributes(name=is_name, 
+Workshop.add_attributes(name=is_alphabetic_str,
                          institute=is_institute, 
-                         ws_target=is_ws_target_or_none, 
+                         ws_target=is_ws_target,
                          nc=is_nc, 
                          artefacts=are_artefacts_or_empty_list,
                          status=is_status,
@@ -811,7 +808,7 @@ def add_artefact(self, artefact):
 
 def add_ws_target_to_workshop(self, ws_target):
     if is_ws_target(ws_target):
-        self.ws_target = ws_target
+        self.set(ws_target=ws_target)
 
 Workshop.add_artefact = add_artefact
 Workshop.add_ws_target = add_ws_target_to_workshop
@@ -837,17 +834,17 @@ class TestWorkshop(TestCase):
                 hub=oc, nc_targets=[], workshops=[])
 
         date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        # oc_target = OCTarget(usage=400, date=date, nctargets = [])
-        # nc_target = NCTarget(usage=400, date=date, 
-        #                      oc_target=oc_target, wstargets=[])
-        # wstarget_check = WSTarget(usage=4000, participants=200, experiments=20,
-        #                           date=date, nc_target=nc_target)
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                             oc_target=oc_target, ws_targets=[])
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
 
-        workshop = Workshop(name=Name(name="Test workshop"), 
+        workshop = Workshop(name="Test workshop",
                             institute=Institute(name="IIITH", 
                                                 address="Hyderabad"), 
                             nc=nc,
-                            ws_target=None,
+                            ws_target=ws_target,
                             status=status, 
                             artefacts=[],
                             date=date,
@@ -867,17 +864,18 @@ class TestWorkshop(TestCase):
                 hub=oc, nc_targets=[], workshops=[])
 
         date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        # oc_target = OCTarget(usage=400, date=date, nctargets = [])
-        # nc_target = NCTarget(usage=400, date=date, 
-        #                      oc_target=oc_target, wstargets=[])
-        # wstarget_check = WSTarget(usage=4000, participants=200, experiments=20,
-        #                           date=date, nc_target=nc_target)
 
-        workshop1 = Workshop(name=Name(name="Test workshop"), 
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                             oc_target=oc_target, ws_targets=[])
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+
+        workshop1 = Workshop(name="Test workshop",
                              institute=Institute(name="IIITH", 
                              address="Hyderabad"), 
                              nc=nc,
-                             ws_target=None,
+                             ws_target=ws_target,
                              status=status, 
                              artefacts=[],
                              date=date,
@@ -885,11 +883,11 @@ class TestWorkshop(TestCase):
                              experiments=0,
                              usage=0)
 
-        workshop2 = Workshop(name=Name(name="Test workshop"), 
+        workshop2 = Workshop(name="Test workshop",
                              institute=Institute(name="IIITH", 
                              address="Hyderabad"), 
                              nc=nc,
-                             ws_target=None,
+                             ws_target=ws_target,
                              status=status, 
                              artefacts=[],
                              date=date,
@@ -898,11 +896,11 @@ class TestWorkshop(TestCase):
                              usage=500)
 
         date = datetime.datetime.strptime("30-07-2017", "%d-%m-%Y").date()
-        workshop3 = Workshop(name=Name(name="Test workshop"), 
+        workshop3 = Workshop(name="Test workshop",
                              institute=Institute(name="IIITH", 
                              address="Hyderabad"), 
                              nc=nc,
-                             ws_target=None,
+                             ws_target=ws_target,
                              status=status, 
                              artefacts=[],
                              date=date,
@@ -917,10 +915,10 @@ class TestWorkshop(TestCase):
 #+END_SRC
 
 
-* Type
+* FileType
    =Type= is an entity that has a field =name= which is an alphabetic string
 
-#+NAME: class_Type
+#+NAME: class_FileType
 #+BEGIN_SRC python
 FileType.add_attributes(name=is_alphabetic_str)
 FileType.__eq__ = lambda self, other: \
@@ -943,9 +941,9 @@ class TestFileType(TestCase):
     def test_instantiate_file_type(self):
         print "test_instantiate_file_type_objects_entities"
         self.assertEqual(is_file_type(FileType(name="photo")), True)
-        a_type = Type.photo
-        self.assertEqual(check_type(a_type), a_type)
-        self.assertRaises(TypeError, Type, name="invalid123")
+        file_type = FileType.photo
+        self.assertEqual(check_file_type(file_type), file_type)
+        self.assertRaises(TypeError, FileType, name="invalid123")
 
     def test_set_and_get_file_type(self):
         print "test_sets_on_file_type"
@@ -968,7 +966,7 @@ class TestFileType(TestCase):
 Artefact.add_attributes(name=is_alphabetic_str, 
                         path=is_string,
                         file_type=is_file_type,
-                        workshop=is_workshop_or_none)
+                        workshop=is_workshop)
 
 Artefact.__eq__ = lambda self, other: \
                   isinstance(other, self.__class__) and \
@@ -985,30 +983,84 @@ class TestArtefact(TestCase):
     def test_instantiate_artefact(self):
         print "test_instantiate_artefact"
 
+        status = Status(name="pending")
+        oc = OC(institute=Institute(name="IIITH", 
+                address="Hyderabad"), 
+                oc_targets=[], spokes=[])
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), 
+                hub=oc, nc_targets=[], workshops=[])
+
+        date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                             oc_target=oc_target, ws_targets=[])
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+
+        workshop = Workshop(name="Test workshop",
+                            institute=Institute(name="IIITH", 
+                                                address="Hyderabad"), 
+                            nc=nc,
+                            ws_target=ws_target,
+                            status=status, 
+                            artefacts=[],
+                            date=date,
+                            participants=0,
+                            experiments=0,
+                            usage=0)
+
         artefact = Artefact(name="attendance", 
                      path="/home/file.txt", 
-                     file_type=Type(name="attendance"),
-                     workshop=None)
+                     file_type=FileType(name="attendance"),
+                     workshop=workshop)
+
         self.assertEqual(is_artefact(artefact), True)
         self.assertEqual(artefact.get("file_type").get("name"), "attendance")
         self.assertRaises(TypeError, Artefact, name="123")
 
     def test_equality_on_artefact(self):
         print "test_equality_on_artefact"
+
+        status = Status(name="pending")
+        oc = OC(institute=Institute(name="IIITH", 
+                address="Hyderabad"), 
+                oc_targets=[], spokes=[])
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), 
+                hub=oc, nc_targets=[], workshops=[])
+
+        date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                             oc_target=oc_target, ws_targets=[])
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+
+        workshop = Workshop(name="Test workshop",
+                            institute=Institute(name="IIITH", 
+                                                address="Hyderabad"), 
+                            nc=nc,
+                            ws_target=ws_target,
+                            status=status, 
+                            artefacts=[],
+                            date=date,
+                            participants=0,
+                            experiments=0,
+                            usage=0)
+
         artefact1 = Artefact(name="attendance", 
                                  path="/home/file.txt", 
-                                 file_type=Type(name="attendance"),
-                                 workshop=None)
+                                 file_type=FileType(name="attendance"),
+                                 workshop=workshop)
 
         artefact2 = Artefact(name="attendance", 
                                  path="/home/file.txt", 
-                                 file_type=Type(name="attendance"),
-                                 workshop=None)
+                                 file_type=FileType(name="attendance"),
+                                 workshop=workshop)
 
         artefact3 = Artefact(name="attendance", 
                                  path="/home/vlead/file.txt", 
-                                 file_type=Type(name="attendance"),
-                                 workshop=None)
+                                 file_type=FileType(name="attendance"),
+                                 workshop=workshop)
 
         self.assertEqual(artefact1 == artefact2, True)
         self.assertEqual(artefact1 == artefact3, False)
@@ -1168,13 +1220,17 @@ WSTarget.add_attributes(usage=is_int,
                         participants=is_int, 
                         experiments=is_int, 
                         date=is_date, 
-                        nc_target=is_nc_target,
-                        workshop=is_workshop)
+                        nc_target=is_nc_target)
 
 WSTarget.__eq__ = lambda self, other: \
                   isinstance(other, self.__class__) and \
-                  self.get("workshop") == other.get("workshop") and \
                   self.get("date") == other.get("date")
+
+def add_workshop_to_ws_target(self, workshop):
+    if is_workshop(workshop):
+        self.set(workshop=workshop)
+
+WSTarget.add_workshop = add_workshop_to_ws_target
 
 #+END_SRC
 
@@ -1209,24 +1265,12 @@ class TestWSTarget(TestCase):
                                  ws_targets=[])
 
         status = Status(name="pending")
-        workshop = Workshop(name=Name(name="Test workshop"), 
-                            institute=Institute(name="IIITH", 
-                                                address="Hyderabad"), 
-                            nc=nc,
-                            ws_target=None,
-                            status=status, 
-                            artefacts=[],
-                            date=date_1,
-                            participants=0,
-                            experiments=0,
-                            usage=0)
 
         ws_target = WSTarget(usage=2000,
                                  participants=200,
                                  experiments=100,
                                  date=date_1,
-                                 nc_target=nc_target,
-                                 workshop=workshop)
+                                 nc_target=nc_target)
 
         self.assertEqual(is_ws_target(ws_target), True)
         self.assertEqual(ws_target.get("participants"), 200)
@@ -1256,52 +1300,23 @@ class TestWSTarget(TestCase):
                                  oc_target=oc_target,
                                  ws_targets=[])
 
-        status = Status(name="pending")
-        workshop_1 = Workshop(name=Name(name="Test workshop"), 
-                                institute=Institute(name="IIITH", 
-                                                    address="Hyderabad"), 
-                                nc=nc,
-                                ws_target=None,
-                                status=status, 
-                                artefacts=[],
-                                date=date_1,
-                                participants=0,
-                                experiments=0,
-                                usage=0)
-
-        workshop_2 = Workshop(name=Name(name="Test workshop"), 
-                                institute=Institute(name="IIITH", 
-                                                    address="Hyderabad"), 
-                                nc=nc,
-                                ws_target=None,
-                                status=status, 
-                                artefacts=[],
-                                date=date_2,
-                                participants=0,
-                                experiments=0,
-                                usage=0)
-
         ws_target_1 = WSTarget(usage=2000,
                                  participants=200,
                                  experiments=100,
                                  date=date_1,
-                                 nc_target=nc_target,
-                                 workshop=workshop_1)
+                                 nc_target=nc_target)
 
         ws_target_2 = WSTarget(usage=2000,
                                  participants=200,
                                  experiments=100,
                                  date=date_1,
-                                 nc_target=nc_target,
-                                 workshop=workshop_1)
+                                 nc_target=nc_target)
 
         ws_target_3 = WSTarget(usage=2000,
                                  participants=200,
                                  experiments=100,
-                                 date=date_1,
-                                 nc_target=nc_target,
-                                 workshop=workshop_2)
-
+                                 date=date_2,
+                                 nc_target=nc_target)
 
         self.assertEqual(ws_target_1 == ws_target_2, True)
         self.assertEqual(ws_target_1 == ws_target_3, False)
@@ -1360,7 +1375,7 @@ if __name__ == '__main__':
 <<class_NC>>
 <<class_Status>>
 <<class_Workshop>>
-<<class_Type>>
+<<class_FileType>>
 <<class_Artefact>>
 <<class_WSTarget>>
 <<class_NCTarget>>
@@ -1381,11 +1396,10 @@ if __name__ == '__main__':
 <<class_TestNC>>
 <<class_TestStatus>>
 <<class_TestWorkshop>>
-<<class_TestType>>
-<<class_TetsArtefact>>
-<<class_TestWSTarget>>
-<<class_TestNCTarget>>
+<<class_TestFileType>>
+<<class_TestArtefact>>
 <<class_TestOCTarget>>
+<<class_TestNCTarget>>
+<<class_TestWSTarget>>
 <<run_test_cases>>
-
 #+end_src

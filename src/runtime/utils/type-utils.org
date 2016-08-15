@@ -30,6 +30,8 @@ is_str = is_inst(str)
 is_dict = is_inst(dict)
 is_list = is_inst(list)
 is_string = is_inst(str)
+is_unicode = is_inst(unicode)
+
 #+END_SRC
 
 *** Test Instance predicate
@@ -50,8 +52,8 @@ class TestIsInstance(TestCase):
         self.assertEqual(is_str(False), False)
         self.assertEqual(is_dict({'email': 'xyz@g.com'}), True)
         self.assertEqual(is_dict("{'email': 'xyz@g.com'}"), False)
-#+END_SRC
 
+#+END_SRC
 
 ** Alphabetic string predicate
 
@@ -67,6 +69,7 @@ def is_alphabetic_str(value):
         return True
     else:
         return False
+
 #+END_SRC
 
 ** Email string predicate
@@ -84,6 +87,7 @@ def is_email_str(value):
         return True
     else:
         return False
+
 #+END_SRC
 
 ** Date predicate
@@ -92,6 +96,15 @@ def is_email_str(value):
 #+BEGIN_SRC  python
 def is_date(value):
     return isinstance(value, datetime.date)
+
+#+END_SRC
+
+** None predicate
+
+#+name: def_is_none
+#+BEGIN_SRC  python
+def is_none(value):
+    return value == None
 
 #+END_SRC
 
@@ -126,6 +139,7 @@ check_email_str = check_pred(is_email_str)
 check_string = check_pred(is_string)
 check_date = check_pred(is_date)
 check_int = check_pred(is_int)
+
 #+END_SRC
 
 *** Tests for =check_pred=
@@ -172,6 +186,7 @@ class TestCheckAlphabeticStr(TestCase):
         print "test_more_alphabetic_strings"
         # this looks wierd!  Should it be a name?
         self.assertEqual(check_alphabetic_str(".  ."), ".  .")
+
 #+END_SRC
 
 *** Tests for check_email_str
@@ -295,6 +310,7 @@ def check_inv(inv, *name):
             else:
                 raise TypeError("invariant for class %s fails on args %s" % (name[0], args))
     return fn
+
 #+END_SRC
 
 
@@ -341,6 +357,7 @@ if __name__ == '__main__':
 <<def_is_string>>
 <<def_is_email_str>>
 <<def_is_date>>
+<<def_is_none>>
 <<def_is_int>>
 <<def_check_pred>>
 <<def_check_inst>>

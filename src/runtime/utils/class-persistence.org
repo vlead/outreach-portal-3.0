@@ -212,7 +212,9 @@
         def fn(**kwargs):
             db.session.autoflush = False
             for key, value in kwargs.iteritems():
-                if not (is_str(value) or is_unicode(value)):
+                if not (is_str(value) or is_unicode(value) or
+                            is_none(value) or is_int(value) or
+                            is_date(value)):
                    for unique_key in value.__class__.unique_key_list:
                        args_dict = {}
                        args_dict[unique_key] = value.get(unique_key)
