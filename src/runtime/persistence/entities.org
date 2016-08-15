@@ -341,8 +341,10 @@ users_roles = db.Table('users_roles',
 #+BEGIN_SRC python
 args = {"__tablename__": "user",
         "id": db.Column(db.Integer, primary_key=True),
-        "name_id": db.Column(db.Integer, db.ForeignKey('name.id')),
-        "email_id": db.Column(db.Integer, db.ForeignKey('email.id')),
+        "name_id": db.Column(db.Integer, db.ForeignKey('name.id'), 
+                                 nullable=False, unique=False),
+        "email_id": db.Column(db.Integer, db.ForeignKey('email.id'), 
+                                 unique=True),
         "roles": db.relationship('Role',
                                      secondary=users_roles, backref='users') 
         }
@@ -525,7 +527,6 @@ args = {"__tablename__": "institutes",
         }
 
 Institute = ClassPersistenceTemplate.mk_persistent(Institute, ['name'], **args)
-
 #+END_SRC
 
 ** Test Institute
@@ -569,7 +570,7 @@ class TestPersistenceInstitute(TestCase):
 args = {"__tablename__": "oc",
 	"id": db.Column(db.Integer, primary_key=True),
         "institute_id": db.Column(db.Integer, db.ForeignKey('institutes.id'), 
-                        unique=True),
+                        unique=True, nullable=True),
         "spokes": db.relationship('NC', backref='hub'),
         "oc_targets": db.relationship('OCTarget', backref='oc'),
         "role": db.relationship('Role', backref='centre_oc', uselist=False)
@@ -685,7 +686,7 @@ class TestPersistenceOC(TestCase):
 args = {"__tablename__": "nc",
 	"id": db.Column(db.Integer, primary_key=True),
         "institute_id": db.Column(db.Integer, db.ForeignKey('institutes.id'), 
-                        unique=True),
+                        unique=True, nullable=False),
         "hub_id": db.Column(db.Integer, db.ForeignKey('oc.id'), 
                                 nullable=False),
         "nc_targets": db.relationship('NCTarget', backref='nc'),
