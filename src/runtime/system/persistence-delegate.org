@@ -58,9 +58,12 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_user_exists
 #+BEGIN_SRC python
     def user_exists(self, user):
-        if user in User.get_all():
-            return True
-        else:
+        email = user.get("email")
+        try:
+            user = User.apply_filters(email=email)[0]
+            if user:
+                return True
+        except NotFoundError as e:
             return False
 #+END_SRC
 
@@ -80,6 +83,13 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_add_user
 #+BEGIN_SRC python
     def add_user(self, user):
+        name = user.get("name")
+        name.save()
+        email = user.get("email")
+        email.save()
+        roles = user.get("roles")
+        for role in roles:
+            role.save()
         user.save()
         return user
 
@@ -88,20 +98,40 @@ class TestPersistentDelegate(TestCase):
 **** Tests
 #+NAME: test_persistent_add_user
 #+BEGIN_SRC python
-    def test_add_user(self):
-         print "test_add_user"
-         name = Name(name="some user")
-         name.save()
-         email = Email(email="tt@kk.com")
-         email.save()
-         role = Role(name="admin", centre_nc=None, centre_oc=None)
-         role.save()
-         
-         user = User(name=name,
-                     email=email,
-                     roles=[Role.get_by_id(1)])
-         user = self.persistent_delegate.add_user(user)
-         self.assertEqual(self.persistent_delegate.user_exists(user), True)
+    def test_add_user1(self):
+        print "test_add_user1"
+        name = Name(name="some user")
+        email = Email(email="tt@kk.com")
+        role = Role(name="admin", centre_nc=None, centre_oc=None)
+
+        user = User(name=name,
+                    email=email,
+                    roles=[role])
+        user = self.persistent_delegate.add_user(user)
+        self.assertEqual(self.persistent_delegate.user_exists(user), True)
+
+    def test_add_user2(self):
+        print "test_add_user2"
+        name1 = Name(name="some user")
+        email1 = Email(email="tt@kk.com")
+        role1 = Role(name="admin", centre_nc=None, centre_oc=None)
+        role2 = Role(name="noc", centre_nc=None, centre_oc=None)
+
+        user1 = User(name=name1,
+                    email=email1,
+                    roles=[role1, role2])
+
+        name2 = Name(name="some other user")
+        email2 = Email(email="other@kk.com")
+        role2 = Role(name="admin", centre_nc=None, centre_oc=None)
+
+        user2 = User(name=name2,
+                    email=email2,
+                    roles=[role2])
+        user1 = self.persistent_delegate.add_user(user1)
+        user2 = self.persistent_delegate.add_user(user2)
+        self.assertEqual(self.persistent_delegate.user_exists(user1), True)
+        self.assertEqual(self.persistent_delegate.user_exists(user2), True)
 
 #+END_SRC
 
