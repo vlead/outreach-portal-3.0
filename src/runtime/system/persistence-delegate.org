@@ -34,30 +34,6 @@ class PersistenceDelegate():
 class TestPersistentDelegate(TestCase):
     TESTING = True
 
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
-
     def create_app(self):
         app = create_app(config)
         return app
@@ -65,23 +41,11 @@ class TestPersistentDelegate(TestCase):
     def setUp(self):
         db.create_all()
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
         self.persistent_delegate = None
-
-    def test_initialize_persistent_delegate(self):
-         print "test_initialize_persistent_delegate"
-         self.assertEqual(len(Role.get_all()), 4)
-         self.assertEqual(Role.get_by_id(1).get("name"), "admin")
-         self.assertEqual(len(User.get_all()), 1)
-         self.assertEqual(User.get_by_id(1).get("roles")[0].get("name"),
-                          "admin")
-         self.assertEqual(User.get_by_id(1).get("roles")[1].get("name"),
-                         "guest")
 
 #+END_SRC
 
@@ -94,8 +58,7 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_user_exists
 #+BEGIN_SRC python
     def user_exists(self, user):
-        active_users = self.get_active_users()
-        if user in active_users:
+        if user in User.get_all():
             return True
         else:
             return False
@@ -131,9 +94,12 @@ class TestPersistentDelegate(TestCase):
          name.save()
          email = Email(email="tt@kk.com")
          email.save()
+         role = Role(name="admin", centre_nc=None, centre_oc=None)
+         role.save()
+         
          user = User(name=name,
                      email=email,
-                     roles=[Role.get_by_id(1)], user_status="active")
+                     roles=[Role.get_by_id(1)])
          user = self.persistent_delegate.add_user(user)
          self.assertEqual(self.persistent_delegate.user_exists(user), True)
 
@@ -1279,46 +1245,45 @@ if __name__ == '__main__':
 #+BEGIN_SRC python :tangle test_persistent_delegates.py :eval no :noweb yes
 <<imports_for_tests_persistence>>
 <<test_class_persistent_delegate>>
-<<test_persistent_user_exists>>
-<<test_persistent_get_name>>
+#<<test_persistent_user_exists>>
+#<<test_persistent_get_name>>
 <<test_persistent_add_user>>
-<<test_persistent_get_user>>
-<<test_persistent_get_role>>
-<<test_persistent_get_email>>
-<<test_persistent_update_user>>
-<<test_persistent_delete_user>>
-<<test_persistent_add_role_to_user>>
-<<test_persistent_get_users>>
-<<test_persistent_get_active_users>>
-<<test_persistent_add_oc>>
-<<test_persistent_oc_exists>>
-<<test_persistent_add_nc>>
-<<test_persistent_nc_exists>>
-<<test_persistent_get_ocs>>
-<<test_persistent_get_ncs>>
-<<test_persistent_role_exists>>
-<<test_persistent_add_role>>
-<<test_persistent_add_occ_role>>
-<<test_persistent_add_ncc_role>>
-<<test_persistent_get_roles>>
-<<test_persistent_institute_exists>>
-<<test_persistent_add_institute>>
-<<test_persistent_update_institute>>
-<<test_persistent_get_institutes>>
-<<test_persistent_add_workshop>>
-<<test_persistent_workshop_exists>>
-
-<<test_persistent_cancel_workshop>>
-<<test_persistent_reschedule_workshop>>
-<<test_persistent_conduct_workshop>>
-<<test_persistent_upload_artefact>>
-<<test_persistent_approve_workshop>>
-<<test_persistent_reject_workshop>>
-<<test_persistent_delete_artefact>>
-<<test_persistent_get_workshops>>
-<<test_persistent_get_artefacts>>
-<<test_persistent_get_artefacts_of_a_workshop>>
-<<test_persistent_get_active_users>>
+#<<test_persistent_get_user>>
+#<<test_persistent_get_role>>
+#<<test_persistent_get_email>>
+#<<test_persistent_update_user>>
+#<<test_persistent_delete_user>>
+#<<test_persistent_add_role_to_user>>
+#<<test_persistent_get_users>>
+#<<test_persistent_get_active_users>>
+#<<test_persistent_add_oc>>
+#<<test_persistent_oc_exists>>
+#<<test_persistent_add_nc>>
+#<<test_persistent_nc_exists>>
+#<<test_persistent_get_ocs>>
+#<<test_persistent_get_ncs>>
+#<<test_persistent_role_exists>>
+#<<test_persistent_add_role>>
+#<<test_persistent_add_occ_role>>
+#<<test_persistent_add_ncc_role>>
+#<<test_persistent_get_roles>>
+#<<test_persistent_institute_exists>>
+#<<test_persistent_add_institute>>
+#<<test_persistent_update_institute>>
+#<<test_persistent_get_institutes>>
+#<<test_persistent_add_workshop>>
+#<<test_persistent_workshop_exists>>
+#<<test_persistent_cancel_workshop>>
+#<<test_persistent_reschedule_workshop>>
+#<<test_persistent_conduct_workshop>>
+#<<test_persistent_upload_artefact>>
+#<<test_persistent_approve_workshop>>
+#<<test_persistent_reject_workshop>>
+#<<test_persistent_delete_artefact>>
+#<<test_persistent_get_workshops>>
+#<<test_persistent_get_artefacts>>
+#<<test_persistent_get_artefacts_of_a_workshop>>
+#<<test_persistent_get_active_users>>
 <<run_test_cases>>
 
 #+end_src
