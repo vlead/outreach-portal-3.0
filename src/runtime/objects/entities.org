@@ -1377,9 +1377,9 @@ if __name__ == '__main__':
 <<class_Workshop>>
 <<class_FileType>>
 <<class_Artefact>>
-<<class_WSTarget>>
-<<class_NCTarget>>
 <<class_OCTarget>>
+<<class_NCTarget>>
+<<class_WSTarget>>
 #+end_src
 
 

@@ -16,6 +16,7 @@
   The purpose of this document is to describe the expected behaviour of the new
   outreach portal. It is a specification for the new requirements of this portal.
 
+
 * Notation
   The system is defined as the data model.  There is a certain notation that is
   used for defining the data model. 
@@ -83,6 +84,7 @@ Encodes the following items of information:
  #+begin_example
  user: Email > User?
  #+end_example
+
 
 * Abstract Entity Types
   The following are the abstract data types in our system. 
@@ -206,7 +208,7 @@ TYPE NCTarget
 ;;; Entity Types
 TYPE WSTarget (Workshop is abbreviated to WS here)
 #+END_SRC
-** Type
+** FileType
 :PROPERTIES:
 :CUSTOM_ID: entity_type
 :END: 
@@ -233,7 +235,7 @@ TYPE Artefact
 ;;; Entity Types
 TYPE AuditEntry
 #+END_SRC
-** Operation
+** COMMENT Operation
 :PROPERTIES:
 :CUSTOM_ID: entity_operation
 :END: 
@@ -242,7 +244,7 @@ TYPE AuditEntry
 ;;; Entity Types
 TYPE Operation
 #+END_SRC
-** UserStatus
+** COMMENT UserStatus
 :PROPERTIES:
 :CUSTOM_ID: entity_user_status
 :END: 
@@ -256,11 +258,15 @@ Note: Outreach Centre Coordinator is abrreviated as OCC
       Nodal Centre Coordinator is abrreviated as NCC
       National Outreach Coordinator is abrreviated as NOC
        
+
 * Relations and cardinality constraints over entity types 
   :PROPERTIES:
   :CUSTOM_ID: cardinal_constraints
   :END: 
+  The constraints are defined both in terms of formal notation and also in
+  diagrams for visual clarity. 
 
+** Formal Notation
 For each relation, we define its inverse next to it.
 #+BEGIN_SRC spec :tangle spec.txt
 
@@ -272,56 +278,108 @@ For each relation, we define its inverse next to it.
 [host, oc]             : OC ?        >    Institute ! 
 [spokes, hub]          : OC !        >    NC
 [host, nc]             : NC ?        >    Institute !
-[nctarget, nc]         : NC          >    NCTarget !
-[octarget, oc]         : OC          >    OCTarget !
-[user, session]        : Session     >    User !
-[role, session]        : Session     >    Role !
-[userStatus, user]     : User +      >    UserStatus !
-[operation, audit]     : AuditEntry  >    Operation !
-[location, workshop]   : Workshop    >    Institute !
-[wstarget, workshop]   : Workshop    >    WSTarget !
-[photos, workshop]     : Workshop    >    Artefact *
-[reports, workshop]    : Workshop    >    Artefact ?
-[feedback, workshop]   : Workshop    >    Artefact *
-[attendance, workshop] : Workshop    >    Artefact !
-[status, workshop]     : Workshop    >    Status !         
-[owner, workshop]      : Workshop    >    Role !
+[octargets, oc]        : OC !        >    OCTarget
+[nctargets, nc]        : NC !        >    NCTarget
+[user, sessions]       : Session     >    User !
+[role, sessions]       : Session     >    Role !
+[location, workshops]  : Workshop    >    Institute !
+[wstarget, workshop]   : Workshop ?  >    WSTarget !
+[photos, workshop]     : Workshop ?  >    Artefact +
+[reports, workshop]    : Workshop ?  >    Artefact +
+[feedback, workshop]   : Workshop ?  >    Artefact +
+[attendance, workshop] : Workshop ?  >    Artefact +
+[status, workshops]    : Workshop    >    Status !         
+[owner, workshops]     : Workshop    >    Role !
 [artefact, type]       : Type !      >    Artefact
+[operation, audit]     : AuditEntry  >    Operation !
 
 Note: if s1.user = s2.user -> 
          s1.role != s2.role, where s1 and s2 belong to session-set
 
-
 #+END_SRC
 
-  #+BEGIN_HTML
-  <p>   The following diagrams summarizes all the cardinality constraints
-  across all entities.
-  </p>
-  <img src="https://docs.google.com/drawings/d/1Yd7QJUEX5DlwZd0RpUtVM1zYwexTOBPJvWzGHeYXEhg/pub?w=960&h=720"
-  <p align="center"> User Relations Diagram </p>
-  <img src="https://docs.google.com/drawings/d/1O7VGdfUzBAu1gxf3cgPWmj1oL95dnKH-WfYed1ZKHZY/pub?w=960&h=720"
-  <p align="center"> Workshop Relations Diagram </p>
 
-  #+END_HTML
+** Diagrams
+   The following diagrams summarizes all the cardinality constraints across all
+   entities.
+*** Relationships of User
+    This diagrams depicts the relationships between User, Role, Session, Email
+    and Name entities
+#+BEGIN_HTML
+<img src="https://docs.google.com/drawings/d/1Yd7QJUEX5DlwZd0RpUtVM1zYwexTOBPJvWzGHeYXEhg/pub?w=960&h=720">
+<p align="center"> User Relations </p>
+
+#+END_HTML
   To edit the user relations image click [[https://docs.google.com/drawings/d/1Yd7QJUEX5DlwZd0RpUtVM1zYwexTOBPJvWzGHeYXEhg/edit][here]]
+
+
+*** Relationships of Outreach and Nodal Centers
+p    This diagrams depicts the relationships between Nodal Center, Outreach
+    Center, their hosts and their targets. 
+
+#+BEGIN_HTML
+<img src="https://docs.google.com/drawings/d/1yTyZuVOcHjg7JACaoxGnGHcO_jc3YBULrSpziqSMBB4/pub?w=960&amp;h=720">
+<p align="center"> OC and NC Relations </p>
+#+END_HTML
+
+    To edit the user relations image click [[https://docs.google.com/drawings/d/1yTyZuVOcHjg7JACaoxGnGHcO_jc3YBULrSpziqSMBB4/edit][here]]
+
+
+*** Relationships of Workshops
+    This diagrams depicts the relationships between Workshop, its artefacts and
+    status.
+#+BEGIN_HTML
+<img src="https://docs.google.com/drawings/d/1O7VGdfUzBAu1gxf3cgPWmj1oL95dnKH-WfYed1ZKHZY/pub?w=960&amp;h=720">
+<p align="center"> Workshop and its relations </p>
+
+#+END_HTML
+
+
   To edit the workshop relations image click [[https://docs.google.com/drawings/d/1O7VGdfUzBAu1gxf3cgPWmj1oL95dnKH-WfYed1ZKHZY/edit][here]].
-** Keys
+
+
+* Keys
 
 An entity =K= is called a /key for/ an entity =A= if there
 is a relation =r: A? > K!=.
 
-|---------+---------------|
-| Entity  | Key           |
-|---------+---------------|
-| User    | Email         |
-|---------+---------------|
-| OC      | Institute     |
-|---------+---------------|
-| NC      | Institute     |
-|---------+---------------|
-| Session | User and Role |
-|---------+---------------|
+|-----+-----------+------------------------------|
+|  1. | Entity    | Key                          |
+|-----+-----------+------------------------------|
+|  2. | Name      | name string                  |
+|-----+-----------+------------------------------|
+|  3. | Email     | email string                 |
+|-----+-----------+------------------------------|
+|  4. | User      | Email                        |
+|-----+-----------+------------------------------|
+|  5. | Session   | User and Role                |
+|-----+-----------+------------------------------|
+|  6. | Institute | alphabetic string            |
+|-----+-----------+------------------------------|
+|  7. | OC        | Institute                    |
+|-----+-----------+------------------------------|
+|  8. | NC        | Institute                    |
+|-----+-----------+------------------------------|
+|  9. | OCTarget  | OC and Date                  |
+|-----+-----------+------------------------------|
+| 10. | NCTarget  | NC and Date                  |
+|-----+-----------+------------------------------|
+| 11. | Workshop  | NC, location(Institute),     |
+|     |           | name of workshop,            |
+|     |           | Date                         |
+|-----+-----------+------------------------------|
+| 12. | Status    | name of type string          |
+|-----+-----------+------------------------------|
+| 13. | WSTarget  | NCTarget, Date,              |
+|     |           | usage of type integer,       |
+|     |           | experiments of type integer, |
+|     |           | participants of type integer |
+|-----+-----------+------------------------------|
+| 14. | Type      | name of type string          |
+|-----+-----------+------------------------------|
+| 15. | Artefact  | file path                    |
+|-----+-----------+------------------------------|
+
 
 * Assumptions
 
@@ -329,9 +387,11 @@ is a relation =r: A? > K!=.
 2) The Session Entity also contains a 'last-active' time, which may be used to
    delete a user if he remains inactive past a specified time and hasn't logged
    out.
+
+
 * System state
-  The system's state is captured by a set of /state
-  variables/.  
+  The system's state is captured by a set of /state variables/.
+
 ** Primary Entity sets
 :PROPERTIES:
 :CUSTOM_ID: primary_entity_sets
@@ -351,67 +411,12 @@ Sets
  user-set      : set[User]      ; set of users in the system
  role-set      : set[Role]      ; set of roles in the system
  session-set   : set[Session]   ; set of sessions in the system
- nc-set        : set[NC]        ; set of nodal centres
  oc-set        : set[OC]        ; set of outreach centres in the system
- institute-set : set[Institute] ; set of institutes in the system
- workshop-set  : set[Workshop]  ; set of all workshops 
- status-set    : set[Status]    ; set of all statuses
+ status-set    : set[Status]    ; set of all status that a wokshop can be
+ type-set      : set[Type]      ; set of all types that an artefact can be
+
  #+END_SRC
 
-#+BEGIN_HTML
-<img src="https://docs.google.com/drawings/d/1pehN8AwI8Om4hYwjM4CPP7nyWEhwCNkSazXrKnXhbMw/pub?w=960&h=720">
-#+END_HTML
-
-[[https://docs.google.com/drawings/d/1pehN8AwI8Om4hYwjM4CPP7nyWEhwCNkSazXrKnXhbMw/edit?usp=sharing][edit image]]
-
-*** Institute, NC and OC relations
-
-#+BEGIN_HTML
-<img src="https://docs.google.com/drawings/d/1WEnEb5L6_3NjUje-JWPvyHnYAFsaKRbn3_-PRRccs28/pub?w=960&h=720">
-#+END_HTML
-
-    [[https://docs.google.com/drawings/d/1WEnEb5L6_3NjUje-JWPvyHnYAFsaKRbn3_-PRRccs28/edit?usp=sharing][edit image]]
-*** Workshop relations
-
-#+BEGIN_HTML
-<img src="https://docs.google.com/drawings/d/1VQQRDTdGrAT1_sUL9WlV5PCFS-D1PNvNsMg9NQOo8pg/pub?w=960&h=720">
-#+END_HTML
-
-    [[https://drive.google.com/open?id=1VQQRDTdGrAT1_sUL9WlV5PCFS-D1PNvNsMg9NQOo8pg][edit image]]
-
-** Referential Integrity Constraints over entity-sets
-   
-*** Admin User
-:PROPERTIES:
-:CUSTOM_ID: admin_user
-:END:    
-
-    There is atleast one user  whose role is =admin=.
-    This rule meets requirement [[../requirements/index.org::#req_role_admin][user with admin role]].
-#+BEGIN_SRC spec :tangle spec.txt
-
-;;; The admin-user
-admin-user-set     : user-set.role==admin; set of admin users
-and admin-user-set != NULL
-    
-#+END_SRC
-*** Referential Integrity over primary and derived entity sets
-:PROPERTIES:
-:CUSTOM_ID: referential_constraints
-:END: 
-
-Meets requirements [[../requirements/index.org::#req_user_uniqueness][uniqueness of a user]], [[../requirements/index.org::#req_user_role][role of a user]] and [[../requirements/index.org::#req_session_constraints][session constraints]]
-#+BEGIN_SRC spec :tangle spec.txt
-
-;;; Relation variables with Referential Integrity
-[email, user]    :  user-set!    > email-set!
-[name, user]     :  user-set+    > name-set!    
-[roles, user]    :  user-set     > role-set+   
-[session, user]  :  user-set!    > session-set?
-[host, oc]       :  oc-set?      > institute-set!
-[spokes, hub]    :  oc-set!      > nc-set
-[host, nc]       :  oc-set?      > institute-set!
-#+END_SRC
 
 ** Derived Entity sets
 :PROPERTIES:
@@ -421,15 +426,74 @@ Meets requirements [[../requirements/index.org::#req_user_uniqueness][uniqueness
 #+BEGIN_SRC spec :tangle spec.txt
   name-set           : user-set.name       ; set of names in the system
   email-set          : user-set.email      ; set of emails in the system
+  nc-set             : oc-set.spokes       ; set of nodal centers in the system
   oc-institute-set   : oc-set.host         ; set of institutes in the system which are OCs
   nc-institute-set   : nc-set.host         ; set of institutes in the system which are NCs
+  ws-institute-set   : nc-set.workshops.location ; set of institutes in the system where workshops are conducted. 
+  institute-set      : oc-institute-set U nc-institute-set U ws-institute-set ;; all institutes in the system.
+  workshop-set       : nc-set.workshops     ; set of all workshops 
+  oc-target-set      : oc-set.octargets  ; set of all targets for all outreach centers
+  nc-target-set      : nc-set.nctargets  ; set of all targets for all nodal centers
+  ws-target-set      : nc-set.workshops.wstarget  ; set of all targets for all workshops in the system
+  artefact-set       : nc-set.workshops.artefacts : set of all artefacts in the system
   logged-in-user-set : session-set.user    ; set of logged in users
   admin-user-set     : user-set.role==admin; set of admin users
   active-user-set    : user-set.userStatus==active; set of active users
   inactive-user-set  : user-set.userStatus==inactive ; set of inactive users
-  workshop-targets   : nc-set.workshops.wstarget ; set of workshop targets for a particular nc
-  nc-targets         : oc-set.spokes.nctarget ; set of all nc targets for a particular oc
+
 #+END_SRC
+
+
+** Referential Integrity Constraints over entity-sets
+   
+*** Admin User
+:PROPERTIES:
+:CUSTOM_ID: admin_user
+:END:    
+
+    There is atleast one user whose role is =admin=.  This rule meets
+    requirement [[../requirements/index.org::#req_role_admin][user with admin role]].
+#+BEGIN_SRC spec :tangle spec.txt
+
+;;; The admin-user
+admin-user-set     : user-set.role==admin; set of admin users
+and admin-user-set != NULL
+    
+#+END_SRC
+
+
+*** Referential Integrity over primary and derived entity sets
+:PROPERTIES:
+:CUSTOM_ID: referential_constraints
+:END: 
+
+Meets requirements [[../requirements/index.org::#req_user_uniqueness][uniqueness of a user]], [[../requirements/index.org::#req_user_role][role of a user]] and [[../requirements/index.org::#req_session_constraints][session constraints]]
+#+BEGIN_SRC spec :tangle spec.txt
+
+;;; Relation variables with Referential Integrity
+[email, user]     :  user-set !  >   email-set !
+[name, user]      :  user-set +  >   name-set !    
+[roles, users]    :  user-set    >   role-set +   
+[sessions, user]  :  user-set !  >   session-set
+[host, oc]        :  oc-set ?    >   institute-set !
+[spokes, hub]     :  oc-set !    >   nc-set
+[host, nc]        :  nc-set ?    >   institute-set !
+[octargets, oc]   :  oc-set !    >   oc-target-set
+[nctargets, nc]   :  nc-set !    >   nc-target-set
+[role, sessions]  :  session-set   >  role-set !
+[location, workshops]  : workshop-set    >   institute-set !
+[wstarget, workshop]   : workshop-set ?  >    ws-target-set !
+[photos, workshop]     : workshop-set ?  >    artefact-set +
+[reports, workshop]    : workshop-set !  >    artefact-set +
+[feedback, workshop]   : workshop-set !  >    artefact-set +
+[attendance, workshop] : workshop-set !  >    artefact-set +
+[status, workshops]    : workshop-set    >    status-set !
+[owner, workshops]     : workshop-set    >    role-set !
+[artefact, type]       : Type !      >    Artefact
+[operation, audit]     : AuditEntry  >    Operation ![
+#+END_SRC
+
+
 * Operations 
 
 CRUD operations.  
