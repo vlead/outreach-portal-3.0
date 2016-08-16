@@ -601,10 +601,12 @@ class CreateInstitute():
     arg_types = {"institute": is_institute,
                  "session":is_session}
     arity_and_type_checks_needed = True
+
     @staticmethod
     def auth_check(args):
         session = args['session']
-        if System.is_session_guest(session) or System.is_session_reviewer(session):
+        if System.is_session_guest(session) or \
+           System.is_session_reviewer(session):
             raise AuthError("Role not Authorized to perform this action")
 
     @staticmethod
@@ -614,8 +616,7 @@ class CreateInstitute():
         if not (session in System.session_set):
             raise StateError("user not in session %s"
                               % session.get('user').get('name').get('name'))
-        for inst in System.delegate.get_institutes():
-            if inst.get('name') == institute.get('name') and inst.get('address') == institute.get('address'):
+        for inst in System.delegate.institute_exists(institute):
                 raise StateError("institute %s already in System"
                                   % inst.get('name'))
 
@@ -624,13 +625,14 @@ class CreateInstitute():
         institute = args["institute"]
         System.delegate.add_institute(institute)
         return institute
+
 #+end_src
 
 ** =create_oc=
 #+NAME: class_CreateOC
 #+begin_src python
 class CreateOC():
-    arg_types = {"institute":is_institute,"spokes":are_spokes,
+    arg_types = {"institute":is_institute,"spokes":are_spokes_or_empty_list,
                   "session":is_session, "oc_target":is_octarget}
     arity_and_type_checks_needed = True
     @staticmethod
@@ -675,7 +677,7 @@ class CreateOC():
 #+begin_src python
 class CreateNC():
     arg_types = {"institute":is_institute,"hub":is_oc,"session":is_session,
-                  "nc_target" : is_nctarget, "workshops": are_workshops}
+                  "nc_target" : is_nctarget, "workshops": are_workshops_or_empty_list}
     arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):
@@ -773,7 +775,7 @@ class CreateWorkshop():
                  "name" : is_name ,
                  "session":is_session,
                  "ws_target" : is_wstarget,
-                 "artefacts": are_artefacts,
+                 "artefacts": are_artefacts_or_empty_list,
                  "status" : is_status,
                  "nc" : is_nc
                  }
@@ -828,7 +830,7 @@ class CreateWorkshop():
 #+NAME: class_CancelWorkshop
 #+begin_src python
 class CancelWorkshop():
-    arg_types = {"workshop":is_workshop, "session":is_session}
+    arg_types = {"workshop":is_workshop_or_none, "session":is_session}
     arity_and_type_checks_needed = True   
     @staticmethod
     def auth_check(args):
@@ -866,7 +868,7 @@ class CancelWorkshop():
 #+NAME: class_RescheduleWorkshop
 #+begin_src python
 class RescheduleWorkshop():
-    arg_types = {"workshop":is_workshop, "session":is_session,
+    arg_types = {"workshop":is_workshop_or_none, "session":is_session,
                  "wstarget" : is_wst}
     arity_and_type_checks_needed = True   
     @staticmethod
@@ -907,7 +909,7 @@ class RescheduleWorkshop():
 #+NAME: class_ConductWorkshop
 #+begin_src python
 class ConductWorkshop():
-    arg_types = {"workshop":is_workshop, "session":is_session}
+    arg_types = {"workshop":is_workshop_or_none, "session":is_session}
     arity_and_type_checks_needed = True   
     @staticmethod
     def auth_check(args):
@@ -948,7 +950,7 @@ class ConductWorkshop():
 #+NAME: class_UploadArtefact
 #+begin_src python
 class UploadArtefact():
-    arg_types = {"workshop":is_workshop, "session":is_session,
+    arg_types = {"workshop":is_workshop_or_none, "session":is_session,
                  "artefact" : is_artefact}
     arity_and_type_checks_needed = True   
     @staticmethod
@@ -993,7 +995,7 @@ class UploadArtefact():
 #+NAME: class_ApproveWorkshop
 #+begin_src python
 class ApproveWorkshop():
-    arg_types = {"workshop":is_workshop, "session":is_session}
+    arg_types = {"workshop":is_workshop_or_none, "session":is_session}
     arity_and_type_checks_needed = True   
     @staticmethod
     def auth_check(args):
@@ -1031,7 +1033,7 @@ class ApproveWorkshop():
 #+NAME: class_RejectWorkshop
 #+begin_src python
 class RejectWorkshop():
-    arg_types = {"workshop":is_workshop, "session":is_session}
+    arg_types = {"workshop":is_workshop_or_none, "session":is_session}
     arity_and_type_checks_needed = True   
     @staticmethod
     def auth_check(args):
@@ -1069,7 +1071,7 @@ class RejectWorkshop():
 #+NAME: class_DeleteArtefact
 #+begin_src python
 class DeleteArtefact():
-    arg_types = {"workshop":is_workshop, "session":is_session,
+    arg_types = {"workshop":is_workshop_or_none, "session":is_session,
                  "artefact" : is_artefact}
     arity_and_type_checks_needed = True   
     @staticmethod
@@ -1152,9 +1154,10 @@ ops_table = {'add_user' : AddUser,
 from runtime.exceptions.custom_exceptions import *
 from runtime.exceptions.exceptions import *
 from runtime.objects.entities import is_user, is_session, is_role, is_email, \
-    is_name, is_alphabetic_str, is_str, are_spokes, is_institute, is_octarget, \
-    is_oc, is_nctarget, are_workshops, is_wstarget, are_artefacts, is_status, is_nc, \
-    is_workshop, is_wst, is_artefact, Session, OC, NC
+    is_name, is_alphabetic_str, is_str, are_spokes_or_empty_list, is_institute,\
+    is_octarget, is_oc, is_nctarget, are_workshops_or_empty_list, is_wstarget,\
+    are_artefacts_or_empty_list, is_status, is_nc, is_workshop_or_none, is_wst, \
+    is_artefact, Session
 
 
 #+end_src

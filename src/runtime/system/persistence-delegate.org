@@ -327,9 +327,12 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_institute_exists
 #+BEGIN_SRC python
     def institute_exists(self, institute):
-        if institute in Institute.get_all():
-            return True
-        else:
+        institute_name = institute.get("name")
+        try:
+            institute = Institute.apply_filters(name=institute_name)[0]
+            if institute:
+                return True
+        except NotFoundError as e:
             return False
 
 #+END_SRC
@@ -339,9 +342,16 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_institute_exists(self):
          print "test_institute_exists"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         inst = self.persistent_delegate.add_institute(ins)
-         self.assertEqual(self.persistent_delegate.institute_exists(inst), True)
+         institute = Institute(name='IIIT', address='Hyderabad')
+         institute = self.persistent_delegate.add_institute(institute)
+         self.assertEqual(self.persistent_delegate.institute_exists(institute),
+                           True)
+
+    def test_institute_does_not_exists(self):
+         print "test_institute_does_not_exists"
+         institute = Institute(name='IIIT', address='Hyderabad')
+         self.assertEqual(self.persistent_delegate.institute_exists(institute),
+                          False)
 
 #+END_SRC
 
@@ -361,9 +371,10 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_add_institute(self):
          print "test_add_institute"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         inst = self.persistent_delegate.add_institute(ins)
-         self.assertEqual(self.persistent_delegate.institute_exists(inst), True)
+         institute = Institute(name='IIIT', address='Hyderabad')
+         institute = self.persistent_delegate.add_institute(institute)
+         self.assertEqual(self.persistent_delegate.institute_exists(institute),
+                          True)
 
 #+END_SRC
 
@@ -1264,7 +1275,7 @@ if __name__ == '__main__':
 #<<test_persistent_add_occ_role>>
 #<<test_persistent_add_ncc_role>>
 #<<test_persistent_get_roles>>
-#<<test_persistent_institute_exists>>
+<<test_persistent_institute_exists>>
 <<test_persistent_add_institute>>
 #<<test_persistent_update_institute>>
 #<<test_persistent_get_institutes>>
