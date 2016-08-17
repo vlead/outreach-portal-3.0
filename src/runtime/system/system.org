@@ -1058,26 +1058,6 @@ from runtime.objects.entities import is_user, is_session, is_role, is_email, \
 #+end_src
 
 
-** Tests
-*** Imports 
-#+name: imports_for_tests
-#+BEGIN_SRC python
-# -*- coding: utf-8 -*-
-import unittest
-from unittest import TestCase
-from system import *
-from object_delegates import * 
-#+end_src
-
-*** Running tests
-#+NAME: run_test_cases
-#+BEGIN_SRC python
-if __name__ == '__main__':
-    unittest.main()
-
-#+END_SRC
-
-
 * Tangling                                                      :boilerplate:
 
 ** sources
