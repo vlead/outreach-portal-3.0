@@ -1253,27 +1253,27 @@ if __name__ == '__main__':
 * Tangling                                                      :boilerplate:
 ** tests
 #+BEGIN_SRC python :tangle test_object_system.py :eval no :noweb yes 
-<<imports_for_tests>>
-<<test_system_constructor>>
-<<test_arity_and_types>>
-<<test_adduser>>
-<<test_updateuser>>
-<<test_deleteuser>>
-<<test_login>>
-<<test_logout>>
-<<test_CreateInstitute>>
-<<test_CreateOC>>
-<<test_CreateNC>>
-<<test_AddRole>>
-<<test_UpdateInstitute>>
-<<test_CreateWorkshop>>
-<<test_CancelWorkshop>>
-<<test_RescheduleWorkshop>>
-<<test_ConductWorkshop>>
-<<test_UploadArtefact>>
-<<test_ApproveWorkshop>>
-<<test_RejectWorkshop>>
-<<test_DeleteArtefact>>
+#<<imports_for_tests>>
+#<<test_system_constructor>>
+#<<test_arity_and_types>>
+#<<test_adduser>>
+#<<test_updateuser>>
+#<<test_deleteuser>>
+#<<test_login>>
+#<<test_logout>>
+#<<test_CreateInstitute>>
+#<<test_CreateOC>>
+#<<test_CreateNC>>
+#<<test_AddRole>>
+#<<test_UpdateInstitute>>
+#<<test_CreateWorkshop>>
+#<<test_CancelWorkshop>>
+#<<test_RescheduleWorkshop>>
+#<<test_ConductWorkshop>>
+#<<test_UploadArtefact>>
+#<<test_ApproveWorkshop>>
+#<<test_RejectWorkshop>>
+#<<test_DeleteArtefact>>
 
-<<run_test_cases>>
+#<<run_test_cases>>
 #+end_src

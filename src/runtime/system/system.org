@@ -129,80 +129,6 @@ class System ():
  
 #+end_src
 
-*** Test Constructor
-#+NAME: test_system_constructor
-#+BEGIN_SRC python
-class TestSystemConstructor(TestCase):
-    TESTING = True
-
-    def setUp(self):
-        System.initialize_system(ObjectDelegate)
-
-    def tearDown(self):
-        System.delegate = None
-        System.session_set = []
-   
-    def test_system_constructor(self):
-        print "test_system_constructor"
-        self.assertEqual(System.delegate.user_set[0].get("name").get("name"),
-                         Config.admin_name)
-        self.assertEqual(System.delegate.user_set[0].get("email").get("email"),
-                         "app-admin@vlabs.ac.in")
-        self.assertEqual(System.delegate.user_set[0].get('roles')[0].get('name'),
-                         "admin")
-
-    def test_is_session_admin(self):
-        print "test_is_session_admin"
-        admin_user=System.delegate.user_set[0]
-        session = Session(user=admin_user,role=Role.admin)
-        System.session_set.append(session)
-        self.assertEqual(System.is_session_admin(session), True)
-
-    def test_is_session_OC(self):
-        print "test_is_session_OCC"
-        admin_user=System.delegate.user_set[0]
-        session = Session(user=admin_user,
-                          role=Role(name="OCC",centre_oc=None,centre_nc=None))
-        System.session_set.append(session)
-        self.assertEqual(System.is_session_OCC(session), True)
-
-    def test_is_session_NCC(self):
-        print "test_is_session_NCC"
-        admin_user=System.delegate.user_set[0]
-        session = Session(user=admin_user,
-                          role=Role(name="NCC",centre_oc=None,centre_nc=None))
-        System.session_set.append(session)
-        self.assertEqual(System.is_session_NCC(session), True)
-
-    def test_is_session_reviewer(self):
-        print "test_is_session_reviewer"
-        admin_user=System.delegate.user_set[0]
-        session = Session(user=admin_user,role=Role.reviewer)
-        System.session_set.append(session)
-        self.assertEqual(System.is_session_reviewer(session), True)
-
-    def test_is_session_guest(self):
-        print "test_is_session_guest"
-        admin_user=System.delegate.user_set[0]
-        session = Session(user=admin_user,role=Role.guest)
-        System.session_set.append(session)
-        self.assertEqual(System.is_session_guest(session), True)
-
-    def test_is_session_noc(self):
-        print "test_is_session_noc"
-        admin_user=System.delegate.user_set[0]
-        session = Session(user=admin_user,role=Role.noc)
-        System.session_set.append(session)
-        self.assertEqual(System.is_session_noc(session), True)
-
-    def test_session_exists(self):
-        print "test_session_exists"
-        admin_user=System.delegate.user_set[0]
-        session = Session(user=admin_user, role=Role.admin)
-        System.session_set.append(session)
-        self.assertEqual(System.session_exists(session), True)
-
-#+END_SRC
 
 
 ** Arity and Type check methods 
@@ -633,7 +559,7 @@ class CreateInstitute():
 #+begin_src python
 class CreateOC():
     arg_types = {"institute":is_institute,"spokes":are_spokes_or_empty_list,
-                  "session":is_session, "oc_target":is_octarget}
+                  "session":is_session, "oc_target":is_oc_target}
     arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):
@@ -677,7 +603,7 @@ class CreateOC():
 #+begin_src python
 class CreateNC():
     arg_types = {"institute":is_institute,"hub":is_oc,"session":is_session,
-                  "nc_target" : is_nctarget, "workshops": are_workshops_or_empty_list}
+                  "nc_target" : is_nc_target, "workshops": are_workshops_or_empty_list}
     arity_and_type_checks_needed = True
     @staticmethod
     def auth_check(args):
@@ -774,7 +700,7 @@ class CreateWorkshop():
     arg_types = {"institute":is_institute,
                  "name" : is_name ,
                  "session":is_session,
-                 "ws_target" : is_wstarget,
+                 "ws_target" : is_ws_target,
                  "artefacts": are_artefacts_or_empty_list,
                  "status" : is_status,
                  "nc" : is_nc
@@ -869,7 +795,7 @@ class CancelWorkshop():
 #+begin_src python
 class RescheduleWorkshop():
     arg_types = {"workshop":is_workshop_or_none, "session":is_session,
-                 "wstarget" : is_wst}
+                 "wstarget" : is_ws_target}
     arity_and_type_checks_needed = True   
     @staticmethod
     def auth_check(args):
@@ -1155,8 +1081,8 @@ from runtime.exceptions.custom_exceptions import *
 from runtime.exceptions.exceptions import *
 from runtime.objects.entities import is_user, is_session, is_role, is_email, \
     is_name, is_alphabetic_str, is_str, are_spokes_or_empty_list, is_institute,\
-    is_octarget, is_oc, is_nctarget, are_workshops_or_empty_list, is_wstarget,\
-    are_artefacts_or_empty_list, is_status, is_nc, is_workshop_or_none, is_wst, \
+    is_oc_target, is_oc, is_nc_target, are_workshops_or_empty_list, is_ws_target,\
+    are_artefacts_or_empty_list, is_status, is_nc, is_workshop_or_none, is_ws_target, \
     is_artefact, Session
 
 
