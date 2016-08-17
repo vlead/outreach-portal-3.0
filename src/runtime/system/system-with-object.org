@@ -6,6 +6,120 @@
 #+EXCLUDE_TAGS: boilerplate
 #+OPTIONS: ^:nil
 
+* Test Constructor
+#+NAME: test_system_constructor
+#+BEGIN_SRC python
+class TestSystemConstructor(TestCase):
+    TESTING = True
+    def setUp(self):
+	System.initialize_system(ObjectDelegate)
+
+    def tearDown(self):
+	admin = filter( lambda x: x.get("email").get("email") ==
+			"app-admin@vlabs.ac.in",
+			System.delegate.user_set)
+	System.user_set = admin
+	System.session_set = []
+	System.delegate.institute_set = []
+	System.delegate.oc_set = []
+	System.delegate.nc_set = []
+
+ 
+   
+    def test_system_constructor(self):
+        print "test_system_constructor"
+        self.assertEqual(System.delegate.user_set[0].get("name").get("name"),
+                         Config.admin_name)
+        self.assertEqual(System.delegate.user_set[0].get("email").get("email"),
+                         "app-admin@vlabs.ac.in")
+        self.assertEqual(System.delegate.user_set[0].get('roles')[0].get('name'),
+                         "admin")
+
+    def test_is_session_admin(self):
+        print "test_is_session_admin"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user,role=Role.admin)
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_admin(session), True)
+
+    def test_is_session_OC(self):
+        print "test_is_session_OCC"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user,
+                          role=Role(name="OCC",centre_oc=None,centre_nc=None))
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_OCC(session), True)
+
+    def test_is_session_NCC(self):
+        print "test_is_session_NCC"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user,
+                          role=Role(name="NCC",centre_oc=None,centre_nc=None))
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_NCC(session), True)
+
+    def test_is_session_reviewer(self):
+        print "test_is_session_reviewer"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user,role=Role.reviewer)
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_reviewer(session), True)
+
+    def test_is_session_guest(self):
+        print "test_is_session_guest"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user,role=Role.guest)
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_guest(session), True)
+
+    def test_is_session_noc(self):
+        print "test_is_session_noc"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user,role=Role.noc)
+        System.session_set.append(session)
+        self.assertEqual(System.is_session_noc(session), True)
+
+    def test_session_exists(self):
+        print "test_session_exists"
+        admin_user=System.delegate.user_set[0]
+        session = Session(user=admin_user, role=Role.admin)
+        System.session_set.append(session)
+        self.assertEqual(System.session_exists(session), True)
+
+#+END_SRC
+
+* Test Arity and Type Checks
+#+NAME: test_arity_and_types
+#+BEGIN_SRC python
+class TestSystemArityAndType(TestCase):
+    TESTING = True
+
+    def setUp(self):
+        System.initialize_system(ObjectDelegate)
+
+    def tearDown(self):
+        System.delegate = None
+
+    def test_arity(self):
+        print "test_arity"
+        with self.assertRaises(ArityError):
+            System.arity_check([1,2], 3)
+
+    def test_type_checks(self):
+        print "test_type_checks"
+        args = {"name": Name(name="Jimi Hendrix"),
+                "email": Name(name="Jimi Hendrix")
+                }
+
+        arg_types = {"name": is_name,
+                     "email": is_email
+                     }
+
+        with self.assertRaises(TypeError):
+            System.type_check(args, arg_types)
+
+#+END_SRC
+
 * Test AddUser
 #+NAME: test_adduser
 #+BEGIN_SRC python
