@@ -441,11 +441,11 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_oc_exists(self):
          print "test_oc_exists"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         ins.save()
-         spokes=[]
-         oc_target = None
-         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
+         institute = Institute(name='IIIT', address='Hyderabad')
+         spokes = []
+         oc_targets = []
+         oc = self.persistent_delegate.add_oc(institute, spokes,
+                                               oc_targets)
          self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 
 #+END_SRC
@@ -455,8 +455,13 @@ class TestPersistentDelegate(TestCase):
     This function adds an outreach centre to the oc-set maintained by the system.
 #+NAME: persistent_add_oc
 #+BEGIN_SRC python
-    def add_oc(self, institute, spokes, oc_target):
-        self.new_oc = OC(institute=institute, spokes=spokes, oc_target = oc_target)
+    def add_oc(self, institute, spokes, oc_targets):
+        institute.save()
+        for spoke in spokes:
+            spoke.save()
+        for oc_target in oc_targets:
+            oc_target.save()
+        self.new_oc = OC(institute=institute, spokes=spokes, oc_targets=oc_targets)
         self.new_oc.save()
         return self.new_oc
 #+END_SRC
@@ -466,11 +471,10 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_add_oc(self):
          print "test_persistent_add_oc"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         ins.save()
-         spokes=[]
-         oc_target = None
-         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
+         institute = Institute(name='IIIT',address='Hyderabad')
+         spokes = []
+         oc_targets = []
+         oc = self.persistent_delegate.add_oc(institute, spokes, oc_targets)
          self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 #+END_SRC
 
@@ -1264,8 +1268,8 @@ if __name__ == '__main__':
 #<<test_persistent_add_role_to_user>>
 #<<test_persistent_get_users>>
 #<<test_persistent_get_active_users>>
-#<<test_persistent_add_oc>>
-#<<test_persistent_oc_exists>>
+<<test_persistent_add_oc>>
+<<test_persistent_oc_exists>>
 #<<test_persistent_add_nc>>
 #<<test_persistent_nc_exists>>
 #<<test_persistent_get_ocs>>

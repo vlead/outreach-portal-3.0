@@ -493,7 +493,7 @@ class logout():
 #+NAME: class_CreateInstitute
 #+begin_src python
 class CreateInstitute():
-    arg_types = {"institute": is_institute,
+    arg_types = {"institute":is_institute,
                  "session":is_session}
     arity_and_type_checks_needed = True
 
@@ -527,14 +527,13 @@ class CreateInstitute():
 #+NAME: class_CreateOC
 #+begin_src python
 class CreateOC():
-    arg_types = {"institute":is_institute,"spokes":are_spokes_or_empty_list,
-                  "session":is_session, "oc_target":is_oc_target}
+    arg_types = {"institute":is_institute, "spokes":are_spokes_or_empty_list,
+                  "session":is_session, "oc_targets":are_oc_targets_or_empty_list}
     arity_and_type_checks_needed = True
+
     @staticmethod
     def auth_check(args):
         session = args['session']
-        institute = args['institute']
-        oc_target = args['oc_target']
         if not (System.is_session_admin(session) or
                 System.is_session_noc(session)):
             raise AuthError("Role not Authorized to perform this action")
@@ -543,7 +542,7 @@ class CreateOC():
     def state_check(args):
         session = args["session"]
         institute = args['institute']
-        oc_target = args['oc_target']
+
         if not (session in System.session_set):
             raise StateError("user not in session %s"
                               % session.get('user').get('name').get('name'))
@@ -552,19 +551,22 @@ class CreateOC():
                              % institute.get('name'))
         for oc in System.delegate.get_ocs():
             if oc.get('institute') == institute:
-                raise StateError("institute %s already has an oc associated with it" %oc)
+                raise StateError("institute %s already has an oc associated with it"
+                                     %oc)
         for nc in System.delegate.get_ncs():
             if nc.get('institute') == institute:
-                raise StateError("institute %s already has an nc associated with it" %nc)
+                raise StateError("institute %s already has an nc associated with it"
+                                     %nc)
 
     @staticmethod
     def action(args):
         institute = args["institute"]
-        spokes=args["spokes"]
-        oc_target = args["oc_target"]
-        new_oc = System.delegate.add_oc(institute, spokes, oc_target)
+        spokes = args["spokes"]
+        oc_targets = args["oc_targets"]
+        new_oc = System.delegate.add_oc(institute, spokes, oc_targets)
         new_role = System.delegate.add_occ_role("OCC", new_oc, None)
         return new_oc
+
 #+end_src
 
 ** =create_nc=
@@ -1049,10 +1051,11 @@ ops_table = {'add_user' : AddUser,
 from runtime.exceptions.custom_exceptions import *
 from runtime.exceptions.exceptions import *
 from runtime.objects.entities import is_user, is_session, is_role, is_email, \
-    is_name, is_alphabetic_str, is_str, are_spokes_or_empty_list, is_institute,\
-    is_oc_target, is_oc, is_nc_target, are_workshops_or_empty_list, is_ws_target,\
-    are_artefacts_or_empty_list, is_status, is_nc, is_workshop_or_none, is_ws_target, \
-    is_artefact, Session
+    is_name, is_alphabetic_str, is_str, are_spokes_or_empty_list,\
+    is_institute, is_oc_target, is_status, is_nc,\
+    is_oc, is_nc_target, are_workshops_or_empty_list, is_ws_target,\
+    are_artefacts_or_empty_list,  is_workshop_or_none, is_ws_target, \
+    is_artefact, are_oc_targets_or_empty_list, Session
 
 
 #+end_src
