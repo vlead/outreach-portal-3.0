@@ -511,14 +511,14 @@ class CreateInstitute():
         if not (session in System.session_set):
             raise StateError("user not in session %s"
                               % session.get('user').get('name').get('name'))
-        for inst in System.delegate.institute_exists(institute):
+        elif System.delegate.institute_exists(institute):
                 raise StateError("institute %s already in System"
                                   % inst.get('name'))
 
     @staticmethod
     def action(args):
         institute = args["institute"]
-        System.delegate.add_institute(institute)
+        institute = System.delegate.add_institute(institute)
         return institute
 
 #+end_src
