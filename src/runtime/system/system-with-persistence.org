@@ -176,7 +176,7 @@ class TestAddUser(TestCase):
         role_guest = Role.get_by_id(2)
         self.admin_user = User(name=admin_name,
                           email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
+                          roles=[role_admin, role_guest])
         self.admin_user.save()
         return User.get_all()
 
@@ -201,35 +201,29 @@ class TestAddUser(TestCase):
         admin_user = User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
-        user_name = Name(name="me")
-        user_name.save()
-        user_email = Email(email="abc@gmail.com")
-        user_email.save()
-        guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
-                    roles= [guest_role],
-                    user_status="active")
+        name = Name(name="me")
+        email = Email(email="abc@gmail.com")
+        role = Role(name="guest", centre_nc=None, centre_oc=None)
+        user = User(name=name, email=email,
+                        roles= [role],
+                        )
 
         user = System.do("add_user", user=user, session=session)
 
-        u=User.get_by_id(2)
-        self.assertEqual(u.get("name").get("name"),"me")
+        user = User.get_by_id(2)
+        self.assertEqual(user.get("name").get("name"), "me")
 
     def test_add_user_noc_by_admin(self):
         print "test_add_user_by_noc"
-        admin_user=User.get_by_id(1)
+        admin_user = User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
 
         name = Name(name="nocuser")
-        name.save()
         email = Email(email="abc@gmail.com")
-        email.save()
-
-        guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
-                    roles= [guest_role],
-                    user_status="active")
+        role = Role(name="noc", centre_nc=None, centre_oc=None)
+        user = User(name=name, email=email, \
+                        roles= [role])
 
         noc_user=System.do("add_user", user=user, session=session)
 
@@ -237,25 +231,21 @@ class TestAddUser(TestCase):
 
         System.session_set.append(session_noc)
 
-        u=User.get_by_id(2)
-        self.assertEqual(u.get("name").get("name"),"nocuser")
+        user = User.get_by_id(2)
+        self.assertEqual(user.get("name").get("name"),"nocuser")
 
     def test_add_user_by_noc(self):
         print "test_add_user_by_noc"
-        admin_user=User.get_by_id(1)
+        admin_user = User.get_by_id(1)
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
 
         name = Name(name="nocuser")
-        name.save()
         email = Email(email="abc@gmail.com")
-        email.save()
-        guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
-                    roles= [guest_role],
-                    user_status="active")
+        role = Role(name="guest", centre_nc=None, centre_oc=None)
+        user = User(name=name,email=email,
+                        roles= [role])
         noc_user= System.do("add_user", user=user, session=session)
-
         session_noc = Session(user=noc_user,role=Role.get_by_id(4))
         System.session_set.append(session_noc)
         inst = Institute(name = "NITK", address = "Surathkal")
@@ -266,15 +256,11 @@ class TestAddUser(TestCase):
                         spokes = [], oc_target = None)
 
         name = Name(name="ocuser")
-        name.save()
         email = Email(email="mary@gmail.com")
-        email.save()
-        guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3),
-                    roles= [guest_role],
-                    user_status="active")
+        role = Role(name="guest", centre_nc=None, centre_oc=None)
+        user = User(name=name, email=email,
+                    roles=[role])
         oc_user= System.do("add_user", user=user, session=session_noc)
-
 
         oc_role = filter(lambda x:x.get('name') == "OCC" and
                          x.get('centre_oc').get("institute").get("name") ==
@@ -282,8 +268,8 @@ class TestAddUser(TestCase):
         if oc_role:
             oc_user.append_role(oc_role[0])
 
-        u=User.get_by_id(3)
-        self.assertEqual(u.get("name").get("name"),"ocuser")
+        user = User.get_by_id(3)
+        self.assertEqual(user.get("name").get("name"),"ocuser")
 
     def test_add_user_raises_arity_error(self):
         print "test_add_user_raises_arity_error"
@@ -293,12 +279,9 @@ class TestAddUser(TestCase):
         System.session_set.append(session)
 
         name = Name(name="nocuser")
-        name.save()
         email = Email(email="abc@gmail.com")
-        email.save()
-        guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2), roles= [guest_role],
-                    user_status="active")
+        role = Role(name="guest", centre_nc=None, centre_oc=None)
+        user = User(name=name, email=email, roles= [role])
 
         with self.assertRaises(ArityError):
             System.do("add_user", user=user)
@@ -2125,24 +2108,24 @@ if __name__ == '__main__':
 ** tests
 #+BEGIN_SRC python :tangle test_persistent_system.py :eval no :noweb yes
 <<imports_for_tests>>
-<<test_persistent_system_constructor>>
-<<test_arity_and_types>>
+#<<test_persistent_system_constructor>>
+#<<test_arity_and_types>>
 <<test_adduser>>
-<<test_login>>
-<<test_logout>>
-<<test_updateuser>>
-<<test_CreateInstitute>>
-<<test_CreateOC>>
-<<test_CreateNC>>
-<<test_AddRole>>
-<<test_UpdateInstitute>>
-<<test_CreateWorkshop>>
-<<test_CancelWorkshop>>
-<<test_RescheduleWorkshop>>
-<<test_ConductWorkshop>>
-<<test_UploadArtefact>>
-<<test_ApproveWorkshop>>
-<<test_RejectWorkshop>>
-<<test_DeleteArtefact>>
+#<<test_login>>
+#<<test_logout>>
+#<<test_updateuser>>
+#<<test_CreateInstitute>>
+#<<test_CreateOC>>
+#<<test_CreateNC>>
+#<<test_AddRole>>
+#<<test_UpdateInstitute>>
+#<<test_CreateWorkshop>>
+#<<test_CancelWorkshop>>
+#<<test_RescheduleWorkshop>>
+#<<test_ConductWorkshop>>
+#<<test_UploadArtefact>>
+#<<test_ApproveWorkshop>>
+#<<test_RejectWorkshop>>
+#<<test_DeleteArtefact>>
 <<run_test_cases>>
 #+end_src
