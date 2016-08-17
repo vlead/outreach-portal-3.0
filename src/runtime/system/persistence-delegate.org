@@ -483,8 +483,8 @@ class TestPersistentDelegate(TestCase):
     This function adds an outreach centre to the oc-set maintained by the system.
 #+NAME: persistent_add_nc
 #+BEGIN_SRC python
-    def add_nc(self, institute, oc, nc_target, workshops):
-        self.new_nc = NC(institute=institute, hub=oc, nc_target=nc_target,
+    def add_nc(self, institute, oc, nc_targets, workshops):
+        self.new_nc = NC(institute=institute, hub=oc, nc_targets=nc_targets,
                          workshops=workshops)
         self.new_nc.save()
         oc.append_spoke(self.new_nc)
@@ -496,15 +496,14 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_add_nc(self):
          print "test_persistent_add_nc"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         ins.save()
-         institute=Institute.get_by_id(1)
-         spokes=[]
-         oc_target = None
-         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
-         nc_target=None
-         workshops=[]
-         nc = self.persistent_delegate.add_nc(institute, oc, nc_target, workshops)
+         institute = Institute(name='IIIT',address='Hyderabad')
+         spokes = []
+         oc_targets = []
+         oc = self.persistent_delegate.add_oc(institute, spokes, oc_targets)
+         nc_targets = []
+         workshops = []
+         nc = self.persistent_delegate.add_nc(institute, oc, nc_targets,
+                                                workshops)
          self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 
 #+END_SRC
@@ -552,15 +551,13 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_nc_exists(self):
          print "test_persistent_nc_exists"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         ins.save()
-         institute=Institute.get_by_id(1)
+         institute = Institute(name='IIIT',address='Hyderabad')
          spokes=[]
-         oc_target = None
-         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
-         nc_target=None
+         oc_targets = []
+         oc = self.persistent_delegate.add_oc(institute, spokes, oc_targets)
+         nc_targets = []
          workshops=[]
-         nc = self.persistent_delegate.add_nc(institute, oc, nc_target, workshops)
+         nc = self.persistent_delegate.add_nc(institute, oc, nc_targets, workshops)
          self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 #+END_SRC
 

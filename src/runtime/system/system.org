@@ -574,14 +574,16 @@ class CreateOC():
 #+begin_src python
 class CreateNC():
     arg_types = {"institute":is_institute,"hub":is_oc,"session":is_session,
-                  "nc_target" : is_nc_target, "workshops": are_workshops_or_empty_list}
+                  "nc_targets" : are_nc_targets_or_empty_list, 
+                  "workshops": are_workshops_or_empty_list}
     arity_and_type_checks_needed = True
+
     @staticmethod
     def auth_check(args):
         session = args['session']
         institute = args['institute']
         oc = args['hub']
-        nc_target = args['nc_target']
+        nc_targets = args['nc_targets']
         workshops = args["workshops"]
         if not (System.is_session_admin(session) or
                 System.is_session_OCC(session)):
@@ -595,7 +597,7 @@ class CreateNC():
         session = args["session"]
         institute = args['institute']
         oc = args['hub']
-        nc_target = args['nc_target']
+        nc_targets = args['nc_targets']
         workshops = args["workshops"]
         if not (session in System.session_set):
             raise StateError("user not in session %s"
@@ -615,9 +617,9 @@ class CreateNC():
     def action(args):
         institute = args["institute"]
         oc = args['hub']
-        nc_target = args['nc_target']
+        nc_targets = args['nc_targets']
         workshops = args["workshops"]
-        new_nc = System.delegate.add_nc(institute, oc, nc_target, workshops)
+        new_nc = System.delegate.add_nc(institute, oc, nc_targets, workshops)
         new_role = System.delegate.add_ncc_role("NCC", None, new_nc)
 #        oc.append_spoke(new_nc)
         return new_nc
@@ -1055,7 +1057,8 @@ from runtime.objects.entities import is_user, is_session, is_role, is_email, \
     is_institute, is_oc_target, is_status, is_nc,\
     is_oc, is_nc_target, are_workshops_or_empty_list, is_ws_target,\
     are_artefacts_or_empty_list,  is_workshop_or_none, is_ws_target, \
-    is_artefact, are_oc_targets_or_empty_list, Session
+    is_artefact, are_oc_targets_or_empty_list, \
+    are_nc_targets_or_empty_list, Session
 
 
 #+end_src

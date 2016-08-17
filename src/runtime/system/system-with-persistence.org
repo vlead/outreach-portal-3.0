@@ -982,7 +982,7 @@ class TestCreateNC(TestCase):
         role_guest = Role.get_by_id(2)
         self.admin_user = User(name=admin_name,
                           email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
+                          roles=[role_admin, role_guest])
         self.admin_user.save()
         return User.get_all()
 
@@ -1006,15 +1006,18 @@ class TestCreateNC(TestCase):
         print "test_create_nc"
         login_user= User.get_by_id(1)
         login_role = Role.get_by_id(1)
-        sess = System.do("login",user=login_user,role=login_role)
-        inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute", institute = inst, session=sess)
+        session = System.do("login",user=login_user,role=login_role)
+        institute = Institute(name="IIIT",address="Hyderabad")
+        institute = System.do("create_institute", institute = institute,
+                               session=session)
         oc = System.do("create_oc",institute=institute,spokes=[],
-                        session=sess, oc_target = None)
-        nc = System.do("create_nc",institute=institute,hub=oc,session=sess,
-                        nc_target = None, workshops = [])
-#        self.assertEqual(NC.get_by_id(1).get('institute'),institute)
-#        self.assertEqual(OC.get_by_id(1).get('spokes')[0],nc)
+                        session=session, oc_targets = [])
+        nc = System.do("create_nc", institute=institute, hub=oc,
+                        session=session, nc_targets=[], workshops = [])
+        self.assertEqual(NC.get_by_id(1).get('institute').get("name"),
+                             institute.get("name"))
+        self.assertEqual(OC.get_by_id(1).get('spokes')[0].get("institute").get("name"),
+                             nc.get("institute").get("name"))
         self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 #+END_SRC
 * Test update_institute
@@ -2133,7 +2136,7 @@ if __name__ == '__main__':
 #<<test_updateuser>>
 <<test_CreateInstitute>>
 <<test_CreateOC>>
-#<<test_CreateNC>>
+<<test_CreateNC>>
 #<<test_AddRole>>
 #<<test_UpdateInstitute>>
 #<<test_CreateWorkshop>>
