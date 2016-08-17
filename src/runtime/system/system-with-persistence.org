@@ -849,7 +849,7 @@ class TestCreateInstitute(TestCase):
         role_guest = Role.get_by_id(2)
         self.admin_user = User(name=admin_name,
                           email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
+                          roles=[role_admin, role_guest])
         self.admin_user.save()
         return User.get_all()
 
@@ -871,12 +871,12 @@ class TestCreateInstitute(TestCase):
     
     def test_create_institute(self):
         print "test_create_institute"
-        login_user= User.get_by_id(1)
+        login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
-        sess = System.do("login",user=login_user,role=login_role)
-        inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute",institute = inst, session=sess)
-        self.assertEqual(Institute.get_by_id(1).get('name'),'IIIT')
+        session = System.do("login", user=login_user, role=login_role)
+        inst = Institute(name="IIIT", address="Hyderabad")
+        institute = System.do("create_institute", institute=inst, session=session)
+        self.assertEqual(Institute.get_by_id(1).get('name'), 'IIIT')
 
 #+END_SRC
 * Test create_oc
@@ -2115,6 +2115,7 @@ if __name__ == '__main__':
 #<<test_logout>>
 #<<test_updateuser>>
 #<<test_CreateInstitute>>
+#<<test_updateuser>>
 #<<test_CreateOC>>
 #<<test_CreateNC>>
 #<<test_AddRole>>
