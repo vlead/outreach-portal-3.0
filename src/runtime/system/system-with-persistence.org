@@ -34,7 +34,7 @@ class TestSystemConstructor(TestCase):
         role_guest = Role.get_by_id(2)
         self.admin_user = User(name=admin_name,
                           email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
+                          roles=[role_admin, role_guest])
         self.admin_user.save()
         return User.get_all()
 
@@ -905,7 +905,7 @@ class TestCreateOC(TestCase):
         role_guest = Role.get_by_id(2)
         self.admin_user = User(name=admin_name,
                           email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
+                          roles=[role_admin, role_guest])
         self.admin_user.save()
         return User.get_all()
 
@@ -924,18 +924,18 @@ class TestCreateOC(TestCase):
         System.session_set = []
         db.session.remove()
         db.drop_all()
-
     
     def test_create_oc(self):
         print "test_create_oc"
-        login_user=User.get_by_id(1)
+        login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
-        sess = System.do("login",user=login_user,role=login_role)
-        inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute",institute = inst,session=sess)
-        oc = System.do("create_oc",institute=institute,spokes=[],
-                        session=sess, oc_target = None)
-#        self.assertEqual(OC.get_by_id(1).get("name"), Institute.get_by_id(1).get("name"))
+        session = System.do("login", user=login_user, role=login_role)
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute = System.do("create_institute", institute=institute, session=session)
+        oc = System.do("create_oc", institute=institute, spokes=[],
+                        session=session, oc_targets=[])
+        self.assertEqual(OC.get_by_id(1).get("institute").get("name"), 
+                             Institute.get_by_id(1).get("name"))
         self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 
 #+END_SRC
