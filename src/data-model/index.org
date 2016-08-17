@@ -414,9 +414,10 @@ Sets
  oc-set        : set[OC]        ; set of outreach centres in the system
  status-set    : set[Status]    ; set of all status that a wokshop can be
  type-set      : set[Type]      ; set of all types that an artefact can be
+ operation-set : set[Operation] ; set of all operations that can happen on the system
+ audit-set     : set[Audit]     ; set of all audit entries
 
  #+END_SRC
-
 
 ** Derived Entity sets
 :PROPERTIES:
@@ -471,26 +472,27 @@ Meets requirements [[../requirements/index.org::#req_user_uniqueness][uniqueness
 #+BEGIN_SRC spec :tangle spec.txt
 
 ;;; Relation variables with Referential Integrity
-[email, user]     :  user-set !  >   email-set !
-[name, user]      :  user-set +  >   name-set !    
-[roles, users]    :  user-set    >   role-set +   
-[sessions, user]  :  user-set !  >   session-set
-[host, oc]        :  oc-set ?    >   institute-set !
-[spokes, hub]     :  oc-set !    >   nc-set
-[host, nc]        :  nc-set ?    >   institute-set !
-[octargets, oc]   :  oc-set !    >   oc-target-set
-[nctargets, nc]   :  nc-set !    >   nc-target-set
-[role, sessions]  :  session-set   >  role-set !
-[location, workshops]  : workshop-set    >   institute-set !
-[wstarget, workshop]   : workshop-set ?  >    ws-target-set !
-[photos, workshop]     : workshop-set ?  >    artefact-set +
-[reports, workshop]    : workshop-set !  >    artefact-set +
-[feedback, workshop]   : workshop-set !  >    artefact-set +
-[attendance, workshop] : workshop-set !  >    artefact-set +
-[status, workshops]    : workshop-set    >    status-set !
-[owner, workshops]     : workshop-set    >    role-set !
-[artefact, type]       : Type !      >    Artefact
-[operation, audit]     : AuditEntry  >    Operation ![
+[email, user]          :  user-set !      >   email-set !
+[name, user]           :  user-set +      >   name-set !    
+[roles, users]         :  user-set        >   role-set +   
+[sessions, user]       :  user-set !      >   session-set
+[host, oc]             :  oc-set ?        >   institute-set !
+[spokes, hub]          :  oc-set !        >   nc-set
+[host, nc]             :  nc-set ?        >   institute-set !
+[octargets, oc]        :  oc-set !        >   oc-target-set
+[nctargets, nc]        :  nc-set !        >   nc-target-set
+[role, sessions]       :  session-set     >   role-set !
+[location, workshops]  :  workshop-set    >   institute-set !
+[wstarget, workshop]   :  workshop-set ?  >   ws-target-set !
+[photos, workshop]     :  workshop-set ?  >   artefact-set +
+[reports, workshop]    :  workshop-set !  >   artefact-set +
+[feedback, workshop]   :  workshop-set !  >   artefact-set +
+[attendance, workshop] :  workshop-set !  >   artefact-set +
+[status, workshops]    :  workshop-set    >   status-set !
+[owner, workshops]     :  workshop-set    >   role-set !
+[type, artefact]       :  artefact-set    >   type-set !
+[operation, audit]     :  audit-set       >   operation-set !
+
 #+END_SRC
 
 
@@ -530,10 +532,12 @@ the  actors:  =session=.
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
     u = new user
-    active-user-set = (active-user-set) U {u}
+    active-user-set = active-user-set U {u}
     roles(u)= {guest}
+
 #+END_SRC   
-** Add Role
+
+** Add Role to a User
 *** Parameters
 #+BEGIN_SRC spec :tangle spec.txt
     u: User, r: Role, s: Session
@@ -544,19 +548,21 @@ the  actors:  =session=.
 #+END_SRC   
 *** Referential Integrity
 #+BEGIN_SRC spec :tangle spec.txt
-    s:session-set
-    r: ~ roles(u)
-    s.role == admin => r:role-set
-    s.role == OCC(oc) =>          
-         nc:nc-set
-         r==NCC(nc)
-         hub(nc) == oc
-    u:active-user-set
+    s:session-set AND
+    u:active-user-set AND
+    r: ~ roles(u)     AND      
+    (s.role == admin and 
+     r: role-set)             OR
+    (s.role == OCC(oc) and 
+     r == NCC(nc)      and
+     nc: nc-set        and 
+     hub(nc) == oc)
+
 #+END_SRC   
 *** Effect
 #+BEGIN_SRC spec :tangle spec.txt
     r is added to u.roles
-    roles(u)= roles(u) U {r}
+    roles(u) = roles(u) U {r}
 #+END_SRC   
 ** Add institute
 *** Parameters
@@ -964,6 +970,6 @@ the  actors:  =session=.
 <img src="https://docs.google.com/drawings/d/1av_XMueESqLkUdYRGZuJskeTzr9yl8_agsGq1JedMMg/pub?w=960&h=720">
 #+END_HTML
 
-   [[https://docs.google.com/drawings/d/1av_XMueESqLkUdYRGZuJskeTzr9yl8_agsGq1JedMMg/edit?usp=sharing][edit image]]
+   [[https://docs.google.com/drawings/d/1wz8_vM-U33oc8VuOgkMh5B7ZixISCFUWlSOUZftCebk/edit][edit image]]
 
    
