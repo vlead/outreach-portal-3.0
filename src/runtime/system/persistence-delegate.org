@@ -170,7 +170,6 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_add_user(self):
         print "test_add_user"
-        print "test_add_user"
         name = Name(name="some user")
         email = Email(email="tt@kk.com")
         role = Role(name="guest", centre_nc=None, centre_oc=None)
@@ -411,11 +410,9 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def institute_exists(self, institute):
         institute_name = institute.get("name")
-        try:
-            institute = Institute.apply_filters(name=institute_name)[0]
-            if institute:
-                return True
-        except NotFoundError as e:
+        if institute_name:
+            return institute == self.get_institute(name=institute_name)
+        else:
             return False
 
 #+END_SRC
@@ -512,11 +509,11 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_oc_exists
 #+BEGIN_SRC python
     def oc_exists(self, oc):
-        if oc in OC.get_all():
-            return True
+        institute = oc.get("institute")
+        if institute:
+            return oc == self.get_oc(institute=institute)
         else:
             return False
-
 #+END_SRC
 
 **** Tests
@@ -525,10 +522,8 @@ class TestPersistentDelegate(TestCase):
     def test_oc_exists(self):
          print "test_oc_exists"
          institute = Institute(name='IIIT', address='Hyderabad')
-         spokes = []
-         oc_targets = []
-         oc = self.persistent_delegate.add_oc(institute, spokes,
-                                               oc_targets)
+         institute = self.persistent_delegate.add_institute(institute)
+         oc = self.persistent_delegate.add_oc(institute)
          self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 
 #+END_SRC
@@ -538,15 +533,12 @@ class TestPersistentDelegate(TestCase):
     This function adds an outreach centre to the oc-set maintained by the system.
 #+NAME: persistent_add_oc
 #+BEGIN_SRC python
-    def add_oc(self, institute, spokes, oc_targets):
-        institute.save()
-        for spoke in spokes:
-            spoke.save()
-        for oc_target in oc_targets:
-            oc_target.save()
-        self.new_oc = OC(institute=institute, spokes=spokes, oc_targets=oc_targets)
-        self.new_oc.save()
-        return self.new_oc
+    def add_oc(self, institute):
+        new_oc = OC(institute=institute, spokes=[], oc_targets=[])
+        new_oc.save()
+        new_role = self.add_occ_role("OCC", new_oc, None)
+        new_role.save()
+        return new_oc
 #+END_SRC
 
 **** Tests
@@ -555,9 +547,8 @@ class TestPersistentDelegate(TestCase):
     def test_add_oc(self):
          print "test_persistent_add_oc"
          institute = Institute(name='IIIT',address='Hyderabad')
-         spokes = []
-         oc_targets = []
-         oc = self.persistent_delegate.add_oc(institute, spokes, oc_targets)
+         institute = self.persistent_delegate.add_institute(institute)
+         oc = self.persistent_delegate.add_oc(institute)
          self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 #+END_SRC
 
@@ -566,12 +557,12 @@ class TestPersistentDelegate(TestCase):
     This function adds an outreach centre to the oc-set maintained by the system.
 #+NAME: persistent_add_nc
 #+BEGIN_SRC python
-    def add_nc(self, institute, oc, nc_target, workshops):
-        self.new_nc = NC(institute=institute, hub=oc, nc_target=nc_target,
-                         workshops=workshops)
-        self.new_nc.save()
-        oc.append_spoke(self.new_nc)
-        return self.new_nc
+    def add_nc(self, institute, oc):
+        new_nc = NC(institute=institute, hub=oc, nc_targets=[], workshops=[])
+        new_nc.save()
+        new_role = self.add_ncc_role("NCC", None, new_nc)
+        new_role.save()
+        return new_nc
 #+END_SRC
 
 **** Tests
@@ -579,15 +570,10 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_add_nc(self):
          print "test_persistent_add_nc"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         ins.save()
-         institute=Institute.get_by_id(1)
-         spokes=[]
-         oc_target = None
-         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
-         nc_target=None
-         workshops=[]
-         nc = self.persistent_delegate.add_nc(institute, oc, nc_target, workshops)
+         institute = Institute(name="IIIT", address="Hyderabad")
+         institute = self.persistent_delegate.add_institute(institute)
+         oc = self.persistent_delegate.add_oc(institute)
+         nc = self.persistent_delegate.add_nc(institute, oc)
          self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 
 #+END_SRC
@@ -610,8 +596,6 @@ class TestPersistentDelegate(TestCase):
          print "test_get_ocs"
          ins = Institute(name='IIIT',address='Hyderabad')
          ins.save()
-         spokes=[]
-         oc_target = None
          oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
 
          self.assertEqual(len(self.persistent_delegate.get_ocs()), 1)
@@ -624,8 +608,9 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_nc_exists
 #+BEGIN_SRC python
     def nc_exists(self, nc):
-        if nc in NC.get_all():
-            return True
+        institute = nc.get("institute")
+        if institute:
+            return nc == self.get_nc(institute=institute)
         else:
             return False
 #+END_SRC
@@ -635,15 +620,9 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_nc_exists(self):
          print "test_persistent_nc_exists"
-         ins = Institute(name='IIIT',address='Hyderabad')
-         ins.save()
-         institute=Institute.get_by_id(1)
-         spokes=[]
-         oc_target = None
-         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
-         nc_target=None
-         workshops=[]
-         nc = self.persistent_delegate.add_nc(institute, oc, nc_target, workshops)
+         institute = Institute(name='IIIT',address='Hyderabad')
+         oc = self.persistent_delegate.add_oc(institute)
+         nc = self.persistent_delegate.add_nc(institute, oc)
          self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 #+END_SRC
 
@@ -1205,6 +1184,92 @@ class TestPersistentDelegate(TestCase):
 #+END_SRC
 
 
+*** Get Institute
+    This function returns an institute if present in the database.  If the institute is
+    not present, =None= type is returned.
+#+NAME: persistent_get_institute
+#+BEGIN_SRC python
+    def get_institute(self, **kwargs):
+        return self.get_object(Institute, **kwargs)
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_get_institute
+#+BEGIN_SRC python
+    def test_get_institute(self):
+         print "test_get_institute"
+         institute = Institute(name="IIIT", address="Hyderabad")
+         institute.save()
+         institute_obj = self.persistent_delegate.get_institute(name=
+                                                institute.get("name"))
+         self.assertEqual(institute_obj.get("name"),
+                              institute.get("name"))
+
+#+END_SRC
+
+
+*** Get OC
+    This function returns an =OC= if present in the database.  If =OC= is
+    not present, =None= type is returned.
+#+NAME: persistent_get_oc
+#+BEGIN_SRC python
+    def get_oc(self, **kwargs):
+        return self.get_object(OC, **kwargs)
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_get_oc
+#+BEGIN_SRC python
+    def test_get_oc(self):
+         print "test_get_oc"
+         institute = Institute(name="IIIT", address="Hyderabad")
+         institute.save()
+
+         oc = OC(institute=institute, spokes=[], oc_targets=[])
+         oc.save()
+
+         oc_obj = self.persistent_delegate.get_oc(institute=
+                                                oc.get("institute"))
+         self.assertEqual(oc_obj.get("institute").get("name"),
+                              oc.get("institute").get("name"))
+
+#+END_SRC
+
+
+*** Get NC
+    This function returns an =NC= if present in the database.  If =NC= is
+    not present, =None= type is returned.
+#+NAME: persistent_get_nc
+#+BEGIN_SRC python
+    def get_nc(self, **kwargs):
+        return self.get_object(NC, **kwargs)
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_get_nc
+#+BEGIN_SRC python
+    def test_get_nc(self):
+         print "test_get_nc"
+         institute = Institute(name="IIIT", address="Hyderabad")
+         institute.save()
+
+         oc = OC(institute=institute, spokes=[], oc_targets=[])
+         oc.save()
+
+         nc = NC(institute=institute, hub=oc, nc_targets=[], workshops=[])
+         nc.save()
+
+         nc_obj = self.persistent_delegate.get_nc(institute=
+                                                nc.get("institute"))
+         self.assertEqual(nc_obj.get("institute").get("name"),
+                              nc.get("institute").get("name"))
+
+#+END_SRC
+
+
 *** Get Role
     This function returns either admin or user role from the roles in database
 #+NAME: persistent_get_role
@@ -1308,6 +1373,9 @@ if __name__ == '__main__':
 <<persistent_get_user>>
 <<persistent_get_email>>
 <<persistent_get_name>>
+<<persistent_get_institute>>
+<<persistent_get_oc>>
+<<persistent_get_nc>>
 <<persistent_update_user>>
 <<persistent_delete_user>>
 <<persistent_add_role_to_user>>
@@ -1356,6 +1424,9 @@ if __name__ == '__main__':
 #<<test_persistent_get_user>>
 #<<test_persistent_get_role>>
 #<<test_persistent_get_email>>
+<<test_persistent_get_institute>>
+<<test_persistent_get_oc>>
+<<test_persistent_get_nc>>
 #<<test_persistent_update_user>>
 #<<test_persistent_delete_user>>
 #<<test_persistent_add_role_to_user>>
@@ -1369,8 +1440,8 @@ if __name__ == '__main__':
 #<<test_persistent_get_ncs>>
 #<<test_persistent_role_exists>>
 #<<test_persistent_add_role>>
-#<<test_persistent_add_occ_role>>
-#<<test_persistent_add_ncc_role>>
+<<test_persistent_add_occ_role>>
+<<test_persistent_add_ncc_role>>
 #<<test_persistent_get_roles>>
 #<<test_persistent_institute_exists>>
 #<<test_persistent_add_institute>>

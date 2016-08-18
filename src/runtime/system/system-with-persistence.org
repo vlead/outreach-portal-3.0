@@ -6,7 +6,38 @@
 #+EXCLUDE_TAGS: boilerplate
 #+OPTIONS: ^:nil
 
+* Initialize database for tests
+  Before any test is run, the database is populated with two roles and one user
+  whose role is admin.
+#+NAME: populate_db
+#+BEGIN_SRC python
+def populate_db():
+    admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
+    guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+    noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
+    reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+    admin_role.save()
+    guest_role.save()
+    reviewer_role.save()
+    noc_role.save()
 
+    admin_role = Role.get_by_id(1)
+    guest_role = Role.get_by_id(2)
+    reviewer_role = Role.get_by_id(3)
+    noc_role = Role.get_by_id(4)
+    
+    admin_name = Name(name=Config.admin_name)
+    admin_email = Email(email=Config.admin_email)
+    admin_name.save()
+    admin_email.save()
+    user = User(name=admin_name,
+                            email=admin_email,
+                            roles=[admin_role, guest_role])
+    user.save()
+
+    admin_user = User.get_by_id(1)
+
+#+END_SRC
 * Test Constructor
 #+NAME: test_persistent_system_constructor
 #+BEGIN_SRC python
@@ -156,30 +187,6 @@ class TestAddUser(TestCase):
     TESTING = True
     persistent_delegate = None
 
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest])
-        self.admin_user.save()
-        return User.get_all()
-
     def create_app(self):
         app = create_app(config)
         return app
@@ -188,8 +195,7 @@ class TestAddUser(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         db.session.remove()
@@ -307,31 +313,6 @@ class TestAddUser(TestCase):
 #+BEGIN_SRC python
 class TestDeleteUser(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None,
-                                  centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest],
-                          user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -341,8 +322,7 @@ class TestDeleteUser(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -488,30 +468,6 @@ class TestDeleteUser(TestCase):
 class TestUpdateUser(TestCase):
     TESTING = True
 
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
-
     def create_app(self):
         app = create_app(config)
         return app
@@ -520,8 +476,7 @@ class TestUpdateUser(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -659,29 +614,6 @@ class TestUpdateUser(TestCase):
 #+BEGIN_SRC python
 class TestAddRole(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -691,8 +623,7 @@ class TestAddRole(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -713,29 +644,6 @@ class TestAddRole(TestCase):
 #+BEGIN_SRC python
 class Testlogin(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -745,8 +653,7 @@ class Testlogin(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -769,30 +676,6 @@ class Testlogin(TestCase):
 #+BEGIN_SRC python
 class Testlogout(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
-
     def create_app(self):
         app = create_app(config)
         return app
@@ -801,8 +684,7 @@ class Testlogout(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -823,30 +705,6 @@ class Testlogout(TestCase):
 #+BEGIN_SRC python
 class TestCreateInstitute(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None,
-                                  centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest])
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -856,8 +714,7 @@ class TestCreateInstitute(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -879,30 +736,6 @@ class TestCreateInstitute(TestCase):
 #+BEGIN_SRC python
 class TestCreateOC(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None,
-                                  centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -912,8 +745,7 @@ class TestCreateOC(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -925,12 +757,12 @@ class TestCreateOC(TestCase):
         print "test_create_oc"
         login_user=User.get_by_id(1)
         login_role = Role.get_by_id(1)
-        sess = System.do("login",user=login_user,role=login_role)
-        inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute",institute = inst,session=sess)
-        oc = System.do("create_oc",institute=institute,spokes=[],
-                        session=sess, oc_target = None)
-#        self.assertEqual(OC.get_by_id(1).get("name"), Institute.get_by_id(1).get("name"))
+        session = System.do("login", user=login_user, role=login_role)
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute = System.do("create_institute", institute=institute, session=session)
+        oc = System.do("create_oc", institute=institute, session=session)
+        self.assertEqual(OC.get_by_id(1).get("institute").get("name"), 
+                             Institute.get_by_id(1).get("name"))
         self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 
 #+END_SRC
@@ -940,29 +772,6 @@ class TestCreateOC(TestCase):
 #+BEGIN_SRC python
 class TestCreateNC(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -972,8 +781,7 @@ class TestCreateNC(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -984,15 +792,17 @@ class TestCreateNC(TestCase):
         print "test_create_nc"
         login_user= User.get_by_id(1)
         login_role = Role.get_by_id(1)
-        sess = System.do("login",user=login_user,role=login_role)
-        inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute", institute = inst, session=sess)
-        oc = System.do("create_oc",institute=institute,spokes=[],
-                        session=sess, oc_target = None)
-        nc = System.do("create_nc",institute=institute,hub=oc,session=sess,
-                        nc_target = None, workshops = [])
-#        self.assertEqual(NC.get_by_id(1).get('institute'),institute)
-#        self.assertEqual(OC.get_by_id(1).get('spokes')[0],nc)
+        session = System.do("login", user=login_user, role=login_role)
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute = System.do("create_institute", institute = institute,
+                               session=session)
+        oc = System.do("create_oc", institute=institute, session=session)
+        nc = System.do("create_nc", institute=institute, hub=oc,
+                        session=session)
+        self.assertEqual(NC.get_by_id(1).get('institute').get("name"),
+                             institute.get("name"))
+        self.assertEqual(OC.get_by_id(1).get('spokes')[0].get("institute").get("name"),
+                             nc.get("institute").get("name"))
         self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 #+END_SRC
 * Test update_institute
@@ -1000,29 +810,6 @@ class TestCreateNC(TestCase):
 #+BEGIN_SRC python
 class TestUpdateInstitute(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -1032,8 +819,7 @@ class TestUpdateInstitute(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -1061,29 +847,6 @@ class TestUpdateInstitute(TestCase):
 #+BEGIN_SRC python
 class TestCreateWorkshop(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -1093,14 +856,12 @@ class TestCreateWorkshop(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
         db.session.remove()
         db.drop_all()
-    
 
     def test_create_workshop(self):
         print "test_create_workshop"
@@ -1170,29 +931,6 @@ class TestCreateWorkshop(TestCase):
 #+BEGIN_SRC python
 class TestCancelWorkshop(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -1202,14 +940,12 @@ class TestCancelWorkshop(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
         db.session.remove()
         db.drop_all()
-
 
     def test_cancel_workshop(self):
         print "test_cancel_workshop"
@@ -1287,30 +1023,6 @@ class TestCancelWorkshop(TestCase):
 #+BEGIN_SRC python
 class TestRescheduleWorkshop(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], 
-                          user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -1320,8 +1032,7 @@ class TestRescheduleWorkshop(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -1410,29 +1121,6 @@ class TestRescheduleWorkshop(TestCase):
 #+BEGIN_SRC python
 class TestConductWorkshop(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -1442,8 +1130,6 @@ class TestConductWorkshop(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
 
     def tearDown(self):
         System.session_set = []
@@ -1526,29 +1212,6 @@ class TestConductWorkshop(TestCase):
 #+BEGIN_SRC python
 class TestUploadArtefact(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -1558,8 +1221,7 @@ class TestUploadArtefact(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -1645,29 +1307,6 @@ class TestUploadArtefact(TestCase):
 #+BEGIN_SRC python
 class TestApproveWorkshop(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -1677,8 +1316,7 @@ class TestApproveWorkshop(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -1783,29 +1421,6 @@ class TestApproveWorkshop(TestCase):
 #+BEGIN_SRC python
 class TestRejectWorkshop(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -1815,8 +1430,7 @@ class TestRejectWorkshop(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -1921,29 +1535,6 @@ class TestRejectWorkshop(TestCase):
 #+BEGIN_SRC python
 class TestDeleteArtefact(TestCase):
     TESTING = True
-    def initialize_role_set(self):
-        self.admin_role = Role(name="admin", centre_oc=None, centre_nc=None)
-        self.guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
-        self.noc_role = Role(name="noc", centre_oc=None, centre_nc=None)
-        self.reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
-        self.admin_role.save()
-        self.guest_role.save()
-        self.reviewer_role.save()
-        self.noc_role.save()
-        return Role.query.all()
-
-    def initialize_user_set(self):
-        admin_name = Name(name=Config.admin_name)
-        admin_email = Email(email=Config.admin_email)
-        admin_name.save()
-        admin_email.save()
-        role_admin = Role.get_by_id(1)
-        role_guest = Role.get_by_id(2)
-        self.admin_user = User(name=admin_name,
-                          email=admin_email,
-                          roles=[role_admin, role_guest], user_status="active")
-        self.admin_user.save()
-        return User.get_all()
 
     def create_app(self):
         app = create_app(config)
@@ -1953,8 +1544,7 @@ class TestDeleteArtefact(TestCase):
         db.create_all()
         System.initialize_system(PersistenceDelegate)
         self.persistent_delegate = PersistenceDelegate()
-        self.initialize_role_set()
-        self.initialize_user_set()
+        populate_db()
 
     def tearDown(self):
         System.session_set = []
@@ -2103,16 +1693,16 @@ if __name__ == '__main__':
 ** tests
 #+BEGIN_SRC python :tangle test_persistent_system.py :eval no :noweb yes
 <<imports_for_tests>>
+<<populate_db>>
 #<<test_persistent_system_constructor>>
 #<<test_arity_and_types>>
 <<test_adduser>>
 #<<test_login>>
 #<<test_logout>>
 #<<test_updateuser>>
-#<<test_CreateInstitute>>
-#<<test_updateuser>>
-#<<test_CreateOC>>
-#<<test_CreateNC>>
+<<test_CreateInstitute>>
+<<test_CreateOC>>
+<<test_CreateNC>>
 #<<test_AddRole>>
 #<<test_UpdateInstitute>>
 #<<test_CreateWorkshop>>
