@@ -181,7 +181,7 @@ class TestSystemArityAndType(TestCase):
 #+END_SRC
 
 * Test AddUser
-#+NAME: test_adduser
+#+NAME: test_add_user
 #+BEGIN_SRC python
 class TestAddUser(TestCase):
     TESTING = True
@@ -316,7 +316,7 @@ class TestAddUser(TestCase):
             
 #+END_SRC
 * Test DeleteUser
-#+NAME: test_adduser
+#+NAME: test_delete_user
 #+BEGIN_SRC python
 class TestDeleteUser(TestCase):
     TESTING = True
@@ -470,7 +470,7 @@ class TestDeleteUser(TestCase):
 
 #+END_SRC
 * Test UpdateUser
-#+NAME: test_adduser
+#+NAME: test_update_user
 #+BEGIN_SRC python
 class TestUpdateUser(TestCase):
     TESTING = True
@@ -1704,7 +1704,9 @@ if __name__ == '__main__':
 <<populate_db>>
 #<<test_persistent_system_constructor>>
 #<<test_arity_and_types>>
-#<<test_adduser>>
+<<test_add_user>>
+#<<test_update_user>>
+#<<test_update_user>>
 #<<test_login>>
 #<<test_logout>>
 #<<test_updateuser>>
