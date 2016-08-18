@@ -1697,7 +1697,7 @@ if __name__ == '__main__':
 <<populate_db>>
 #<<test_persistent_system_constructor>>
 #<<test_arity_and_types>>
-<<test_adduser>>
+#<<test_adduser>>
 #<<test_login>>
 #<<test_logout>>
 #<<test_updateuser>>
