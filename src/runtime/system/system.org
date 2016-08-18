@@ -216,8 +216,8 @@ class AddUser():
     def auth_check(args):
         session = args['session']
  
-       if not (System.is_session_admin(session) or
-                System.is_session_OCC(session) or
+        if not (System.is_session_admin(session) or 
+                System.is_session_OCC(session) or 
                 System.is_session_noc(session)):
             raise AuthError("Role not Authorized to perform this action")
 

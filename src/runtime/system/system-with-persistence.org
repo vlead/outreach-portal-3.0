@@ -733,9 +733,10 @@ class TestCreateInstitute(TestCase):
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
-        inst = Institute(name="IIIT", address="Hyderabad")
-        institute = System.do("create_institute", institute=inst, session=session)
-        self.assertEqual(Institute.get_by_id(1).get('name'), 'IIIT')
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute = System.do("create_institute", institute=institute,
+                                  session=session)
+        self.assertEqual(Institute.get_by_id(1).get("name"), "IIIT")
 
 #+END_SRC
 * Test create_oc
@@ -1703,7 +1704,7 @@ if __name__ == '__main__':
 <<populate_db>>
 #<<test_persistent_system_constructor>>
 #<<test_arity_and_types>>
-<<test_adduser>>
+#<<test_adduser>>
 #<<test_login>>
 #<<test_logout>>
 #<<test_updateuser>>
