@@ -242,44 +242,6 @@ class TestAddUser(TestCase):
         user = User.get_by_id(2)
         self.assertEqual(user.get("name").get("name"),"nocuser")
 
-    def test_add_user_by_noc(self):
-        print "test_add_user_by_noc"
-        admin_user = User.get_by_id(1)
-        admin_role = Role.get_by_id(1)
-        session = Session(user=admin_user,role=admin_role)
-        System.session_set.append(session)
-
-        name = Name(name="nocuser")
-        email = Email(email="abc@gmail.com")
-
-        guest_role = Role.get_by_id(2)
-        user = User(name=name,email=email,
-                        roles= [guest_role])
-        noc_user= System.do("add_user", user=user, session=session)
-        noc_role = Role.get_by_id(4)
-        session_noc = Session(user=noc_user,role=noc_role)
-        System.session_set.append(session_noc)
-        inst = Institute(name = "NITK", address = "Surathkal")
-        institute = System.do("create_institute", institute = inst,
-                               session=session)
-        oc = System.do("create_oc", institute = institute,
-                        session = session)
-
-        name = Name(name="ocuser")
-        email = Email(email="mary@gmail.com")
-        user = User(name=name, email=email,
-                    roles=[guest_role])
-        oc_user= System.do("add_user", user=user, session=session_noc)
-
-        oc_role = filter(lambda x:x.get('name') == "OCC" and
-                         x.get('centre_oc').get("institute").get("name") ==
-                         institute.get("name"), Role.get_all())
-        if oc_role:
-            oc_user.append_role(oc_role[0])
-
-        user = User.get_by_id(3)
-        self.assertEqual(user.get("name").get("name"),"ocuser")
-
     def test_add_user_raises_arity_error(self):
         print "test_add_user_raises_arity_error"
 
