@@ -328,11 +328,9 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def institute_exists(self, institute):
         institute_name = institute.get("name")
-        try:
-            institute = Institute.apply_filters(name=institute_name)[0]
-            if institute:
-                return True
-        except NotFoundError as e:
+        if institute_name:
+            return institute == self.get_institute(name=institute_name)
+        else:
             return False
 
 #+END_SRC
@@ -1117,6 +1115,31 @@ class TestPersistentDelegate(TestCase):
 #+END_SRC
 
 
+*** Get Institute
+    This function returns an institute if present in the database.  If the institute is
+    not present, =None= type is returned.
+#+NAME: persistent_get_institute
+#+BEGIN_SRC python
+    def get_institute(self, **kwargs):
+        return self.get_object(Institute, **kwargs)
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_get_institute
+#+BEGIN_SRC python
+    def test_get_institute(self):
+         print "test_get_institute"
+         institute = Institute(name="IIIT", address="Hyderabad")
+         institute.save()
+         institute_obj = self.persistent_delegate.get_institute(name=
+                                                institute.get("name"))
+         self.assertEqual(institute_obj.get("name"),
+                              institute.get("name"))
+
+#+END_SRC
+
+
 *** Get Role
     This function returns either admin or user role from the roles in database
 #+NAME: persistent_get_role
@@ -1215,6 +1238,7 @@ if __name__ == '__main__':
 <<persistent_get_user>>
 <<persistent_get_email>>
 <<persistent_get_name>>
+<<persistent_get_institute>>
 <<persistent_update_user>>
 <<persistent_delete_user>>
 <<persistent_add_role_to_user>>
@@ -1260,6 +1284,7 @@ if __name__ == '__main__':
 #<<test_persistent_get_user>>
 #<<test_persistent_get_role>>
 #<<test_persistent_get_email>>
+<<test_persistent_get_institute>>
 #<<test_persistent_update_user>>
 #<<test_persistent_delete_user>>
 #<<test_persistent_add_role_to_user>>
