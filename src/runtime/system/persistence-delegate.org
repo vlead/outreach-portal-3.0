@@ -28,6 +28,24 @@ class PersistenceDelegate():
 #+END_SRC
 
 
+*** get_role_set
+#+NAME: persistent_get_role_set
+#+begin_src python
+    def get_role_set(self):
+        return Role.get_all()
+
+#+end_src
+
+
+*** get_user_set
+#+NAME: persistent_get_user_set
+#+begin_src python
+    def get_user_set(self):
+        return User.get_all()
+
+#+end_src
+
+
 *** Tests
 #+NAME: test_class_persistent_delegate
 #+BEGIN_SRC python
@@ -51,6 +69,7 @@ class TestPersistentDelegate(TestCase):
 
 
 ** Other functions
+
    Other functions that help =System= perform the operations. 
    
 ***  Check if =user= already exists
@@ -58,8 +77,8 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_user_exists
 #+BEGIN_SRC python
     def user_exists(self, user):
-        if user in User.get_all():
-            return True
+        if self.email_exists(user.get("email")):
+            return user == self.get_user(email=user.get("email"))
         else:
             return False
 #+END_SRC
@@ -68,9 +87,63 @@ class TestPersistentDelegate(TestCase):
 #+NAME: test_persistent_user_exists
 #+BEGIN_SRC python
     def test_user_exists(self):
-         print "test_user_exists"
-         user = User.get_by_id(1)
-         self.assertEqual(self.persistent_delegate.user_exists(user), True)
+        print "test_user_exists"
+        name = Name(name="some user")
+        email = Email(email="tt@kk.com")
+        role = Role(name="guest", centre_nc=None, centre_oc=None)
+        role.save()
+        guest_role = Role.get_by_id(1)
+        user = User(name=name, email=email,
+                        roles=[guest_role])
+
+        user = self.persistent_delegate.add_user(user)
+        self.assertEqual(self.persistent_delegate.user_exists(user), True)
+        
+#+END_SRC
+
+
+***  Check if =name= already exists
+    This function checks if a name is already in the database of the =System=.
+#+NAME: persistent_name_exists
+#+BEGIN_SRC python
+    def name_exists(self, name):
+        return name == self.get_name(name=name.get("name"))
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_name_exists
+#+BEGIN_SRC python
+    def test_name_exists(self):
+        print "test_name_exists"
+        name = Name(name="some user")
+        name.save()
+        self.assertEqual(self.persistent_delegate.name_exists(name), True)
+        name = Name(name="Temp user")
+        self.assertEqual(self.persistent_delegate.name_exists(name), False)
+
+#+END_SRC
+
+
+***  Check if =email= already exists
+    This function checks if email is already in the database of the =System=.
+#+NAME: persistent_email_exists
+#+BEGIN_SRC python
+    def email_exists(self, email):
+        return email == self.get_email(email=email.get("email"))
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_email_exists
+#+BEGIN_SRC python
+    def test_email_exists(self):
+         print "test_email_exists"
+         email = Email(email="someuser@gnu.org")
+         email.save()
+         self.assertEqual(self.persistent_delegate.email_exists(email), True)
+         email = Email(email="abc@gnu.org")
+         self.assertEqual(self.persistent_delegate.email_exists(email), False)
 
 #+END_SRC
 
@@ -80,26 +153,35 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_add_user
 #+BEGIN_SRC python
     def add_user(self, user):
-        user.save()
-        return user
-
+        name = user.get("name")
+        email = user.get("email")
+        try:
+            if not self.name_exists(name):
+                name.save()
+            email.save()
+            user.save()
+            return self.get_user(email=email)
+        except Exception as e:
+            return None
 #+END_SRC
 
 **** Tests
 #+NAME: test_persistent_add_user
 #+BEGIN_SRC python
     def test_add_user(self):
-         print "test_add_user"
-         name = Name(name="some user")
-         name.save()
-         email = Email(email="tt@kk.com")
-         email.save()
-         user = User(name=name,
-                     email=email,
-                     roles=[Role.get_by_id(1)], user_status="active")
-         user = self.persistent_delegate.add_user(user)
-         self.assertEqual(self.persistent_delegate.user_exists(user), True)
+        print "test_add_user"
+        name = Name(name="some user")
+        email = Email(email="tt@kk.com")
+        role = Role(name="guest", centre_nc=None, centre_oc=None)
+        role.save()
+        guest_role = Role.get_by_id(1)
+        user = User(name=name, email=email,
+                        roles=[guest_role])
 
+        user = self.persistent_delegate.add_user(user)
+        self.assertEqual(self.persistent_delegate.user_exists(user), True)
+
+    
 #+END_SRC
 
 
@@ -1049,8 +1131,10 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_get_name(self):
          print "test_get_name"
-         name_obj = self.persistent_delegate.get_name(name=Config.admin_name)
-         self.assertEqual(name_obj.get("name"),  Config.admin_name)
+         name = Name(name="dummy name")
+         name.save()
+         name_obj = self.persistent_delegate.get_name(name=name.get("name"))
+         self.assertEqual(name_obj.get("name"),  name.get("name"))
 
 #+END_SRC
 
@@ -1262,6 +1346,7 @@ config = {
          }
 #+end_src
 
+
 *** Running tests
 #+NAME: run_test_cases
 #+BEGIN_SRC python
@@ -1279,7 +1364,11 @@ if __name__ == '__main__':
 <<imports_for_persistent_delegates>>
 <<class_persistence_delegate>>
 <<persistent_get_object>>
+<<persistent_get_role_set>>
+<<persistent_get_user_set>>
 <<persistent_user_exists>>
+<<persistent_email_exists>>
+<<persistent_name_exists>>
 <<persistent_add_user>>
 <<persistent_get_user>>
 <<persistent_get_email>>
@@ -1322,13 +1411,16 @@ if __name__ == '__main__':
 <<persistent_get_artefacts_of_a_workshop>>
 <<persistent_get_active_users>>
 #+end_src
+
 ** tests
 #+BEGIN_SRC python :tangle test_persistent_delegates.py :eval no :noweb yes
 <<imports_for_tests_persistence>>
 <<test_class_persistent_delegate>>
-#<<test_persistent_user_exists>>
-#<<test_persistent_get_name>>
-#<<test_persistent_add_user>>
+<<test_persistent_user_exists>>
+<<test_persistent_email_exists>>
+<<test_persistent_name_exists>>
+<<test_persistent_get_name>>
+<<test_persistent_add_user>>
 #<<test_persistent_get_user>>
 #<<test_persistent_get_role>>
 #<<test_persistent_get_email>>
@@ -1340,8 +1432,8 @@ if __name__ == '__main__':
 #<<test_persistent_add_role_to_user>>
 #<<test_persistent_get_users>>
 #<<test_persistent_get_active_users>>
-<<test_persistent_add_oc>>
-<<test_persistent_oc_exists>>
+#<<test_persistent_add_oc>>
+#<<test_persistent_oc_exists>>
 #<<test_persistent_add_nc>>
 #<<test_persistent_nc_exists>>
 #<<test_persistent_get_ocs>>
@@ -1351,13 +1443,12 @@ if __name__ == '__main__':
 <<test_persistent_add_occ_role>>
 <<test_persistent_add_ncc_role>>
 #<<test_persistent_get_roles>>
-<<test_persistent_institute_exists>>
-<<test_persistent_add_institute>>
+#<<test_persistent_institute_exists>>
+#<<test_persistent_add_institute>>
 #<<test_persistent_update_institute>>
 #<<test_persistent_get_institutes>>
 #<<test_persistent_add_workshop>>
 #<<test_persistent_workshop_exists>>
-
 #<<test_persistent_cancel_workshop>>
 #<<test_persistent_reschedule_workshop>>
 #<<test_persistent_conduct_workshop>>
