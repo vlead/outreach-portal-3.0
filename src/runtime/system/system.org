@@ -493,13 +493,12 @@ class logout():
 #+NAME: class_CreateInstitute
 #+begin_src python
 class CreateInstitute():
-    arg_types = {"institute":is_institute,
-                 "session":is_session}
+    arg_types = {"institute":is_institute, "session":is_session}
     arity_and_type_checks_needed = True
 
     @staticmethod
     def auth_check(args):
-        session = args['session']
+        session = args["session"]
         if System.is_session_guest(session) or \
            System.is_session_reviewer(session):
             raise AuthError("Role not Authorized to perform this action")
@@ -507,13 +506,13 @@ class CreateInstitute():
     @staticmethod
     def state_check(args):
         session = args["session"]
-        institute = args['institute']
+        institute = args["institute"]
         if not (session in System.session_set):
             raise StateError("user not in session %s"
-                              % session.get('user').get('name').get('name'))
+                              % session.get("user").get("name").get("name"))
         elif System.delegate.institute_exists(institute):
                 raise StateError("institute %s already in System"
-                                  % inst.get('name'))
+                                  % institute.get("name"))
 
     @staticmethod
     def action(args):
@@ -527,13 +526,12 @@ class CreateInstitute():
 #+NAME: class_CreateOC
 #+begin_src python
 class CreateOC():
-    arg_types = {"institute":is_institute, "spokes":are_spokes_or_empty_list,
-                  "session":is_session, "oc_targets":are_oc_targets_or_empty_list}
+    arg_types = {"institute":is_institute, "session":is_session}
     arity_and_type_checks_needed = True
 
     @staticmethod
     def auth_check(args):
-        session = args['session']
+        session = args["session"]
         if not (System.is_session_admin(session) or
                 System.is_session_noc(session)):
             raise AuthError("Role not Authorized to perform this action")
@@ -541,30 +539,24 @@ class CreateOC():
     @staticmethod
     def state_check(args):
         session = args["session"]
-        institute = args['institute']
+        institute = args["institute"]
 
         if not (session in System.session_set):
             raise StateError("user not in session %s"
-                              % session.get('user').get('name').get('name'))
+                              % session.get("user").get("name").get("name"))
         if not System.delegate.institute_exists(institute):
             raise StateError("institute %s not in System"
-                             % institute.get('name'))
+                             % institute.get("name"))
+
         for oc in System.delegate.get_ocs():
-            if oc.get('institute') == institute:
-                raise StateError("institute %s already has an oc associated with it"
-                                     %oc)
-        for nc in System.delegate.get_ncs():
-            if nc.get('institute') == institute:
-                raise StateError("institute %s already has an nc associated with it"
-                                     %nc)
+            if oc.get("institute") == institute:
+                raise StateError("institute %s already has an oc"
+                                   " associated with it" % oc)
 
     @staticmethod
     def action(args):
         institute = args["institute"]
-        spokes = args["spokes"]
-        oc_targets = args["oc_targets"]
-        new_oc = System.delegate.add_oc(institute, spokes, oc_targets)
-        new_role = System.delegate.add_occ_role("OCC", new_oc, None)
+        new_oc = System.delegate.add_oc(institute)
         return new_oc
 
 #+end_src
@@ -573,18 +565,14 @@ class CreateOC():
 #+NAME: class_CreateNC
 #+begin_src python
 class CreateNC():
-    arg_types = {"institute":is_institute,"hub":is_oc,"session":is_session,
-                  "nc_targets" : are_nc_targets_or_empty_list, 
-                  "workshops": are_workshops_or_empty_list}
+    arg_types = {"institute":is_institute,"hub":is_oc,"session":is_session}
     arity_and_type_checks_needed = True
 
     @staticmethod
     def auth_check(args):
         session = args['session']
         institute = args['institute']
-        oc = args['hub']
-        nc_targets = args['nc_targets']
-        workshops = args["workshops"]
+        oc = args["hub"]
         if not (System.is_session_admin(session) or
                 System.is_session_OCC(session)):
             raise AuthError("Role not Authorized to perform this action")
@@ -595,10 +583,9 @@ class CreateNC():
     @staticmethod
     def state_check(args):
         session = args["session"]
-        institute = args['institute']
-        oc = args['hub']
-        nc_targets = args['nc_targets']
-        workshops = args["workshops"]
+        institute = args["institute"]
+        oc = args["hub"]
+
         if not (session in System.session_set):
             raise StateError("user not in session %s"
                               % session.get('user').get('name').get('name'))
@@ -606,22 +593,15 @@ class CreateNC():
             raise StateError("institute %s not in System"
                              % institute.get('name'))
         for nc in System.delegate.get_ncs():
-            if nc.get('institute') == institute:
-                raise StateError("institute %s already has an nc associated with it" %nc)
-        for oc1 in System.delegate.get_ocs():
-            if oc1.get('institute') == institute:
-                if oc != oc1:
-                    raise StateError("institute %s already has an oc associated with it,the new nc's hub should be same" %oc1)
+            if nc.get("institute") == institute:
+                raise StateError("institute %s already has an nc" 
+                                     " associated with it" % nc)
 
     @staticmethod
     def action(args):
         institute = args["institute"]
-        oc = args['hub']
-        nc_targets = args['nc_targets']
-        workshops = args["workshops"]
-        new_nc = System.delegate.add_nc(institute, oc, nc_targets, workshops)
-        new_role = System.delegate.add_ncc_role("NCC", None, new_nc)
-#        oc.append_spoke(new_nc)
+        oc = args["hub"]
+        new_nc = System.delegate.add_nc(institute, oc)
         return new_nc
 
 #+end_src

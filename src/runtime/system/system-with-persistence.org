@@ -949,8 +949,7 @@ class TestCreateOC(TestCase):
         session = System.do("login", user=login_user, role=login_role)
         institute = Institute(name="IIIT", address="Hyderabad")
         institute = System.do("create_institute", institute=institute, session=session)
-        oc = System.do("create_oc", institute=institute, spokes=[],
-                        session=session, oc_targets=[])
+        oc = System.do("create_oc", institute=institute, session=session)
         self.assertEqual(OC.get_by_id(1).get("institute").get("name"), 
                              Institute.get_by_id(1).get("name"))
         self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
@@ -1006,14 +1005,13 @@ class TestCreateNC(TestCase):
         print "test_create_nc"
         login_user= User.get_by_id(1)
         login_role = Role.get_by_id(1)
-        session = System.do("login",user=login_user,role=login_role)
-        institute = Institute(name="IIIT",address="Hyderabad")
+        session = System.do("login", user=login_user, role=login_role)
+        institute = Institute(name="IIIT", address="Hyderabad")
         institute = System.do("create_institute", institute = institute,
                                session=session)
-        oc = System.do("create_oc",institute=institute,spokes=[],
-                        session=session, oc_targets = [])
+        oc = System.do("create_oc", institute=institute, session=session)
         nc = System.do("create_nc", institute=institute, hub=oc,
-                        session=session, nc_targets=[], workshops = [])
+                        session=session)
         self.assertEqual(NC.get_by_id(1).get('institute').get("name"),
                              institute.get("name"))
         self.assertEqual(OC.get_by_id(1).get('spokes')[0].get("institute").get("name"),

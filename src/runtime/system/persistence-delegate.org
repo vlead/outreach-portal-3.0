@@ -440,10 +440,8 @@ class TestPersistentDelegate(TestCase):
     def test_oc_exists(self):
          print "test_oc_exists"
          institute = Institute(name='IIIT', address='Hyderabad')
-         spokes = []
-         oc_targets = []
-         oc = self.persistent_delegate.add_oc(institute, spokes,
-                                               oc_targets)
+         institute = self.persistent_delegate.add_institute(institute)
+         oc = self.persistent_delegate.add_oc(institute)
          self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 
 #+END_SRC
@@ -453,15 +451,12 @@ class TestPersistentDelegate(TestCase):
     This function adds an outreach centre to the oc-set maintained by the system.
 #+NAME: persistent_add_oc
 #+BEGIN_SRC python
-    def add_oc(self, institute, spokes, oc_targets):
-        institute.save()
-        for spoke in spokes:
-            spoke.save()
-        for oc_target in oc_targets:
-            oc_target.save()
-        self.new_oc = OC(institute=institute, spokes=spokes, oc_targets=oc_targets)
-        self.new_oc.save()
-        return self.new_oc
+    def add_oc(self, institute):
+        new_oc = OC(institute=institute, spokes=[], oc_targets=[])
+        new_oc.save()
+        new_role = self.add_occ_role("OCC", new_oc, None)
+        new_role.save()
+        return new_oc
 #+END_SRC
 
 **** Tests
@@ -470,9 +465,8 @@ class TestPersistentDelegate(TestCase):
     def test_add_oc(self):
          print "test_persistent_add_oc"
          institute = Institute(name='IIIT',address='Hyderabad')
-         spokes = []
-         oc_targets = []
-         oc = self.persistent_delegate.add_oc(institute, spokes, oc_targets)
+         institute = self.persistent_delegate.add_institute(institute)
+         oc = self.persistent_delegate.add_oc(institute)
          self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 #+END_SRC
 
@@ -481,12 +475,12 @@ class TestPersistentDelegate(TestCase):
     This function adds an outreach centre to the oc-set maintained by the system.
 #+NAME: persistent_add_nc
 #+BEGIN_SRC python
-    def add_nc(self, institute, oc, nc_targets, workshops):
-        self.new_nc = NC(institute=institute, hub=oc, nc_targets=nc_targets,
-                         workshops=workshops)
-        self.new_nc.save()
-        oc.append_spoke(self.new_nc)
-        return self.new_nc
+    def add_nc(self, institute, oc):
+        new_nc = NC(institute=institute, hub=oc, nc_targets=[], workshops=[])
+        new_nc.save()
+        new_role = self.add_ncc_role("NCC", None, new_nc)
+        new_role.save()
+        return new_nc
 #+END_SRC
 
 **** Tests
@@ -494,14 +488,10 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_add_nc(self):
          print "test_persistent_add_nc"
-         institute = Institute(name='IIIT',address='Hyderabad')
-         spokes = []
-         oc_targets = []
-         oc = self.persistent_delegate.add_oc(institute, spokes, oc_targets)
-         nc_targets = []
-         workshops = []
-         nc = self.persistent_delegate.add_nc(institute, oc, nc_targets,
-                                                workshops)
+         institute = Institute(name="IIIT", address="Hyderabad")
+         institute = self.persistent_delegate.add_institute(institute)
+         oc = self.persistent_delegate.add_oc(institute)
+         nc = self.persistent_delegate.add_nc(institute, oc)
          self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 
 #+END_SRC
@@ -524,8 +514,6 @@ class TestPersistentDelegate(TestCase):
          print "test_get_ocs"
          ins = Institute(name='IIIT',address='Hyderabad')
          ins.save()
-         spokes=[]
-         oc_target = None
          oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
 
          self.assertEqual(len(self.persistent_delegate.get_ocs()), 1)
@@ -550,12 +538,8 @@ class TestPersistentDelegate(TestCase):
     def test_nc_exists(self):
          print "test_persistent_nc_exists"
          institute = Institute(name='IIIT',address='Hyderabad')
-         spokes=[]
-         oc_targets = []
-         oc = self.persistent_delegate.add_oc(institute, spokes, oc_targets)
-         nc_targets = []
-         workshops=[]
-         nc = self.persistent_delegate.add_nc(institute, oc, nc_targets, workshops)
+         oc = self.persistent_delegate.add_oc(institute)
+         nc = self.persistent_delegate.add_nc(institute, oc)
          self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 #+END_SRC
 
@@ -1298,8 +1282,8 @@ if __name__ == '__main__':
 #<<test_persistent_get_ncs>>
 #<<test_persistent_role_exists>>
 #<<test_persistent_add_role>>
-#<<test_persistent_add_occ_role>>
-#<<test_persistent_add_ncc_role>>
+<<test_persistent_add_occ_role>>
+<<test_persistent_add_ncc_role>>
 #<<test_persistent_get_roles>>
 <<test_persistent_institute_exists>>
 <<test_persistent_add_institute>>
