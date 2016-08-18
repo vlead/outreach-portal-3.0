@@ -526,8 +526,9 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_nc_exists
 #+BEGIN_SRC python
     def nc_exists(self, nc):
-        if nc in NC.get_all():
-            return True
+        institute = nc.get("institute")
+        if institute:
+            return nc == self.get_nc(institute=institute)
         else:
             return False
 #+END_SRC
