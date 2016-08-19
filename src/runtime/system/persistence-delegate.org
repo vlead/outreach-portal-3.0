@@ -81,6 +81,7 @@ class TestPersistentDelegate(TestCase):
             return user == self.get_user(email=user.get("email"))
         else:
             return False
+
 #+END_SRC
 
 **** Tests
@@ -163,6 +164,7 @@ class TestPersistentDelegate(TestCase):
             return self.get_user(email=email)
         except Exception as e:
             return None
+
 #+END_SRC
 
 **** Tests
@@ -180,7 +182,6 @@ class TestPersistentDelegate(TestCase):
 
         user = self.persistent_delegate.add_user(user)
         self.assertEqual(self.persistent_delegate.user_exists(user), True)
-
     
 #+END_SRC
 

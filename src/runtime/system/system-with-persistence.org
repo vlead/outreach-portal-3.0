@@ -181,7 +181,7 @@ class TestSystemArityAndType(TestCase):
 #+END_SRC
 
 * Test AddUser
-#+NAME: test_adduser
+#+NAME: test_add_user
 #+BEGIN_SRC python
 class TestAddUser(TestCase):
     TESTING = True
@@ -205,13 +205,14 @@ class TestAddUser(TestCase):
     def test_add_user_by_admin(self):
         print "test_add_user_by_admin"
         admin_user = User.get_by_id(1)
-        session = Session(user=admin_user, role=Role.admin)
+        admin_role = Role.get_by_id(1)
+        session = Session(user=admin_user, role=admin_role)
         System.session_set.append(session)
         name = Name(name="me")
         email = Email(email="abc@gmail.com")
-        role = Role(name="guest", centre_nc=None, centre_oc=None)
+        guest_role = Role.get_by_id(2)
         user = User(name=name, email=email,
-                        roles= [role],
+                        roles= [guest_role],
                         )
 
         user = System.do("add_user", user=user, session=session)
@@ -222,60 +223,24 @@ class TestAddUser(TestCase):
     def test_add_user_noc_by_admin(self):
         print "test_add_user_by_noc"
         admin_user = User.get_by_id(1)
-        session = Session(user=admin_user,role=Role.admin)
+        admin_role = Role.get_by_id(1)
+        session = Session(user=admin_user,role=admin_role)
         System.session_set.append(session)
 
         name = Name(name="nocuser")
         email = Email(email="abc@gmail.com")
-        role = Role(name="noc", centre_nc=None, centre_oc=None)
+
+        noc_role = Role.get_by_id(4)
         user = User(name=name, email=email, \
-                        roles= [role])
+                        roles=[noc_role])
 
         noc_user=System.do("add_user", user=user, session=session)
-
-        session_noc = Session(user=noc_user, role=Role.noc)
+        session_noc = Session(user=noc_user, role=noc_role)
 
         System.session_set.append(session_noc)
 
         user = User.get_by_id(2)
         self.assertEqual(user.get("name").get("name"),"nocuser")
-
-    def test_add_user_by_noc(self):
-        print "test_add_user_by_noc"
-        admin_user = User.get_by_id(1)
-        session = Session(user=admin_user,role=Role.admin)
-        System.session_set.append(session)
-
-        name = Name(name="nocuser")
-        email = Email(email="abc@gmail.com")
-        role = Role(name="guest", centre_nc=None, centre_oc=None)
-        user = User(name=name,email=email,
-                        roles= [role])
-        noc_user= System.do("add_user", user=user, session=session)
-        session_noc = Session(user=noc_user,role=Role.get_by_id(4))
-        System.session_set.append(session_noc)
-        inst = Institute(name = "NITK", address = "Surathkal")
-        institute = System.do("create_institute", institute = inst,
-                               session=session)
-        oc = System.do("create_oc", institute = institute,
-                        session = session,
-                        spokes = [], oc_targets = [])
-
-        name = Name(name="ocuser")
-        email = Email(email="mary@gmail.com")
-        role = Role(name="guest", centre_nc=None, centre_oc=None)
-        user = User(name=name, email=email,
-                    roles=[role])
-        oc_user= System.do("add_user", user=user, session=session_noc)
-
-        oc_role = filter(lambda x:x.get('name') == "OCC" and
-                         x.get('centre_oc').get("institute").get("name") ==
-                         institute.get("name"), Role.get_all())
-        if oc_role:
-            oc_user.append_role(oc_role[0])
-
-        user = User.get_by_id(3)
-        self.assertEqual(user.get("name").get("name"),"ocuser")
 
     def test_add_user_raises_arity_error(self):
         print "test_add_user_raises_arity_error"
@@ -286,8 +251,9 @@ class TestAddUser(TestCase):
 
         name = Name(name="nocuser")
         email = Email(email="abc@gmail.com")
-        role = Role(name="guest", centre_nc=None, centre_oc=None)
-        user = User(name=name, email=email, roles= [role])
+
+        guest_role = Role.get_by_id(2)
+        user = User(name=name, email=email, roles= [guest_role])
 
         with self.assertRaises(ArityError):
             System.do("add_user", user=user)
@@ -296,20 +262,23 @@ class TestAddUser(TestCase):
     def test_add_user_raises_type_check_error(self):
         print "test_add_user_raises_type_check_error"
         admin_user = User.get_by_id(1)
-        session = Session(user=admin_user, role=Role.admin)
+
+        admin_role = Role.get_by_id(1)
+        session = Session(user=admin_user, role=admin_role)
         System.session_set.append(session)
 
         name = Name(name="nocuser")
         email = Email(email="abc@gmail.com")
-        role = Role(name="guest", centre_nc=None, centre_oc=None)
+
+        guest_role = Role.get_by_id(2)
         user = User(name=name, email=email, roles=[guest_role])
 
         with self.assertRaises(TypeError):
             System.do("add_user", user=session, session=session)
-
+            
 #+END_SRC
 * Test DeleteUser
-#+NAME: test_adduser
+#+NAME: test_delete_user
 #+BEGIN_SRC python
 class TestDeleteUser(TestCase):
     TESTING = True
@@ -463,7 +432,7 @@ class TestDeleteUser(TestCase):
 
 #+END_SRC
 * Test UpdateUser
-#+NAME: test_adduser
+#+NAME: test_update_user
 #+BEGIN_SRC python
 class TestUpdateUser(TestCase):
     TESTING = True
@@ -1697,7 +1666,9 @@ if __name__ == '__main__':
 <<populate_db>>
 #<<test_persistent_system_constructor>>
 #<<test_arity_and_types>>
-#<<test_adduser>>
+<<test_add_user>>
+#<<test_update_user>>
+#<<test_update_user>>
 #<<test_login>>
 #<<test_logout>>
 #<<test_updateuser>>
