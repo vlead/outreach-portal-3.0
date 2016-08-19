@@ -209,23 +209,21 @@ class System ():
 #+NAME: class_adduser
 #+begin_src python
 class AddUser():
-    arg_types = {"user": is_user,  "session":is_session}
-    arity_and_type_checks_needed = True 
-  
+    arg_types = {"user": is_user, "session": is_session}
+    arity_and_type_checks_needed = True
+
     @staticmethod
     def auth_check(args):
         session = args['session']
- 
-        if not (System.is_session_admin(session) or 
-                System.is_session_OCC(session) or 
-                System.is_session_noc(session)):
+        if not (System.is_session_admin(session) or \
+                    System.is_session_OCC(session) or \
+                    System.is_session_noc(session)):
             raise AuthError("Role not Authorized to perform this action")
 
     @staticmethod
     def state_check(args):
         session = args["session"]
         user = args["user"]
-
         if not System.session_exists(session):
             raise StateError("session %s does not exist in System"
                                 % session.to_client())
