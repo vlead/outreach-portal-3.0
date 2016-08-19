@@ -422,14 +422,14 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_institute_exists(self):
          print "test_institute_exists"
-         institute = Institute(name='IIIT', address='Hyderabad')
+         institute = Institute(name="IIIT", address="Hyderabad")
          institute = self.persistent_delegate.add_institute(institute)
          self.assertEqual(self.persistent_delegate.institute_exists(institute),
                            True)
 
     def test_institute_does_not_exists(self):
          print "test_institute_does_not_exists"
-         institute = Institute(name='IIIT', address='Hyderabad')
+         institute = Institute(name="IIIT", address="Hyderabad")
          self.assertEqual(self.persistent_delegate.institute_exists(institute),
                           False)
 
@@ -451,7 +451,7 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_add_institute(self):
          print "test_add_institute"
-         institute = Institute(name='IIIT', address='Hyderabad')
+         institute = Institute(name="IIIT", address='Hyderabad')
          institute = self.persistent_delegate.add_institute(institute)
          self.assertEqual(self.persistent_delegate.institute_exists(institute),
                           True)
@@ -521,7 +521,7 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_oc_exists(self):
          print "test_oc_exists"
-         institute = Institute(name='IIIT', address='Hyderabad')
+         institute = Institute(name="IIIT", address="Hyderabad")
          institute = self.persistent_delegate.add_institute(institute)
          oc = self.persistent_delegate.add_oc(institute)
          self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
@@ -546,7 +546,7 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_add_oc(self):
          print "test_persistent_add_oc"
-         institute = Institute(name='IIIT',address='Hyderabad')
+         institute = Institute(name="IIIT",address="Hyderabad")
          institute = self.persistent_delegate.add_institute(institute)
          oc = self.persistent_delegate.add_oc(institute)
          self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
@@ -620,8 +620,8 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_nc_exists(self):
          print "test_persistent_nc_exists"
-         institute = Institute(name='IIIT',address='Hyderabad')
-         institute.save()
+         institute = Institute(name="IIIT", address="Hyderabad")
+         institute = self.persistent_delegate.add_institute(institute)
          oc = self.persistent_delegate.add_oc(institute)
          nc = self.persistent_delegate.add_nc(institute, oc)
          self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
