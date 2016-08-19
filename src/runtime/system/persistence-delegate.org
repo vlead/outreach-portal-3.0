@@ -621,6 +621,7 @@ class TestPersistentDelegate(TestCase):
     def test_nc_exists(self):
          print "test_persistent_nc_exists"
          institute = Institute(name='IIIT',address='Hyderabad')
+         institute.save()
          oc = self.persistent_delegate.add_oc(institute)
          nc = self.persistent_delegate.add_nc(institute, oc)
          self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
@@ -1433,9 +1434,9 @@ if __name__ == '__main__':
 #<<test_persistent_get_users>>
 #<<test_persistent_get_active_users>>
 #<<test_persistent_add_oc>>
-#<<test_persistent_oc_exists>>
+<<test_persistent_oc_exists>>
 #<<test_persistent_add_nc>>
-#<<test_persistent_nc_exists>>
+<<test_persistent_nc_exists>>
 #<<test_persistent_get_ocs>>
 #<<test_persistent_get_ncs>>
 #<<test_persistent_role_exists>>
@@ -1443,7 +1444,7 @@ if __name__ == '__main__':
 <<test_persistent_add_occ_role>>
 <<test_persistent_add_ncc_role>>
 #<<test_persistent_get_roles>>
-#<<test_persistent_institute_exists>>
+<<test_persistent_institute_exists>>
 #<<test_persistent_add_institute>>
 #<<test_persistent_update_institute>>
 #<<test_persistent_get_institutes>>
