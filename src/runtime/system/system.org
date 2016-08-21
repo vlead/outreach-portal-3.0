@@ -557,10 +557,10 @@ class AddOC():
 
 #+end_src
 
-** =create_nc=
-#+NAME: class_CreateNC
+** =add_nc=
+#+NAME: class_AddNC
 #+begin_src python
-class CreateNC():
+class AddNC():
     arg_types = {"institute":is_institute,"hub":is_oc,"session":is_session}
     arity_and_type_checks_needed = True
 
@@ -1001,7 +1001,7 @@ ops_table = {'add_user' : AddUser,
              'add_institute': AddInstitute, 
              'delete_user': DeleteUser,
              'add_oc': AddOC, 
-             'create_nc': CreateNC, 
+             'add_nc': AddNC, 
              'update_user': UpdateUser, 
              'update_institute': UpdateInstitute, 
              'add_role': AddRole,
@@ -1056,7 +1056,7 @@ from runtime.objects.entities import is_user, is_session, is_role, is_email, \
 <<class_AddInstitute>>
 <<class_AddOC>>
 <<class_AddRole>>
-<<class_CreateNC>>
+<<class_AddNC>>
 <<class_UpdateInstitute>>
 <<class_CreateWorkshop>>
 <<class_CancelWorkshop>>
