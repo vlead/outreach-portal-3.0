@@ -518,10 +518,10 @@ class AddInstitute():
 
 #+end_src
 
-** =create_oc=
-#+NAME: class_CreateOC
+** =add_oc=
+#+NAME: class_AddOC
 #+begin_src python
-class CreateOC():
+class AddOC():
     arg_types = {"institute":is_institute, "session":is_session}
     arity_and_type_checks_needed = True
 
@@ -1000,7 +1000,7 @@ ops_table = {'add_user' : AddUser,
              'logout': logout,
              'add_institute': AddInstitute, 
              'delete_user': DeleteUser,
-             'create_oc': CreateOC, 
+             'add_oc': AddOC, 
              'create_nc': CreateNC, 
              'update_user': UpdateUser, 
              'update_institute': UpdateInstitute, 
@@ -1054,7 +1054,7 @@ from runtime.objects.entities import is_user, is_session, is_role, is_email, \
 <<class_updateuser>>
 <<class_deleteuser>>
 <<class_AddInstitute>>
-<<class_CreateOC>>
+<<class_AddOC>>
 <<class_AddRole>>
 <<class_CreateNC>>
 <<class_UpdateInstitute>>

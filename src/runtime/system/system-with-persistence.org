@@ -324,7 +324,7 @@ class TestDeleteUser(TestCase):
         inst = Institute(name="IIT",address="Delhi")
         institute = System.do("add_institute", institute = inst,
                                session=session)
-        oc = System.do("create_oc",institute=institute,session=session,
+        oc = System.do("add_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
 
         name = Name(name="maryoc")
@@ -382,7 +382,7 @@ class TestDeleteUser(TestCase):
         inst = Institute(name="IIT",address="Delhi")
         institute = System.do("add_institute", institute = inst,
                                session=session)
-        oc = System.do("create_oc",institute=institute,session=session,
+        oc = System.do("add_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
         
         name = Name(name="maryoc")
@@ -474,7 +474,7 @@ class TestUpdateUser(TestCase):
         inst = Institute(name="IIT",address="Madras")
         institute = System.do("add_institute", institute = inst,
                                session=session)
-        oc = System.do("create_oc",institute=institute,session=session,
+        oc = System.do("add_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
 
         name = Name(name="useroc")
@@ -530,7 +530,7 @@ class TestUpdateUser(TestCase):
         inst = Institute(name="IIT",address="Madras")
         institute = System.do("add_institute", institute = inst,
                                session=session)
-        oc = System.do("create_oc",institute=institute,session=session,
+        oc = System.do("add_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
         name = Name(name="useroc")
         name.save()
@@ -767,10 +767,10 @@ class TestAddInstitute(TestCase):
             System.do("add_institute", institute=institute, session=session)
 
 #+END_SRC
-* Test create_oc
-#+NAME: test_CreateOC
+* Test add_oc
+#+NAME: test_AddOC
 #+BEGIN_SRC python
-class TestCreateOC(TestCase):
+class TestAddOC(TestCase):
     TESTING = True
 
     def create_app(self):
@@ -788,21 +788,21 @@ class TestCreateOC(TestCase):
         db.session.remove()
         db.drop_all()
     
-    def test_create_oc(self):
-        print "test_create_oc"
+    def test_add_oc(self):
+        print "test_add_oc"
         login_user=User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
         institute = Institute(name="IIIT", address="Hyderabad")
         institute = System.do("add_institute", institute=institute,
                                session=session)
-        oc = System.do("create_oc", institute=institute, session=session)
+        oc = System.do("add_oc", institute=institute, session=session)
         self.assertEqual(OC.get_by_id(1).get("institute").get("name"), 
                              Institute.get_by_id(1).get("name"))
         self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 
-    def test_create_oc_raises_arity_error(self):
-        print "test_create_oc_raises_arity_error"
+    def test_add_oc_raises_arity_error(self):
+        print "test_add_oc_raises_arity_error"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
@@ -812,10 +812,10 @@ class TestCreateOC(TestCase):
                                 session=session)
 
         with self.assertRaises(ArityError):
-            System.do("create_oc", institute=institute)
+            System.do("add_oc", institute=institute)
 
-    def test_create_oc_raises_type_check_error(self):
-        print "test_create_oc_raises_type_check_error"
+    def test_add_oc_raises_type_check_error(self):
+        print "test_add_oc_raises_type_check_error"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
@@ -823,11 +823,11 @@ class TestCreateOC(TestCase):
         institute = Institute(name="IIIT", address="Hyderabad")
 
         with self.assertRaises(TypeError):
-            System.do("create_oc", institute=session, session=session)
+            System.do("add_oc", institute=session, session=session)
 
 
-    def test_create_oc_raises_auth_error(self):
-        print "test_create_oc_raises_auth_error"
+    def test_add_oc_raises_auth_error(self):
+        print "test_add_oc_raises_auth_error"
 
         name = Name(name="nocuser")
         email = Email(email="abc@gmail.com")
@@ -846,7 +846,7 @@ class TestCreateOC(TestCase):
 
         institute = Institute(name="IIIT", address="Hyderabad")
         institute.save()
-        oc = System.do("create_oc", institute=institute, session=admin_session)
+        oc = System.do("add_oc", institute=institute, session=admin_session)
         nc = System.do("create_nc", institute=institute, hub=oc,
                         session=admin_session)
 
@@ -858,20 +858,20 @@ class TestCreateOC(TestCase):
         System.session_set.append(ncc_session)
 
         with self.assertRaises(AuthError):
-            System.do("create_oc", institute=institute,
+            System.do("add_oc", institute=institute,
                         session=guest_session)
         with self.assertRaises(AuthError):
-            System.do("create_oc", institute=institute,
+            System.do("add_oc", institute=institute,
                         session=reviewer_session)
         with self.assertRaises(AuthError):
-            System.do("create_oc", institute=institute,
+            System.do("add_oc", institute=institute,
                         session=occ_session)
         with self.assertRaises(AuthError):
-            System.do("create_oc", institute=institute,
+            System.do("add_oc", institute=institute,
                         session=ncc_session)
 
-    def test_create_oc_raises_state_error_with_no_session(self):
-        print "test_create_oc_raises_state_error_with_no_session"
+    def test_add_oc_raises_state_error_with_no_session(self):
+        print "test_add_oc_raises_state_error_with_no_session"
 
         admin_role = Role.get_by_id(1)
         admin_user = User.get_by_id(1)
@@ -881,10 +881,10 @@ class TestCreateOC(TestCase):
         institute.save()
 
         with self.assertRaises(StateError):
-            System.do("create_oc", institute=institute, session=session)
+            System.do("add_oc", institute=institute, session=session)
 
-    def test_create_oc_raises_state_error_without_an_institute(self):
-        print "test_create_oc_raises_state_error_without_an_institute"
+    def test_add_oc_raises_state_error_without_an_institute(self):
+        print "test_add_oc_raises_state_error_without_an_institute"
 
         admin_role = Role.get_by_id(1)
         admin_user = User.get_by_id(1)
@@ -894,11 +894,11 @@ class TestCreateOC(TestCase):
         institute = Institute(name="IIIT", address="Hyderabad")
 
         with self.assertRaises(StateError):
-            System.do("create_oc", institute=institute, session=session)
+            System.do("add_oc", institute=institute, session=session)
 
 
-    def test_create_oc_raises_state_error_with_existing_oc(self):
-        print "test_create_oc_raises_state_error_with_existing_oc"
+    def test_add_oc_raises_state_error_with_existing_oc(self):
+        print "test_add_oc_raises_state_error_with_existing_oc"
 
         admin_role = Role.get_by_id(1)
         admin_user = User.get_by_id(1)
@@ -912,7 +912,7 @@ class TestCreateOC(TestCase):
         oc.save()
 
         with self.assertRaises(StateError):
-            System.do("create_oc", institute=institute, session=session)
+            System.do("add_oc", institute=institute, session=session)
 
 #+END_SRC
 
@@ -945,7 +945,7 @@ class TestCreateNC(TestCase):
         institute = Institute(name="IIIT", address="Hyderabad")
         institute = System.do("add_institute", institute = institute,
                                session=session)
-        oc = System.do("create_oc", institute=institute, session=session)
+        oc = System.do("add_oc", institute=institute, session=session)
         nc = System.do("create_nc", institute=institute, hub=oc,
                         session=session)
         self.assertEqual(NC.get_by_id(1).get('institute').get("name"),
@@ -963,7 +963,7 @@ class TestCreateNC(TestCase):
         institute = Institute(name="IIIT", address="Hyderabad")
         institute = System.do("add_institute", institute=institute,
                                 session=session)
-        oc = System.do("create_oc", institute=institute, session=session)
+        oc = System.do("add_oc", institute=institute, session=session)
 
         with self.assertRaises(ArityError):
             System.do("create_nc", institute=institute, hub=oc)
@@ -977,7 +977,7 @@ class TestCreateNC(TestCase):
         institute = Institute(name="IIIT", address="Hyderabad")
         institute = System.do("add_institute", institute=institute,
                                 session=session)
-        oc = System.do("create_oc", institute=institute, session=session)
+        oc = System.do("add_oc", institute=institute, session=session)
 
         with self.assertRaises(TypeError):
             System.do("create_nc", institute=session, hub=oc, session=session)
@@ -1004,7 +1004,7 @@ class TestCreateNC(TestCase):
 
         institute = Institute(name="NIT", address="Warangal")
         institute.save()
-        oc = System.do("create_oc", institute=institute, session=admin_session)
+        oc = System.do("add_oc", institute=institute, session=admin_session)
         nc = System.do("create_nc", institute=institute, hub=oc,
                         session=admin_session)
 
@@ -1148,7 +1148,7 @@ class TestCreateWorkshop(TestCase):
         workshop_institute = System.do("add_institute", institute = inst,
                                         session = sess)
         
-        oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
+        oc = System.do("add_oc",institute= Institute.get_by_id(1),spokes=[],
                         session=sess, oc_target = None)
 
         nc = System.do("create_nc",institute= Institute.get_by_id(1),
@@ -1231,7 +1231,7 @@ class TestCancelWorkshop(TestCase):
         inst = Institute(name="NITK",address="Surathkal")
         workshop_institute = System.do("add_institute", institute = inst, session = sess)
 
-        oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
+        oc = System.do("add_oc",institute= Institute.get_by_id(1),spokes=[],
                         session=sess, oc_target = None)
 
         nc = System.do("create_nc",institute= Institute.get_by_id(1),
@@ -1322,7 +1322,7 @@ class TestRescheduleWorkshop(TestCase):
         inst = Institute(name="NITK",address="Surathkal")
         workshop_institute = System.do("add_institute", institute = inst, 
                                         session = session)
-        oc = System.do("create_oc",institute=institute,spokes=[],
+        oc = System.do("add_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
 
         nc = System.do("create_nc",institute=institute,hub=oc,session=session,
@@ -1421,7 +1421,7 @@ class TestConductWorkshop(TestCase):
         workshop_institute = System.do("add_institute", institute = inst,
                                         session = sess)
 
-        oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
+        oc = System.do("add_oc",institute= Institute.get_by_id(1),spokes=[],
                         session=sess, oc_target = None)
 
         nc = System.do("create_nc",institute= Institute.get_by_id(1),
@@ -1511,7 +1511,7 @@ class TestUploadArtefact(TestCase):
         inst = Institute(name="NITK",address="Surathkal")
         workshop_institute = System.do("add_institute", institute = inst,
                                         session = session)
-        oc = System.do("create_oc",institute=institute,spokes=[],
+        oc = System.do("add_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
 
         nc = System.do("create_nc",institute=institute,hub=oc,session=session,
@@ -1609,7 +1609,7 @@ class TestApproveWorkshop(TestCase):
         workshop_institute = System.do("add_institute", institute = inst,
                                         session = sess)
 
-        oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
+        oc = System.do("add_oc",institute= Institute.get_by_id(1),spokes=[],
                         session=sess, oc_target = None)
 
         nc = System.do("create_nc",institute= Institute.get_by_id(1),
@@ -1721,7 +1721,7 @@ class TestRejectWorkshop(TestCase):
         inst = Institute(name = "NITK", address = "Surathkal")
         workshop_institute = System.do("add_institute", institute = inst,
                                         session = session)
-        oc = System.do("create_oc",institute=institute,spokes=[],
+        oc = System.do("add_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
 
         nc = System.do("create_nc",institute=institute,hub=oc,session=session,
@@ -1835,7 +1835,7 @@ class TestDeleteArtefact(TestCase):
         workshop_institute = System.do("add_institute", institute = inst, 
                                         session = session)
             
-        oc = System.do("create_oc",institute=institute,spokes=[],
+        oc = System.do("add_oc",institute=institute,spokes=[],
                        session=session, oc_target = None)
         
         nc = System.do("create_nc",institute=institute,hub=oc,session=session,
@@ -1911,7 +1911,7 @@ ops_table = {'add_user' : AddUser,
              'logout': logout,
              'add_institute': AddInstitute, 
              'delete_user': DeleteUser,
-             'create_oc': CreateOC, 
+             'add_oc': AddOC, 
              'create_nc': CreateNC, 
              'update_user': UpdateUser, 
              'update_institute': UpdateInstitute, 
@@ -1976,7 +1976,7 @@ if __name__ == '__main__':
 #<<test_logout>>
 #<<test_updateuser>>
 <<test_AddInstitute>>
-<<test_CreateOC>>
+<<test_AddOC>>
 <<test_CreateNC>>
 #<<test_AddRole>>
 #<<test_UpdateInstitute>>
