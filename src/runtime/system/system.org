@@ -485,10 +485,10 @@ class logout():
 
 #+end_src
 
-** =CreateInstitute=
-#+NAME: class_CreateInstitute
+** =AddInstitute=
+#+NAME: class_AddInstitute
 #+begin_src python
-class CreateInstitute():
+class AddInstitute():
     arg_types = {"institute":is_institute, "session":is_session}
     arity_and_type_checks_needed = True
 
@@ -998,7 +998,7 @@ class DeleteArtefact():
 ops_table = {'add_user' : AddUser, 
              'login': login, 
              'logout': logout,
-             'create_institute': CreateInstitute, 
+             'add_institute': AddInstitute, 
              'delete_user': DeleteUser,
              'create_oc': CreateOC, 
              'create_nc': CreateNC, 
@@ -1053,7 +1053,7 @@ from runtime.objects.entities import is_user, is_session, is_role, is_email, \
 <<class_logout>>
 <<class_updateuser>>
 <<class_deleteuser>>
-<<class_CreateInstitute>>
+<<class_AddInstitute>>
 <<class_CreateOC>>
 <<class_AddRole>>
 <<class_CreateNC>>
