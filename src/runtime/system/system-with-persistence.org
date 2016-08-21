@@ -890,6 +890,24 @@ class TestCreateOC(TestCase):
         with self.assertRaises(StateError):
             System.do("create_oc", institute=institute, session=session)
 
+
+    def test_create_oc_raises_state_error_with_existing_oc(self):
+        print "test_create_oc_raises_state_error_with_existing_oc"
+
+        admin_role = Role.get_by_id(1)
+        admin_user = User.get_by_id(1)
+        session = Session(user=admin_user, role=admin_role)
+        System.session_set.append(session)
+
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute.save()
+
+        oc = OC(institute=institute, spokes=[], oc_targets=[])
+        oc.save()
+
+        with self.assertRaises(StateError):
+            System.do("create_oc", institute=institute, session=session)
+
 #+END_SRC
 
 * Test CreateNC
