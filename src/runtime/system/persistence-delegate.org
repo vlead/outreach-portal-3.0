@@ -487,7 +487,6 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-
 ***  Add a oc to the system
     This function adds an outreach centre to the oc-set maintained by the system.
 #+NAME: persistent_add_oc
@@ -529,13 +528,13 @@ class TestPersistentDelegate(TestCase):
     def test_add_nc(self):
          print "test_persistent_add_nc"
          institute = Institute(name="IIIT", address="Hyderabad")
-         institute = self.persistent_delegate.add_institute(institute)
-         oc = self.persistent_delegate.add_oc(institute)
+         institute.save()
+         oc = OC(institute=institute, spokes=[], oc_targets=[])
+         oc.save()
          nc = self.persistent_delegate.add_nc(institute, oc)
          self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 
 #+END_SRC
-
 
 ***  Get ocs from system
 
@@ -559,7 +558,6 @@ class TestPersistentDelegate(TestCase):
          self.assertEqual(len(self.persistent_delegate.get_ocs()), 1)
 
 #+END_SRC
-
 
 ***  Check if =nc= already exists
     This function checks if a nodal-centre is already in the nc-set of the =System=.
