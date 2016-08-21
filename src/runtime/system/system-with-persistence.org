@@ -1032,6 +1032,23 @@ class TestCreateNC(TestCase):
             System.do("create_nc", institute=institute, hub=oc,
                         session=ncc_session)
 
+
+    def test_create_nc_raises_state_error_with_no_session(self):
+        print "test_create_nc_raises_state_error_with_no_session"
+
+        admin_role = Role.get_by_id(1)
+        admin_user = User.get_by_id(1)
+        session = Session(user=admin_user, role=admin_role)
+
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute.save()
+        oc = OC(institute=institute, spokes=[], oc_targets=[])
+        oc.save()
+
+        with self.assertRaises(StateError):
+            System.do("create_nc", institute=institute, hub=oc, session=session)
+
+
 #+END_SRC
 * Test update_institute
 #+NAME: test_UpdateInstitute
