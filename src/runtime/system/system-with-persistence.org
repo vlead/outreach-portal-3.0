@@ -919,6 +919,49 @@ class TestCreateNC(TestCase):
         with self.assertRaises(TypeError):
             System.do("create_nc", institute=session, hub=oc, session=session)
 
+    def test_create_nc_raises_auth_error(self):
+        print "test_create_nc_raises_auth_error"
+
+        name = Name(name="nocuser")
+        email = Email(email="abc@gmail.com")
+        admin_role = Role.get_by_id(1)
+        guest_role = Role.get_by_id(2)
+        reviewer_role = Role.get_by_id(3)
+        noc_role = Role.get_by_id(4)
+        user = User(name=name, email=email, roles= [guest_role, reviewer_role])
+
+        admin_session = Session(user=user, role=admin_role)
+        System.session_set.append(admin_session)
+        guest_session = Session(user=user, role=guest_role)
+        System.session_set.append(guest_session)
+        reviewer_session = Session(user=user, role=reviewer_role)
+        System.session_set.append(reviewer_session)
+        noc_session = Session(user=user, role=noc_role)
+        System.session_set.append(noc_session)
+
+        institute = Institute(name="NIT", address="Warangal")
+        institute.save()
+        oc = System.do("create_oc", institute=institute, session=admin_session)
+        nc = System.do("create_nc", institute=institute, hub=oc,
+                        session=admin_session)
+
+        ncc_role = Role.get_by_id(6)
+        ncc_session = Session(user=user, role=ncc_role)
+        System.session_set.append(ncc_session)
+
+        with self.assertRaises(AuthError):
+            System.do("create_nc", institute=institute, hub=oc,
+                        session=guest_session)
+        with self.assertRaises(AuthError):
+            System.do("create_nc", institute=institute, hub=oc,
+                        session=reviewer_session)
+        with self.assertRaises(AuthError):
+            System.do("create_nc", institute=institute, hub=oc,
+                        session=noc_session)
+        with self.assertRaises(AuthError):
+            System.do("create_nc", institute=institute, hub=oc,
+                        session=ncc_session)
+
 #+END_SRC
 * Test update_institute
 #+NAME: test_UpdateInstitute
