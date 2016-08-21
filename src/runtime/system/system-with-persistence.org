@@ -747,6 +747,21 @@ class TestCreateInstitute(TestCase):
             System.do("create_institute", institute=institute,
                         session=reviewer_session)
 
+    def test_create_institute_raises_state_error_with_no_session(self):
+        print "test_create_institute_raises_state_error_with_no_session"
+
+        name = Name(name="nocuser")
+        email = Email(email="abc@gmail.com")
+        admin_role = Role.get_by_id(1)
+        guest_role = Role.get_by_id(2)
+        admin_user = User.get_by_id(1)
+        session = Session(user=admin_user, role=admin_role)
+
+        institute = Institute(name="IIIT", address="Hyderabad")
+
+        with self.assertRaises(StateError):
+            System.do("create_institute", institute=institute, session=session)
+
 #+END_SRC
 * Test create_oc
 #+NAME: test_CreateOC
