@@ -728,17 +728,24 @@ class TestCreateInstitute(TestCase):
 
         name = Name(name="nocuser")
         email = Email(email="abc@gmail.com")
-
         guest_role = Role.get_by_id(2)
-        user = User(name=name, email=email, roles= [guest_role])
+        reviewer_role = Role.get_by_id(3)
+        user = User(name=name, email=email, roles= [guest_role, reviewer_role])
 
-        session = Session(user=user,role=guest_role)
-        System.session_set.append(session)
+        guest_session = Session(user=user,role=guest_role)
+        System.session_set.append(guest_session)
+        reviewer_session = Session(user=user,role=reviewer_role)
+        System.session_set.append(reviewer_session)
 
         institute = Institute(name="IIIT", address="Hyderabad")
 
         with self.assertRaises(AuthError):
-            System.do("create_institute", institute=institute, session=session)
+            System.do("create_institute", institute=institute,
+                        session=guest_session)
+
+        with self.assertRaises(AuthError):
+            System.do("create_institute", institute=institute,
+                        session=reviewer_session)
 
 #+END_SRC
 * Test create_oc

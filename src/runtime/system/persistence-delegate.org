@@ -102,7 +102,6 @@ class TestPersistentDelegate(TestCase):
         
 #+END_SRC
 
-
 ***  Check if =name= already exists
     This function checks if a name is already in the database of the =System=.
 #+NAME: persistent_name_exists
@@ -1053,7 +1052,7 @@ class TestPersistentDelegate(TestCase):
 
 
 
-*** Get an object
+***  Get an object
     A generic function to find an object of type =cls= matching a given a criteria
 
 #+NAME: persistent_get_object
@@ -1069,8 +1068,8 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 	
+***  Get Name 
 
-*** Get Name 
     This function returns a Name object from the database based on the name
     string provided.
 
@@ -1093,8 +1092,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-
-*** Get Email
+***  Get Email
     This function returns an Email object from the database based on the email
     string provided.
 
@@ -1115,8 +1113,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-
-*** Get User
+***  Get User
     This function returns a user if present in the database.  If the user is
     not present, =None= type is returned.
 #+NAME: persistent_get_user
@@ -1138,8 +1135,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-
-*** Get Institute
+***  Get Institute
     This function returns an institute if present in the database.  If the institute is
     not present, =None= type is returned.
 #+NAME: persistent_get_institute
@@ -1163,8 +1159,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-
-*** Get OC
+***  Get OC
     This function returns an =OC= if present in the database.  If =OC= is
     not present, =None= type is returned.
 #+NAME: persistent_get_oc
@@ -1192,8 +1187,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-
-*** Get NC
+***  Get NC
     This function returns an =NC= if present in the database.  If =NC= is
     not present, =None= type is returned.
 #+NAME: persistent_get_nc
@@ -1224,8 +1218,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-
-*** Get Role
+***  Get Role
     This function returns either admin or user role from the roles in database
 #+NAME: persistent_get_role
 #+BEGIN_SRC python
@@ -1244,8 +1237,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-
-*** Get user by Email
+***  Get user by Email
     This function returns the user by email from the database
 #+NAME: get_user_by_email
 #+BEGIN_SRC python
