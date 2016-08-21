@@ -485,7 +485,7 @@ class logout():
 
 #+end_src
 
-** =create institute=
+** =CreateInstitute=
 #+NAME: class_CreateInstitute
 #+begin_src python
 class CreateInstitute():
