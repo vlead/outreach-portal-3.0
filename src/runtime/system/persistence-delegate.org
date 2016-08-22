@@ -184,7 +184,6 @@ class TestPersistentDelegate(TestCase):
     
 #+END_SRC
 
-
 ***  Update a user in the system
 #+NAME: persistent_update_user
 #+BEGIN_SRC python 
@@ -260,15 +259,19 @@ class TestPersistentDelegate(TestCase):
         name.save()
         email = Email(email="tt@kk.com")
         email.save()
+        guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        guest_role.save()
+        reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        reviewer_role.save()
+
         user = User(name=name,
                     email=email,
-                    roles=[Role.get_by_id(2)], user_status="active")
-        new_user = self.persistent_delegate.add_user(user)
+                    roles=[guest_role])
+        user.save()
         user_with_new_role = self.persistent_delegate.add_role_to_user\
-          (new_user, Role.get_by_id(3))
-        self.assertTrue(len(user_with_new_role.get('roles'))==2)
+          (user, reviewer_role)
+        self.assertTrue(len(user_with_new_role.get('roles')) == 2)
 #+END_SRC
-
 
 ***  Get all Active users from the system
 
@@ -491,11 +494,15 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_add_oc
 #+BEGIN_SRC python
     def add_oc(self, institute):
-        new_oc = OC(institute=institute, spokes=[], oc_targets=[])
-        new_oc.save()
-        new_role = self.add_role("OCC", new_oc, None)
-        new_role.save()
-        return new_oc
+        try:
+            new_oc = OC(institute=institute, spokes=[], oc_targets=[])
+            new_oc.save()
+            new_role = self.add_role("OCC", new_oc, None)
+            new_role.save()
+            return new_oc
+        except Exception as e:
+            raise e
+
 #+END_SRC
 
 **** Tests
@@ -510,15 +517,20 @@ class TestPersistentDelegate(TestCase):
 #+END_SRC
 
 ***  Add a nc to the system
-    This function adds an outreach centre to the oc-set maintained by the system.
+    This function adds an outreach centre to the nc-set maintained by the system.
 #+NAME: persistent_add_nc
 #+BEGIN_SRC python
     def add_nc(self, institute, oc):
-        new_nc = NC(institute=institute, hub=oc, nc_targets=[], workshops=[])
-        new_nc.save()
-        new_role = self.add_role("NCC", None, new_nc)
-        new_role.save()
-        return new_nc
+        try:
+            new_nc = NC(institute=institute, hub=oc,
+                        nc_targets=[], workshops=[])
+            new_nc.save()
+            new_role = self.add_role("NCC", None, new_nc)
+            new_role.save()
+            return new_nc
+        except Exception as e:
+            raise e
+
 #+END_SRC
 
 **** Tests
@@ -552,8 +564,8 @@ class TestPersistentDelegate(TestCase):
          print "test_get_ocs"
          ins = Institute(name='IIIT',address='Hyderabad')
          ins.save()
-         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
-
+         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1),
+                                                spokes, oc_target)
          self.assertEqual(len(self.persistent_delegate.get_ocs()), 1)
 
 #+END_SRC
@@ -603,14 +615,15 @@ class TestPersistentDelegate(TestCase):
          institute=Institute.get_by_id(1)
          spokes=[]
          oc_target = None
-         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1), spokes, oc_target)
+         oc = self.persistent_delegate.add_oc(Institute.get_by_id(1),
+                                                spokes, oc_target)
          nc_target=None
          workshops=[]
-         nc = self.persistent_delegate.add_nc(institute, oc, nc_target, workshops)
+         nc = self.persistent_delegate.add_nc(institute, oc, nc_target,
+                                                workshops)
          self.assertEqual(len(self.persistent_delegate.get_ncs()), 1)
 
 #+END_SRC
-
 
 ***  Get all active_users from system
     This function returns All the active users from the user_set.
@@ -639,7 +652,6 @@ class TestPersistentDelegate(TestCase):
          self.assertEqual(len(active_user_list), 2)
 
 #+END_SRC
-
 
 ***  Check if =workshop= already exists
     This function checks if a workshop is already in the workshop-set of the =System=.
@@ -1376,7 +1388,7 @@ if __name__ == '__main__':
 <<test_persistent_get_nc>>
 #<<test_persistent_update_user>>
 #<<test_persistent_delete_user>>
-#<<test_persistent_add_role_to_user>>
+<<test_persistent_add_role_to_user>>
 #<<test_persistent_get_users>>
 #<<test_persistent_get_active_users>>
 <<test_persistent_add_oc>>
