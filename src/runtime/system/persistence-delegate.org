@@ -13,7 +13,7 @@
   each environment, for example, be it either objects or persistence, the
   =system= for that particular environment is derived while not modifying the
   =system= class.
-
+  
 ** Initialize Persistence Delegate
    Provides all the delegates that operate on objects.
 
@@ -258,15 +258,21 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_add_role_to_user(self):
         name = Name(name="some user")
-        name.save()
         email = Email(email="tt@kk.com")
+        name.save()
         email.save()
-        user = User(name=name,
-                    email=email,
-                    roles=[Role.get_by_id(2)], user_status="active")
-        new_user = self.persistent_delegate.add_user(user)
-        user_with_new_role = self.persistent_delegate.add_role_to_user(new_user, Role.get_by_id(3))
+        guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
+        guest_role.save()
+        reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
+        reviewer_role.save()
+
+        user = User(name=name, email=email, roles=[guest_role])
+        user.save()
+        
+        user_with_new_role = self.persistent_delegate.add_role_to_user\
+          (user, reviewer_role)
         self.assertTrue(len(user_with_new_role.get('roles'))==2)
+
 #+END_SRC
 
 
@@ -1430,7 +1436,7 @@ if __name__ == '__main__':
 <<test_persistent_get_nc>>
 #<<test_persistent_update_user>>
 #<<test_persistent_delete_user>>
-#<<test_persistent_add_role_to_user>>
+<<test_persistent_add_role_to_user>>
 #<<test_persistent_get_users>>
 #<<test_persistent_get_active_users>>
 #<<test_persistent_add_oc>>
