@@ -626,10 +626,11 @@ class Testlogin(TestCase):
         print "test_login"
         login_user=User.get_by_id(1)
         login_role = Role.get_by_id(1)
-        System.do("login",user=login_user,role=login_role)
+        System.do("login", user=login_user, role=login_role)
         session=System.session_set[0]
-        self.assertEqual(session.get("user").get("name").get("name"),"admin")
-        self.assertEqual(session.get("user").get('roles')[0].get('name'),"admin")
+        self.assertEqual(session.get("user").get("name").get("name"), "admin")
+        self.assertEqual(session.get("user").get('roles')[0].get('name'),
+                         "admin")
 
 #+END_SRC
 
@@ -657,10 +658,10 @@ class Testlogout(TestCase):
         print "test_logout"
         login_user= User.get_by_id(1)
         login_role = Role.get_by_id(1)
-        sess = System.do("login",user=login_user,role=login_role)
+        session = System.do("login", user=login_user, role=login_role)
         self.assertEqual(len(System.session_set),1)
-        System.do("logout",session=sess)
-        self.assertEqual(System.session_set,[])
+        System.do("logout",session=session)
+        self.assertEqual(System.session_set, [])
 #+END_SRC
 * Test add_institute
 #+NAME: test_AddInstitute
@@ -1154,7 +1155,8 @@ class TestCreateWorkshop(TestCase):
         nc = System.do("add_nc",institute= Institute.get_by_id(1),
                         hub=oc,session=sess, nc_target = None, workshops = [])
 
-        target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
+        target_date = datetime.datetime.strptime("30-06-2016", 
+                                                 "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
         nc_target = NCTarget(usage = 200, date = target_date,
                              oc_target = oc_target, wstargets = [])
@@ -1163,7 +1165,7 @@ class TestCreateWorkshop(TestCase):
         oc_target.save()
         nc_target.save()
 
-        session = Session(user=login_user,role=Role.admin)
+        session = Session(user=login_user, role=Role.admin)
         System.session_set.append(session)
         ws_status = Status(name = "pending")
         ws_status.save()
@@ -1974,8 +1976,8 @@ if __name__ == '__main__':
 <<test_add_user>>
 #<<test_update_user>>
 #<<test_update_user>>
-#<<test_login>>
-#<<test_logout>>
+<<test_login>>
+<<test_logout>>
 #<<test_updateuser>>
 <<test_AddInstitute>>
 <<test_AddOC>>
