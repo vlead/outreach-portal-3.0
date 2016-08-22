@@ -1945,7 +1945,7 @@ from runtime.persistence.entities import *
 from runtime.system.persistent_delegates import *
 
 from runtime.system.system import *
-
+from runtime.system.populate_db import *
 config = {
          'SQLALCHEMY_DATABASE_URI': ''
          }
@@ -1962,7 +1962,10 @@ if __name__ == '__main__':
 
 * Tangling                                                      :boilerplate:
 
-
+** source
+#+BEGIN_SRC python :tangle populate_db.py :eval no :noweb yes
+<<populate_db>>
+#+END_SRC
 ** tests
 #+BEGIN_SRC python :tangle test_persistent_system.py :eval no :noweb yes
 <<imports_for_tests>>
