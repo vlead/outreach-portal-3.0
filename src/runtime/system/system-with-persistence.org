@@ -1938,10 +1938,9 @@ ops_table = {'add_user' : AddUser,
 # -*- coding: utf-8 -*-
 import unittest
 from flask_testing import TestCase
-from runtime.utils.class_persistence_template import *
+#from runtime.utils.class_persistence_template import *
 from runtime.rest.app import create_app
-from sqlalchemy.exc import IntegrityError
-from runtime.persistence.entities import *
+#from sqlalchemy.exc import IntegrityError
 from runtime.system.persistent_delegates import *
 
 from runtime.system.system import *
