@@ -291,7 +291,6 @@ class TestAddUser(TestCase):
         with self.assertRaises(StateError):
             System.do("add_user", user=user, session=admin_session)
 
-
     def test_add_user_raises_state_error_with_existing_user(self):
         print "test_add_user_raises_state_error_with_existing_user"
 
@@ -311,7 +310,6 @@ class TestAddUser(TestCase):
 
         with self.assertRaises(StateError):
             System.do("add_user", user=user, session=admin_session)
-
             
 #+END_SRC
 * Test DeleteUser
