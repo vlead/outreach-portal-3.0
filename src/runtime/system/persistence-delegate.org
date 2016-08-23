@@ -59,7 +59,7 @@ class TestPersistentDelegate(TestCase):
     def setUp(self):
         db.create_all()
         self.persistent_delegate = PersistenceDelegate()
-
+        
     def tearDown(self):
         db.session.remove()
         db.drop_all()
@@ -101,6 +101,7 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(self.persistent_delegate.user_exists(user), True)
         
 #+END_SRC
+
 
 ***  Check if =name= already exists
     This function checks if a name is already in the database of the =System=.
@@ -801,8 +802,10 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_cancel_workshop
 #+BEGIN_SRC python
     def cancel_workshop(self, workshop):
-        workshop.set(status = Status.cancelled)
-        workshop.save()
+        cancelled = self.get_status(name="cancelled")
+        if cancelled:
+            workshop.set(status=cancelled)
+            workshop.save()
         return workshop
 #+END_SRC
 **** Tests 
@@ -810,22 +813,48 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_cancel_workshop(self):
         print "test_cancel_workshop"
-        institute = Institute(name='IIIT',address='Hyderabad')
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
-        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
-        name = Name(name = "New Workshop")
-        status = Status(name = "pending")
-        artefacts = []
+        pending_status = Status(name="pending")
+        pending_status.save()
+        cancel_status = Status(name="cancelled")
+        cancel_status.save()
+        inst1 = Institute(name="NIT", address="Suratkal")
+        inst1.save()
+        inst2 = Institute(name="IIIT", address="Hyderabad")
+        inst2.save()
+        inst3 = Institute(name="HCU", address="Hyderabad")
+        inst3.save()
+        oc = OC(institute=inst1, spokes=[], oc_targets=[])
+        oc.save()
+        nc = NC(institute=inst2, hub=oc,
+                    nc_targets=[], workshops=[])
+        nc.save()
+        date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        oc_target.save()
+        nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                                 oc_target=oc_target, ws_targets=[])
+        nc_target.save()
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+        ws_target.save()
 
-        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        workshop = Workshop(name="Test workshop",
+                            institute=inst3,
+                            status=pending_status, 
+                            artefacts=[], 
+                            nc=nc,
+                            ws_target=ws_target,
+                            date=date,
+                            participants=0,
+                            experiments=0,
+                            usage=0)
+        workshop.save()
 
         cancelled_workshop = self.persistent_delegate.cancel_workshop(workshop)
 
-        self.assertEqual(cancelled_workshop.get("status"), Status.cancelled)
+        self.assertEqual(cancelled_workshop.get("status").get("name"), 
+                             cancel_status.get("name"))
+
 #+END_SRC
 
 
@@ -1328,6 +1357,31 @@ class TestPersistentDelegate(TestCase):
 #+END_SRC
 
 
+***  Get Status
+    This function returns the =Status= if present in the database.  If =Status= is
+    not present, =None= type is returned.
+#+NAME: persistent_get_status
+#+BEGIN_SRC python
+    def get_status(self, **kwargs):
+        return self.get_object(Status, **kwargs)
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_get_status
+#+BEGIN_SRC python
+    def test_get_status(self):
+         print "test_get_status"
+         
+         pending = Status(name="pending")
+         pending.save()
+         status_obj = self.persistent_delegate.get_status(name=\
+                                                        pending.get("name"))
+         self.assertEqual(status_obj.get("name"), pending.get("name"))                                           
+
+#+END_SRC
+
+
 ***  Get Workshop
     This function returns the workshop if present in the database.  If the workshop is
     not present, =None= type is returned.
@@ -1479,6 +1533,7 @@ if __name__ == '__main__':
 <<persistent_get_institute>>
 <<persistent_get_oc>>
 <<persistent_get_nc>>
+<<persistent_get_status>>
 <<persistent_get_workshop>>
 <<persistent_update_user>>
 <<persistent_delete_user>>
@@ -1531,6 +1586,7 @@ if __name__ == '__main__':
 <<test_persistent_get_institute>>
 <<test_persistent_get_oc>>
 <<test_persistent_get_nc>>
+<<test_persistent_get_status>>
 <<test_persistent_get_workshop>>
 #<<test_persistent_update_user>>
 #<<test_persistent_delete_user>>

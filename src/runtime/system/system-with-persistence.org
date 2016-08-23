@@ -30,6 +30,13 @@ def populate_db():
                             roles=[admin_role, guest_role])
     user.save()
 
+    pending = Status(name="pending")
+    cancelled = Status(name="cancelled")
+    completed = Status(name="completed")
+    pending_approval = Status(name="pending for approval")
+    rejected = Status(name="rejected")
+    approved = Status(name="approved")
+
 #+END_SRC
 * Test Constructor
 #+NAME: test_persistent_system_constructor
