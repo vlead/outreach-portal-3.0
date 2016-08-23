@@ -407,13 +407,6 @@ class AddRole():
             raise StateError("role %s is already assigned to this user"
                                  % role)
 
-        active_user_set = System.delegate.get_active_users()
-        if not (user in active_user_set):
-            raise StateError("user %s not in user set"
-                             % user.get("name").get("name"))
-
-
-
     @staticmethod
     def action(args):
         user = args["user"]

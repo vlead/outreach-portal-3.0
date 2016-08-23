@@ -626,15 +626,28 @@ class TestAddRole(TestCase):
         System.session_set = []
         db.session.remove()
         db.drop_all()
+        
+def test_add_role(self):                                                           
+        print "test_add_role"                                                          
+        login_user = User.get_by_id(1)                                                 
+        login_role = Role.get_by_id(1)                                                 
+        sess = System.do("login", user=login_user, role=login_role)                    
+                                                                                        
+        name = Name(name="some user")                                                   
+        email = Email(email="tt@kk.com")                                                
+        name.save()                                                                     
+        email.save()                                                                    
+        guest_role = Role.get_by_id(2)                                                  
+        reviewer_role = Role.get_by_id(3)                                               
+                                                                                        
+        user = User(name=name, email=email, roles=[guest_role])                         
+        user.save()                                                                     
+                                                                                        
+                                                                                        
+        System.do("add_role", user=user, role=reviewer_role,                            
+                   session=sess)                                                        
+        self.assertEqual(len(User.get_by_id(1).get('roles')), 2)
 
-    def test_add_role(self):
-        print "test_add_role"
-        login_user=User.get_by_id(1)
-        login_role = Role.get_by_id(1)
-        sess = System.do("login",user=login_user,role=login_role)
-        System.do("add_role",user=login_user,role=Role.get_by_id(2),
-                   session=sess)
-        self.assertEqual(len(User.get_by_id(1).get('roles')), 3)
 #+END_SRC
 * Test login
 #+NAME: test_login
@@ -2014,10 +2027,10 @@ if __name__ == '__main__':
 <<test_login>>
 <<test_logout>>
 #<<test_updateuser>>
-<<test_AddInstitute>>
-<<test_AddOC>>
-<<test_AddNC>>
-#<<test_AddRole>>
+<<test_CreateInstitute>>
+<<test_CreateOC>>
+<<test_CreateNC>>
+<<test_AddRole>>
 #<<test_UpdateInstitute>>
 #<<test_CreateWorkshop>>
 #<<test_CancelWorkshop>>
