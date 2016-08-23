@@ -639,59 +639,52 @@ class UpdateInstitute():
 #+NAME: class_CreateWorkshop
 #+begin_src python
 class CreateWorkshop():
-    arg_types = {"institute":is_institute,
-                 "name" : is_name ,
+   arg_types = {"institute":is_institute,
+                 "name" : is_alphabetic_str,
                  "session":is_session,
                  "ws_target" : is_ws_target,
-                 "artefacts": are_artefacts_or_empty_list,
                  "status" : is_status,
-                 "nc" : is_nc
+                 "nc" : is_nc,
+                 "date": is_date
                  }
-    arity_and_type_checks_needed = True
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        institute = args['institute']
-        name = args['name']
-        ws_target = args['ws_target']
-        artefacts = args["artefacts"]
-        status = args["status"]
-        nc = args["nc"]
-        if not (System.is_session_NCC(session)):
-            raise AuthError("Role not Authorized to perform this action")
-        if System.is_session_NCC(session):
-            if nc != session.get('role').get('centre_nc'):
-                raise AuthError("Role not Authorized to perform this action")
+   arity_and_type_checks_needed = True
 
-    @staticmethod
-    def state_check(args):
-        session = args["session"]
-        institute = args['institute']
-        name = args['name']
-        ws_target = args['ws_target']
-        artefacts = args["artefacts"]
-        status = args["status"]
-        nc = args["nc"]
-        if not (session in System.session_set):
-            raise StateError("user not in session %s"
-                             % session.get('user').get('name').get('name'))
-        if not System.delegate.institute_exists(institute):
-            raise StateError("institute %s not in System"
-                             % institute.get('name'))
-        if not System.delegate.nc_exists(nc):
-            raise StateError("nc %s not in System" % nc.get('name'))
-
-    @staticmethod
-    def action(args):
-        session = args["session"]
-        institute = args['institute']
-        name = args['name']
-        ws_target = args['ws_target']
-        artefacts = args["artefacts"]
-        status = args["status"]
-        nc = args['nc']
-        workshop = System.delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
-        return workshop
+   @staticmethod
+   def auth_check(args):
+       session = args["session"]
+       nc = args["nc"]
+       if not (System.is_session_NCC(session)):
+           raise AuthError("Role not Authorized to perform this action")
+       if nc != session.get("role").get("centre_nc"):
+           raise AuthError("Role not Authorized to perform this action")
+       
+   @staticmethod
+   def state_check(args):
+       session = args["session"]
+       institute = args["institute"]
+       nc = args["nc"]
+       
+       if not (session in System.session_set):
+           raise StateError("user not in session %s"
+                                % session.get("user").get("name").get("name"))
+       if not System.delegate.institute_exists(institute):
+           raise StateError("institute %s not in System"
+                                % institute.get("name"))
+       if not System.delegate.nc_exists(nc):
+           raise StateError("nc %s not in System" % nc.get("name"))
+       
+   @staticmethod
+   def action(args):
+       session = args["session"]
+       institute = args["institute"]
+       name = args["name"]
+       ws_target = args["ws_target"]
+       status = args["status"]
+       nc = args["nc"]
+       date = args["date"]
+       workshop = System.delegate.add_workshop(name, institute, ws_target,\
+                                                   status, nc, date)
+       return workshop
 #+end_src
 
 ** =cancel_workshop=
@@ -1026,7 +1019,7 @@ from runtime.objects.entities import is_user, is_session, is_role, is_email, \
     is_institute, is_oc_target, is_status, is_nc,\
     is_oc, is_nc_target, are_workshops_or_empty_list, is_ws_target,\
     are_artefacts_or_empty_list,  is_workshop_or_none, is_ws_target, \
-    is_artefact, are_oc_targets_or_empty_list, \
+    is_artefact, are_oc_targets_or_empty_list, is_date, \
     are_nc_targets_or_empty_list, Session
 
 
