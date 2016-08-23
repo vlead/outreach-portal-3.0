@@ -712,6 +712,7 @@ class CancelWorkshop():
         workshop = args["workshop"]
         session = args["session"]
         workshop_status = workshop.get("status")
+        print workshop_status
         if workshop_status == "pending":
             raise StateError("cannot cancel workshop")
                     

@@ -31,11 +31,17 @@ def populate_db():
     user.save()
 
     pending = Status(name="pending")
+    pending.save()
     cancelled = Status(name="cancelled")
+    cancelled.save()
     completed = Status(name="completed")
+    completed.save()
     pending_approval = Status(name="pending for approval")
+    pending_approval.save()
     rejected = Status(name="rejected")
+    rejected.save()
     approved = Status(name="approved")
+    approved.save()
 
 #+END_SRC
 * Test Constructor
@@ -224,19 +230,19 @@ class TestAddUser(TestCase):
         print "test_add_user_by_noc"
         admin_user = User.get_by_id(1)
         admin_role = Role.get_by_id(1)
-        session = Session(user=admin_user,role=admin_role)
+        session = Session(user=admin_user, role=admin_role)
         System.session_set.append(session)
 
         name = Name(name="nocuser")
+        name.save()
         email = Email(email="abc@gmail.com")
-
+        email.save()
         noc_role = Role.get_by_id(4)
-        user = User(name=name, email=email, \
+        noc_user = User(name=name, email=email, \
                         roles=[noc_role])
 
         noc_user=System.do("add_user", user=user, session=session)
         session_noc = Session(user=noc_user, role=noc_role)
-
         System.session_set.append(session_noc)
 
         user = User.get_by_id(2)
@@ -254,18 +260,15 @@ class TestAddUser(TestCase):
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
         user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
-                    roles= [guest_role],
-                    user_status="active")
+                    roles= [guest_role])
         noc_user= System.do("add_user", user=user, session=session)
 
         session_noc = Session(user=noc_user,role=Role.get_by_id(4))
         System.session_set.append(session_noc)
         inst = Institute(name = "NITK", address = "Surathkal")
-        institute = System.do("create_institute", institute = inst,
-                               session=session)
-        oc = System.do("create_oc", institute = institute,
-                        session = session,
-                        spokes = [], oc_target = None)
+        inst.save()
+        oc = System.do("add_oc", institute = inst,
+                        session = session)
 
         name = Name(name="ocuser")
         name.save()
@@ -273,16 +276,17 @@ class TestAddUser(TestCase):
         email.save()
         guest_role = Role.query.filter_by(name='guest').first()
         user = User(name=Name.get_by_id(3), email= Email.get_by_id(3),
-                    roles= [guest_role],
-                    user_status="active")
-        oc_user= System.do("add_user", user=user, session=session_noc)
+                    roles= [guest_role])
 
+        oc_user= System.do("add_user", user=user, session=session_noc)
 
         oc_role = filter(lambda x:x.get('name') == "OCC" and
                          x.get('centre_oc').get("institute").get("name") ==
-                         institute.get("name"), Role.get_all())
-        if oc_role:
-            oc_user.append_role(oc_role[0])
+                         inst.get("name"), Role.get_all())
+
+        System.do("add_role", user = oc_user,
+                    role = oc_role,
+                    session = session)
 
         u=User.get_by_id(3)
         self.assertEqual(u.get("name").get("name"),"ocuser")
@@ -412,8 +416,7 @@ class TestDeleteUser(TestCase):
         inst = Institute(name="IIT",address="Delhi")
         institute = System.do("add_institute", institute = inst,
                                session=session)
-        oc = System.do("add_oc",institute=institute,session=session,
-                        spokes=[], oc_target = None)
+        oc = System.do("add_oc",institute=institute,session=session)
 
         name = Name(name="maryoc")
         email = Email(email="mary@gmail.com")
@@ -1271,8 +1274,7 @@ class TestCreateWorkshop(TestCase):
         System.session_set.append(nc_session)
         role_check = Role.get_by_id(6)
 
-        status = Status(name="pending")
-        status.save()
+        pending_status = Status.get_by_id(1)
         
         date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
         
@@ -1288,7 +1290,7 @@ class TestCreateWorkshop(TestCase):
         new_workshop = System.do("create_workshop", 
                                      name="Test workshop",
                                      institute=inst3,
-                                     status=status, 
+                                     status=pending_status, 
                                      nc=nc,
                                      ws_target=ws_target,
                                      date=date,
@@ -1321,72 +1323,67 @@ class TestCancelWorkshop(TestCase):
 
     def test_cancel_workshop(self):
         print "test_cancel_workshop"
-
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
-        sess = System.do("login",user=login_user,role=login_role)
-        inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("add_institute",institute = inst, session=sess)
-        inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("add_institute", institute = inst, session = sess)
+        session = System.do("login", user=login_user, role=login_role)
+        inst1 = Institute(name="NIT", address="Suratkal")
+        inst1.save()
+        inst2 = Institute(name="IIIT", address="Hyderabad")
+        inst2.save()
+        inst3 = Institute(name="HCU", address="Hyderabad")
+        inst3.save()
+        oc = System.do("add_oc", institute=inst1,
+                        session=session)
+        nc = System.do("add_nc", institute=inst2,
+                        hub=oc, session=session)
 
-        oc = System.do("add_oc",institute= Institute.get_by_id(1),spokes=[],
-                        session=sess, oc_target = None)
-
-        nc = System.do("add_nc",institute= Institute.get_by_id(1),
-                        hub=oc,session=sess, nc_target = None, workshops = [])
-
-        target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date,
-                             oc_target = oc_target, wstargets = [])
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
-                            date = target_date, nc_target = nc_target )
-        oc_target.save()
-        nc_target.save()
-
-        session = Session(user=login_user,role=Role.admin)
-        System.session_set.append(session)
-        ws_status = Status(name = "pending")
-        ws_status.save()
         name=Name(name="ncuser")
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
-        guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
-                    roles= [guest_role],
-                    user_status="active")
+        guest_role = Role.get_by_id(2)
+        user = User(name=Name.get_by_id(2), email=Email.get_by_id(2),
+                    roles=[guest_role])
 
-        nc_user = System.do("add_user", user=user, session = sess)
-
+        nc_user = System.do("add_user", user=user, session=session)
         ncc_role =  Role.get_by_id(6)
-        if ncc_role:
-            nc_user.append_role(ncc_role)
+        System.do("add_role", user=nc_user, role=ncc_role,                            
+                   session=session)                                                        
 
-        nc_session = Session(user = nc_user, role = ncc_role)
+        nc_session = Session(user=nc_user, role=ncc_role)
         System.session_set.append(nc_session)
         role_check = Role.get_by_id(6)
 
-        new_workshop = System.do("create_workshop",
-                                 institute = workshop_institute,
-                                 name = Name(name = "Lab Workshop"),
-                                 ws_target = wstarget,
-                                 status = ws_status,
-                                 artefacts = [],
-                                 nc = nc,
-                                 session = nc_session)
+        pending_status = Status.get_by_id(1)
+        cancelled_status = Status.get_by_id(2)
+        
+        date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
+        
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        oc_target.save()
+        nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                                 oc_target=oc_target, ws_targets=[])
+        nc_target.save()
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+        ws_target.save()
+               
+        new_workshop = System.do("create_workshop", 
+                                     name="Test workshop",
+                                     institute=inst3,
+                                     status=pending_status, 
+                                     nc=nc,
+                                     ws_target=ws_target,
+                                     date=date,
+                                     session=nc_session) 
 
-        self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"),
-                         workshop_institute.get("name"))
-
-
+                     
         System.do("cancel_workshop", workshop = new_workshop,
                    session = nc_session)
         self.assertEqual(Workshop.get_by_id(1).get("status").get("name"),
-                         Status.cancelled.get("name"))
-#        self.assertEqual(nc.get("workshops")[0].get("status").get("name"),
-#                         ws_status.cancelled.get("name"))
+                         cancelled_status.get("name"))
+        self.assertEqual(nc.get("workshops")[0].get("status").get("name"),
+                         cancelled_status.get("name"))
         
     #+END_SRC
 
@@ -2082,7 +2079,7 @@ if __name__ == '__main__':
 <<test_AddRole>>
 #<<test_UpdateInstitute>>
 <<test_CreateWorkshop>>
-#<<test_CancelWorkshop>>
+<<test_CancelWorkshop>>
 #<<test_RescheduleWorkshop>>
 #<<test_ConductWorkshop>>
 #<<test_UploadArtefact>>
