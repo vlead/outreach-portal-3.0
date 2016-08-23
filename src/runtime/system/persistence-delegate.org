@@ -1357,6 +1357,7 @@ class TestPersistentDelegate(TestCase):
 #+END_SRC
 
 
+
 ***  Get Status
     This function returns the =Status= if present in the database.  If =Status= is
     not present, =None= type is returned.
