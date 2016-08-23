@@ -102,6 +102,7 @@ class TestPersistentDelegate(TestCase):
         
 #+END_SRC
 
+
 ***  Check if =name= already exists
     This function checks if a name is already in the database of the =System=.
 #+NAME: persistent_name_exists
@@ -183,6 +184,7 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(self.persistent_delegate.user_exists(user), True)
     
 #+END_SRC
+
 
 ***  Update a user in the system
 #+NAME: persistent_update_user
@@ -273,6 +275,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Get all Active users from the system
 
     This return the user_set maintained by the system.
@@ -345,6 +348,7 @@ class TestPersistentDelegate(TestCase):
                             False)
 
 #+END_SRC
+
 
 ***  Get all roles from the System
     This return the role_set maintained by the system.
@@ -489,6 +493,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Add a oc to the system
     This function adds an outreach centre to the oc-set maintained by the system.
 #+NAME: persistent_add_oc
@@ -515,6 +520,7 @@ class TestPersistentDelegate(TestCase):
          oc = self.persistent_delegate.add_oc(institute)
          self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 #+END_SRC
+
 
 ***  Add a nc to the system
     This function adds an outreach centre to the nc-set maintained by the system.
@@ -547,6 +553,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Get ocs from system
 
     This return the oc_set maintained by the system.
@@ -569,6 +576,7 @@ class TestPersistentDelegate(TestCase):
          self.assertEqual(len(self.persistent_delegate.get_ocs()), 1)
 
 #+END_SRC
+
 
 ***  Check if =nc= already exists
     This function checks if a nodal-centre is already in the nc-set of the =System=.
@@ -594,6 +602,7 @@ class TestPersistentDelegate(TestCase):
          nc = self.persistent_delegate.add_nc(institute, oc)
          self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 #+END_SRC
+
 
 ***  Get ncs from system
 
@@ -625,6 +634,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Get all active_users from system
     This function returns All the active users from the user_set.
 #+NAME: persistent_get_active_users
@@ -652,6 +662,7 @@ class TestPersistentDelegate(TestCase):
          self.assertEqual(len(active_user_list), 2)
 
 #+END_SRC
+
 
 ***  Check if =workshop= already exists
     This function checks if a workshop is already in the workshop-set of the =System=.
@@ -684,6 +695,7 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(self.persistent_delegate.workshop_exists(workshop), True)
 
 #+END_SRC
+
 
 ***  Add a workshop to the system
     This function adds a workshop to the workshop-set maintained by the system.
@@ -757,6 +769,7 @@ class TestPersistentDelegate(TestCase):
 
         self.assertEqual(cancelled_workshop.get("status"), Status.cancelled)
 #+END_SRC
+
 
 ***  Reschedule Workshop
 #+NAME: persistent_reschedule_workshop
@@ -1080,6 +1093,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 	
+
 ***  Get Name 
 
     This function returns a Name object from the database based on the name
@@ -1104,6 +1118,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Get Email
     This function returns an Email object from the database based on the email
     string provided.
@@ -1124,6 +1139,7 @@ class TestPersistentDelegate(TestCase):
          self.assertEqual(email_obj.get("email"), Config.admin_email)
 
 #+END_SRC
+
 
 ***  Get User
     This function returns a user if present in the database.  If the user is
@@ -1146,6 +1162,7 @@ class TestPersistentDelegate(TestCase):
                               Config.admin_email)
 
 #+END_SRC
+
 
 ***  Get Institute
     This function returns an institute if present in the database.  If the institute is
@@ -1170,6 +1187,7 @@ class TestPersistentDelegate(TestCase):
                               institute.get("name"))
 
 #+END_SRC
+
 
 ***  Get OC
     This function returns an =OC= if present in the database.  If =OC= is
@@ -1198,6 +1216,7 @@ class TestPersistentDelegate(TestCase):
                               oc.get("institute").get("name"))
 
 #+END_SRC
+
 
 ***  Get NC
     This function returns an =NC= if present in the database.  If =NC= is
@@ -1230,6 +1249,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Get Role
     This function returns either admin or user role from the roles in database
 #+NAME: persistent_get_role
@@ -1248,6 +1268,7 @@ class TestPersistentDelegate(TestCase):
          self.assertEqual(role_obj.get("name"), Config.admin_role)
 
 #+END_SRC
+
 
 ***  Get user by Email
     This function returns the user by email from the database
