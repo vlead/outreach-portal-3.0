@@ -20,11 +20,6 @@ def populate_db():
     guest_role.save()
     reviewer_role.save()
     noc_role.save()
-
-    admin_role = Role.get_by_id(1)
-    guest_role = Role.get_by_id(2)
-    reviewer_role = Role.get_by_id(3)
-    noc_role = Role.get_by_id(4)
     
     admin_name = Name(name=Config.admin_name)
     admin_email = Email(email=Config.admin_email)
@@ -34,8 +29,6 @@ def populate_db():
                             email=admin_email,
                             roles=[admin_role, guest_role])
     user.save()
-
-    admin_user = User.get_by_id(1)
 
 #+END_SRC
 * Test Constructor
@@ -364,9 +357,9 @@ class TestDeleteUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         inst = Institute(name="IIT",address="Delhi")
-        institute = System.do("create_institute", institute = inst,
+        institute = System.do("add_institute", institute = inst,
                                session=session)
-        oc = System.do("create_oc",institute=institute,session=session,
+        oc = System.do("add_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
 
         name = Name(name="maryoc")
@@ -395,7 +388,7 @@ class TestDeleteUser(TestCase):
         email1.save()
 
 
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+        nc = System.do("add_nc",institute=institute,hub=oc,session=session,
                         workshops = [], nc_target = None)
 
         guest_role = Role.query.filter_by(name='guest').first()
@@ -422,9 +415,9 @@ class TestDeleteUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         inst = Institute(name="IIT",address="Delhi")
-        institute = System.do("create_institute", institute = inst,
+        institute = System.do("add_institute", institute = inst,
                                session=session)
-        oc = System.do("create_oc",institute=institute,session=session,
+        oc = System.do("add_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
         
         name = Name(name="maryoc")
@@ -514,9 +507,9 @@ class TestUpdateUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         inst = Institute(name="IIT",address="Madras")
-        institute = System.do("create_institute", institute = inst,
+        institute = System.do("add_institute", institute = inst,
                                session=session)
-        oc = System.do("create_oc",institute=institute,session=session,
+        oc = System.do("add_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
 
         name = Name(name="useroc")
@@ -537,7 +530,7 @@ class TestUpdateUser(TestCase):
         oc_session = Session(user=oc_user,role=oc_role[0])
         System.session_set.append(oc_session)
 
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+        nc = System.do("add_nc",institute=institute,hub=oc,session=session,
                         nc_target = None, workshops = [])
         
         name1 = Name(name="usernc")
@@ -570,9 +563,9 @@ class TestUpdateUser(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         inst = Institute(name="IIT",address="Madras")
-        institute = System.do("create_institute", institute = inst,
+        institute = System.do("add_institute", institute = inst,
                                session=session)
-        oc = System.do("create_oc",institute=institute,session=session,
+        oc = System.do("add_oc",institute=institute,session=session,
                         spokes=[], oc_target = None)
         name = Name(name="useroc")
         name.save()
@@ -668,10 +661,11 @@ class Testlogin(TestCase):
         print "test_login"
         login_user=User.get_by_id(1)
         login_role = Role.get_by_id(1)
-        System.do("login",user=login_user,role=login_role)
+        System.do("login", user=login_user, role=login_role)
         session=System.session_set[0]
-        self.assertEqual(session.get("user").get("name").get("name"),"admin")
-        self.assertEqual(session.get("user").get('roles')[0].get('name'),"admin")
+        self.assertEqual(session.get("user").get("name").get("name"), "admin")
+        self.assertEqual(session.get("user").get('roles')[0].get('name'),
+                         "admin")
 
 #+END_SRC
 
@@ -699,15 +693,15 @@ class Testlogout(TestCase):
         print "test_logout"
         login_user= User.get_by_id(1)
         login_role = Role.get_by_id(1)
-        sess = System.do("login",user=login_user,role=login_role)
+        session = System.do("login", user=login_user, role=login_role)
         self.assertEqual(len(System.session_set),1)
-        System.do("logout",session=sess)
-        self.assertEqual(System.session_set,[])
+        System.do("logout",session=session)
+        self.assertEqual(System.session_set, [])
 #+END_SRC
-* Test create_institute
-#+NAME: test_CreateInstitute
+* Test add_institute
+#+NAME: test_AddInstitute
 #+BEGIN_SRC python
-class TestCreateInstitute(TestCase):
+class TestAddInstitute(TestCase):
     TESTING = True
 
     def create_app(self):
@@ -725,19 +719,19 @@ class TestCreateInstitute(TestCase):
         db.session.remove()
         db.drop_all()
     
-    def test_create_institute(self):
-        print "test_create_institute"
+    def test_add_institute(self):
+        print "test_add_institute"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
         institute = Institute(name="IIIT", address="Hyderabad")
-        institute = System.do("create_institute", institute=institute,
+        institute = System.do("add_institute", institute=institute,
                                   session=session)
         self.assertEqual(Institute.get_by_id(1).get("name"), "IIIT")
 
 
-    def test_create_institute_raises_arity_error(self):
-        print "test_create_institute_raises_arity_error"
+    def test_add_institute_raises_arity_error(self):
+        print "test_add_institute_raises_arity_error"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
@@ -745,10 +739,10 @@ class TestCreateInstitute(TestCase):
         institute = Institute(name="IIIT", address="Hyderabad")
 
         with self.assertRaises(ArityError):
-            System.do("create_institute", institute=institute)
+            System.do("add_institute", institute=institute)
 
-    def test_create_institute_raises_type_check_error(self):
-        print "test_create_institute_raises_type_check_error"
+    def test_add_institute_raises_type_check_error(self):
+        print "test_add_institute_raises_type_check_error"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
@@ -756,13 +750,63 @@ class TestCreateInstitute(TestCase):
         institute = Institute(name="IIIT", address="Hyderabad")
 
         with self.assertRaises(TypeError):
-            System.do("create_institute", institute=session, session=session)
+            System.do("add_institute", institute=session, session=session)
+
+    def test_add_institute_raises_auth_error(self):
+        print "test_add_institute_raises_auth_error"
+
+        name = Name(name="nocuser")
+        email = Email(email="abc@gmail.com")
+        guest_role = Role.get_by_id(2)
+        reviewer_role = Role.get_by_id(3)
+        user = User(name=name, email=email, roles= [guest_role, reviewer_role])
+
+        guest_session = Session(user=user,role=guest_role)
+        System.session_set.append(guest_session)
+        reviewer_session = Session(user=user,role=reviewer_role)
+        System.session_set.append(reviewer_session)
+
+        institute = Institute(name="IIIT", address="Hyderabad")
+
+        with self.assertRaises(AuthError):
+            System.do("add_institute", institute=institute,
+                        session=guest_session)
+
+        with self.assertRaises(AuthError):
+            System.do("add_institute", institute=institute,
+                        session=reviewer_session)
+
+    def test_add_institute_raises_state_error_with_no_session(self):
+        print "test_add_institute_raises_state_error_with_no_session"
+
+        admin_role = Role.get_by_id(1)
+        admin_user = User.get_by_id(1)
+        session = Session(user=admin_user, role=admin_role)
+
+        institute = Institute(name="IIIT", address="Hyderabad")
+
+        with self.assertRaises(StateError):
+            System.do("add_institute", institute=institute, session=session)
+
+    def test_add_institute_raises_state_error_with_existing_institute(self):
+        print "test_add_institute_raises_state_error_with_existing"
+        "_institute"
+        admin_role = Role.get_by_id(1)
+        admin_user = User.get_by_id(1)
+        session = Session(user=admin_user, role=admin_role)
+        System.session_set.append(session)
+
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute.save()
+
+        with self.assertRaises(StateError):
+            System.do("add_institute", institute=institute, session=session)
 
 #+END_SRC
-* Test create_oc
-#+NAME: test_CreateOC
+* Test add_oc
+#+NAME: test_AddOC
 #+BEGIN_SRC python
-class TestCreateOC(TestCase):
+class TestAddOC(TestCase):
     TESTING = True
 
     def create_app(self):
@@ -780,34 +824,34 @@ class TestCreateOC(TestCase):
         db.session.remove()
         db.drop_all()
     
-    def test_create_oc(self):
-        print "test_create_oc"
+    def test_add_oc(self):
+        print "test_add_oc"
         login_user=User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
         institute = Institute(name="IIIT", address="Hyderabad")
-        institute = System.do("create_institute", institute=institute,
+        institute = System.do("add_institute", institute=institute,
                                session=session)
-        oc = System.do("create_oc", institute=institute, session=session)
+        oc = System.do("add_oc", institute=institute, session=session)
         self.assertEqual(OC.get_by_id(1).get("institute").get("name"), 
                              Institute.get_by_id(1).get("name"))
         self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 
-    def test_create_oc_raises_arity_error(self):
-        print "test_create_oc_raises_arity_error"
+    def test_add_oc_raises_arity_error(self):
+        print "test_add_oc_raises_arity_error"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
 
         institute = Institute(name="IIIT", address="Hyderabad")
-        institute = System.do("create_institute", institute=institute,
+        institute = System.do("add_institute", institute=institute,
                                 session=session)
 
         with self.assertRaises(ArityError):
-            System.do("create_oc", institute=institute)
+            System.do("add_oc", institute=institute)
 
-    def test_create_oc_raises_type_check_error(self):
-        print "test_create_oc_raises_type_check_error"
+    def test_add_oc_raises_type_check_error(self):
+        print "test_add_oc_raises_type_check_error"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
@@ -815,14 +859,103 @@ class TestCreateOC(TestCase):
         institute = Institute(name="IIIT", address="Hyderabad")
 
         with self.assertRaises(TypeError):
-            System.do("create_oc", institute=session, session=session)
+            System.do("add_oc", institute=session, session=session)
+
+
+    def test_add_oc_raises_auth_error(self):
+        print "test_add_oc_raises_auth_error"
+
+        name = Name(name="nocuser")
+        email = Email(email="abc@gmail.com")
+        admin_role = Role.get_by_id(1)
+        guest_role = Role.get_by_id(2)
+        reviewer_role = Role.get_by_id(3)
+
+        user = User(name=name, email=email, roles= [guest_role, reviewer_role])
+
+        admin_session = Session(user=user, role=admin_role)
+        System.session_set.append(admin_session)
+        guest_session = Session(user=user, role=guest_role)
+        System.session_set.append(guest_session)
+        reviewer_session = Session(user=user, role=reviewer_role)
+        System.session_set.append(reviewer_session)
+
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute.save()
+        oc = System.do("add_oc", institute=institute, session=admin_session)
+        nc = System.do("add_nc", institute=institute, hub=oc,
+                        session=admin_session)
+
+        occ_role = Role.get_by_id(5)
+        ncc_role = Role.get_by_id(6)
+        occ_session = Session(user=user, role=occ_role)
+        System.session_set.append(occ_session)
+        ncc_session = Session(user=user, role=ncc_role)
+        System.session_set.append(ncc_session)
+
+        with self.assertRaises(AuthError):
+            System.do("add_oc", institute=institute,
+                        session=guest_session)
+        with self.assertRaises(AuthError):
+            System.do("add_oc", institute=institute,
+                        session=reviewer_session)
+        with self.assertRaises(AuthError):
+            System.do("add_oc", institute=institute,
+                        session=occ_session)
+        with self.assertRaises(AuthError):
+            System.do("add_oc", institute=institute,
+                        session=ncc_session)
+
+    def test_add_oc_raises_state_error_with_no_session(self):
+        print "test_add_oc_raises_state_error_with_no_session"
+
+        admin_role = Role.get_by_id(1)
+        admin_user = User.get_by_id(1)
+        session = Session(user=admin_user, role=admin_role)
+
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute.save()
+
+        with self.assertRaises(StateError):
+            System.do("add_oc", institute=institute, session=session)
+
+    def test_add_oc_raises_state_error_without_an_institute(self):
+        print "test_add_oc_raises_state_error_without_an_institute"
+
+        admin_role = Role.get_by_id(1)
+        admin_user = User.get_by_id(1)
+        session = Session(user=admin_user, role=admin_role)
+        System.session_set.append(session)
+
+        institute = Institute(name="IIIT", address="Hyderabad")
+
+        with self.assertRaises(StateError):
+            System.do("add_oc", institute=institute, session=session)
+
+
+    def test_add_oc_raises_state_error_with_existing_oc(self):
+        print "test_add_oc_raises_state_error_with_existing_oc"
+
+        admin_role = Role.get_by_id(1)
+        admin_user = User.get_by_id(1)
+        session = Session(user=admin_user, role=admin_role)
+        System.session_set.append(session)
+
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute.save()
+
+        oc = OC(institute=institute, spokes=[], oc_targets=[])
+        oc.save()
+
+        with self.assertRaises(StateError):
+            System.do("add_oc", institute=institute, session=session)
 
 #+END_SRC
 
-* Test CreateNC
-#+NAME: test_CreateNC
+* Test AddNC
+#+NAME: test_AddNC
 #+BEGIN_SRC python
-class TestCreateNC(TestCase):
+class TestAddNC(TestCase):
     TESTING = True
 
     def create_app(self):
@@ -840,16 +973,16 @@ class TestCreateNC(TestCase):
         db.session.remove()
         db.drop_all()
 
-    def test_create_nc(self):
-        print "test_create_nc"
+    def test_add_nc(self):
+        print "test_add_nc"
         login_user= User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
         institute = Institute(name="IIIT", address="Hyderabad")
-        institute = System.do("create_institute", institute = institute,
+        institute = System.do("add_institute", institute = institute,
                                session=session)
-        oc = System.do("create_oc", institute=institute, session=session)
-        nc = System.do("create_nc", institute=institute, hub=oc,
+        oc = System.do("add_oc", institute=institute, session=session)
+        nc = System.do("add_nc", institute=institute, hub=oc,
                         session=session)
         self.assertEqual(NC.get_by_id(1).get('institute').get("name"),
                              institute.get("name"))
@@ -857,34 +990,129 @@ class TestCreateNC(TestCase):
                              ("name"), nc.get("institute").get("name"))
         self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 
-    def test_create_nc_raises_arity_error(self):
-        print "test_create_nc_raises_arity_error"
+    def test_add_nc_raises_arity_error(self):
+        print "test_add_nc_raises_arity_error"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
 
         institute = Institute(name="IIIT", address="Hyderabad")
-        institute = System.do("create_institute", institute=institute,
+        institute = System.do("add_institute", institute=institute,
                                 session=session)
-        oc = System.do("create_oc", institute=institute, session=session)
+        oc = System.do("add_oc", institute=institute, session=session)
 
         with self.assertRaises(ArityError):
-            System.do("create_nc", institute=institute, hub=oc)
+            System.do("add_nc", institute=institute, hub=oc)
 
-    def test_create_nc_raises_type_check_error(self):
-        print "test_create_nc_raises_type_check_error"
+    def test_add_nc_raises_type_check_error(self):
+        print "test_add_nc_raises_type_check_error"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
 
         institute = Institute(name="IIIT", address="Hyderabad")
-        institute = System.do("create_institute", institute=institute,
+        institute = System.do("add_institute", institute=institute,
                                 session=session)
-        oc = System.do("create_oc", institute=institute, session=session)
+        oc = System.do("add_oc", institute=institute, session=session)
 
         with self.assertRaises(TypeError):
-            System.do("create_nc", institute=session, hub=oc, session=session)
+            System.do("add_nc", institute=session, hub=oc, session=session)
 
+    def test_add_nc_raises_auth_error(self):
+        print "test_add_nc_raises_auth_error"
+
+        name = Name(name="nocuser")
+        email = Email(email="abc@gmail.com")
+        admin_role = Role.get_by_id(1)
+        guest_role = Role.get_by_id(2)
+        reviewer_role = Role.get_by_id(3)
+        noc_role = Role.get_by_id(4)
+        user = User(name=name, email=email, roles= [guest_role, reviewer_role])
+
+        admin_session = Session(user=user, role=admin_role)
+        System.session_set.append(admin_session)
+        guest_session = Session(user=user, role=guest_role)
+        System.session_set.append(guest_session)
+        reviewer_session = Session(user=user, role=reviewer_role)
+        System.session_set.append(reviewer_session)
+        noc_session = Session(user=user, role=noc_role)
+        System.session_set.append(noc_session)
+
+        institute = Institute(name="NIT", address="Warangal")
+        institute.save()
+        oc = System.do("add_oc", institute=institute, session=admin_session)
+        nc = System.do("add_nc", institute=institute, hub=oc,
+                        session=admin_session)
+
+        ncc_role = Role.get_by_id(6)
+        ncc_session = Session(user=user, role=ncc_role)
+        System.session_set.append(ncc_session)
+
+        with self.assertRaises(AuthError):
+            System.do("add_nc", institute=institute, hub=oc,
+                        session=guest_session)
+        with self.assertRaises(AuthError):
+            System.do("add_nc", institute=institute, hub=oc,
+                        session=reviewer_session)
+        with self.assertRaises(AuthError):
+            System.do("add_nc", institute=institute, hub=oc,
+                        session=noc_session)
+        with self.assertRaises(AuthError):
+            System.do("add_nc", institute=institute, hub=oc,
+                        session=ncc_session)
+
+
+    def test_add_nc_raises_state_error_with_no_session(self):
+        print "test_add_nc_raises_state_error_with_no_session"
+
+        admin_role = Role.get_by_id(1)
+        admin_user = User.get_by_id(1)
+        session = Session(user=admin_user, role=admin_role)
+
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute.save()
+        oc = OC(institute=institute, spokes=[], oc_targets=[])
+        oc.save()
+
+        with self.assertRaises(StateError):
+            System.do("add_nc", institute=institute, hub=oc, session=session)
+
+    def test_add_nc_raises_state_error_without_an_institute(self):
+        print "test_add_nc_raises_state_error_without_an_institute"
+
+        admin_role = Role.get_by_id(1)
+        admin_user = User.get_by_id(1)
+        session = Session(user=admin_user, role=admin_role)
+        System.session_set.append(session)
+
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute.save()
+        oc = OC(institute=institute, spokes=[], oc_targets=[])
+        oc.save()
+
+        nc_institute = Institute(name="IIT", address="Hyderabad")
+
+        with self.assertRaises(StateError):
+            System.do("add_nc", institute=nc_institute, hub=oc, session=session)
+
+    def test_add_nc_raises_state_error_with_existing_nc(self):
+        print "test_add_nc_raises_state_error_with_existing_nc"
+
+        admin_role = Role.get_by_id(1)
+        admin_user = User.get_by_id(1)
+        session = Session(user=admin_user, role=admin_role)
+        System.session_set.append(session)
+
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute.save()
+        oc = OC(institute=institute, spokes=[], oc_targets=[])
+        oc.save()
+        nc = NC(institute=institute, hub=oc, nc_targets=[], workshops=[])
+        nc.save()
+
+        with self.assertRaises(StateError):
+            System.do("add_nc", institute=institute, hub=oc,
+                          session=session)
 #+END_SRC
 * Test update_institute
 #+NAME: test_UpdateInstitute
@@ -915,7 +1143,7 @@ class TestUpdateInstitute(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute", institute = inst, session=session)
+        institute = System.do("add_institute", institute = inst, session=session)
 
         System.do("update_institute",name="NITK",
                    institute=institute,session=session)
@@ -950,19 +1178,20 @@ class TestCreateWorkshop(TestCase):
         login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
         inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute",institute = inst,
+        institute = System.do("add_institute",institute = inst,
                                 session=sess)
         inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst,
+        workshop_institute = System.do("add_institute", institute = inst,
                                         session = sess)
         
-        oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
+        oc = System.do("add_oc",institute= Institute.get_by_id(1),spokes=[],
                         session=sess, oc_target = None)
 
-        nc = System.do("create_nc",institute= Institute.get_by_id(1),
+        nc = System.do("add_nc",institute= Institute.get_by_id(1),
                         hub=oc,session=sess, nc_target = None, workshops = [])
 
-        target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
+        target_date = datetime.datetime.strptime("30-06-2016", 
+                                                 "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
         nc_target = NCTarget(usage = 200, date = target_date,
                              oc_target = oc_target, wstargets = [])
@@ -971,7 +1200,7 @@ class TestCreateWorkshop(TestCase):
         oc_target.save()
         nc_target.save()
 
-        session = Session(user=login_user,role=Role.admin)
+        session = Session(user=login_user, role=Role.admin)
         System.session_set.append(session)
         ws_status = Status(name = "pending")
         ws_status.save()
@@ -1035,14 +1264,14 @@ class TestCancelWorkshop(TestCase):
         login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
         inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute",institute = inst, session=sess)
+        institute = System.do("add_institute",institute = inst, session=sess)
         inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst, session = sess)
+        workshop_institute = System.do("add_institute", institute = inst, session = sess)
 
-        oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
+        oc = System.do("add_oc",institute= Institute.get_by_id(1),spokes=[],
                         session=sess, oc_target = None)
 
-        nc = System.do("create_nc",institute= Institute.get_by_id(1),
+        nc = System.do("add_nc",institute= Institute.get_by_id(1),
                         hub=oc,session=sess, nc_target = None, workshops = [])
 
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
@@ -1126,14 +1355,14 @@ class TestRescheduleWorkshop(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute",institute = inst,session=session)
+        institute = System.do("add_institute",institute = inst,session=session)
         inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst, 
+        workshop_institute = System.do("add_institute", institute = inst, 
                                         session = session)
-        oc = System.do("create_oc",institute=institute,spokes=[],
+        oc = System.do("add_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
 
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+        nc = System.do("add_nc",institute=institute,hub=oc,session=session,
                         nc_target = None, workshops = [])
 
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
@@ -1224,15 +1453,15 @@ class TestConductWorkshop(TestCase):
         login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
         inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute",institute = inst, session=sess)
+        institute = System.do("add_institute",institute = inst, session=sess)
         inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst,
+        workshop_institute = System.do("add_institute", institute = inst,
                                         session = sess)
 
-        oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
+        oc = System.do("add_oc",institute= Institute.get_by_id(1),spokes=[],
                         session=sess, oc_target = None)
 
-        nc = System.do("create_nc",institute= Institute.get_by_id(1),
+        nc = System.do("add_nc",institute= Institute.get_by_id(1),
                         hub=oc,session=sess, nc_target = None, workshops = [])
 
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
@@ -1315,14 +1544,14 @@ class TestUploadArtefact(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute", institute = inst, session=session)
+        institute = System.do("add_institute", institute = inst, session=session)
         inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst,
+        workshop_institute = System.do("add_institute", institute = inst,
                                         session = session)
-        oc = System.do("create_oc",institute=institute,spokes=[],
+        oc = System.do("add_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
 
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+        nc = System.do("add_nc",institute=institute,hub=oc,session=session,
                         nc_target = None, workshops = [])
 
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
@@ -1412,15 +1641,15 @@ class TestApproveWorkshop(TestCase):
         login_role = Role.get_by_id(1)
         sess = System.do("login",user=login_user,role=login_role)
         inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("create_institute",institute = inst, session=sess)
+        institute = System.do("add_institute",institute = inst, session=sess)
         inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst,
+        workshop_institute = System.do("add_institute", institute = inst,
                                         session = sess)
 
-        oc = System.do("create_oc",institute= Institute.get_by_id(1),spokes=[],
+        oc = System.do("add_oc",institute= Institute.get_by_id(1),spokes=[],
                         session=sess, oc_target = None)
 
-        nc = System.do("create_nc",institute= Institute.get_by_id(1),
+        nc = System.do("add_nc",institute= Institute.get_by_id(1),
                         hub=oc,session=sess, nc_target = None, workshops = [])
 
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
@@ -1525,14 +1754,14 @@ class TestRejectWorkshop(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         inst = Institute(name = "IIIT", address = "Hyderabad")
-        institute = System.do("create_institute", institute = inst, session=session)
+        institute = System.do("add_institute", institute = inst, session=session)
         inst = Institute(name = "NITK", address = "Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst,
+        workshop_institute = System.do("add_institute", institute = inst,
                                         session = session)
-        oc = System.do("create_oc",institute=institute,spokes=[],
+        oc = System.do("add_oc",institute=institute,spokes=[],
                         session=session, oc_target = None)
 
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+        nc = System.do("add_nc",institute=institute,hub=oc,session=session,
                         nc_target = None, workshops = [])
 
         target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
@@ -1638,15 +1867,15 @@ class TestDeleteArtefact(TestCase):
         session = Session(user=admin_user,role=Role.admin)
         System.session_set.append(session)
         inst = Institute(name = "IIIT", address = "Hyderabad")
-        institute = System.do("create_institute", institute = inst, session=session)
+        institute = System.do("add_institute", institute = inst, session=session)
         inst = Institute(name = "NITK", address = "Surathkal")
-        workshop_institute = System.do("create_institute", institute = inst, 
+        workshop_institute = System.do("add_institute", institute = inst, 
                                         session = session)
             
-        oc = System.do("create_oc",institute=institute,spokes=[],
+        oc = System.do("add_oc",institute=institute,spokes=[],
                        session=session, oc_target = None)
         
-        nc = System.do("create_nc",institute=institute,hub=oc,session=session,
+        nc = System.do("add_nc",institute=institute,hub=oc,session=session,
                         nc_target = None, workshops = [])
         
         name=Name(name="ncuser")
@@ -1717,10 +1946,10 @@ class TestDeleteArtefact(TestCase):
 ops_table = {'add_user' : AddUser, 
              'login': login, 
              'logout': logout,
-             'create_institute': CreateInstitute, 
+             'add_institute': AddInstitute, 
              'delete_user': DeleteUser,
-             'create_oc': CreateOC, 
-             'create_nc': CreateNC, 
+             'add_oc': AddOC, 
+             'add_nc': AddNC, 
              'update_user': UpdateUser, 
              'update_institute': UpdateInstitute, 
              'add_role': AddRole,
@@ -1746,14 +1975,13 @@ ops_table = {'add_user' : AddUser,
 # -*- coding: utf-8 -*-
 import unittest
 from flask_testing import TestCase
-from runtime.utils.class_persistence_template import *
+#from runtime.utils.class_persistence_template import *
 from runtime.rest.app import create_app
-from sqlalchemy.exc import IntegrityError
-from runtime.persistence.entities import *
+#from sqlalchemy.exc import IntegrityError
 from runtime.system.persistent_delegates import *
 
 from runtime.system.system import *
-
+from runtime.system.populate_db import *
 config = {
          'SQLALCHEMY_DATABASE_URI': ''
          }
@@ -1770,7 +1998,10 @@ if __name__ == '__main__':
 
 * Tangling                                                      :boilerplate:
 
-
+** source
+#+BEGIN_SRC python :tangle populate_db.py :eval no :noweb yes
+<<populate_db>>
+#+END_SRC
 ** tests
 #+BEGIN_SRC python :tangle test_persistent_system.py :eval no :noweb yes
 <<imports_for_tests>>
@@ -1780,12 +2011,12 @@ if __name__ == '__main__':
 <<test_add_user>>
 #<<test_update_user>>
 #<<test_update_user>>
-#<<test_login>>
-#<<test_logout>>
+<<test_login>>
+<<test_logout>>
 #<<test_updateuser>>
-<<test_CreateInstitute>>
-<<test_CreateOC>>
-<<test_CreateNC>>
+<<test_AddInstitute>>
+<<test_AddOC>>
+<<test_AddNC>>
 #<<test_AddRole>>
 #<<test_UpdateInstitute>>
 #<<test_CreateWorkshop>>
