@@ -1609,7 +1609,7 @@ if __name__ == '__main__':
 #<<test_persistent_get_institutes>>
 <<test_persistent_add_workshop>>
 <<test_persistent_workshop_exists>>
-#<<test_persistent_cancel_workshop>>
+<<test_persistent_cancel_workshop>>
 #<<test_persistent_reschedule_workshop>>
 #<<test_persistent_conduct_workshop>>
 #<<test_persistent_upload_artefact>>
