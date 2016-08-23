@@ -184,6 +184,7 @@ class TestPersistentDelegate(TestCase):
     
 #+END_SRC
 
+
 ***  Update a user in the system
 #+NAME: persistent_update_user
 #+BEGIN_SRC python 
@@ -273,6 +274,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Get all Active users from the system
 
     This return the user_set maintained by the system.
@@ -345,6 +347,7 @@ class TestPersistentDelegate(TestCase):
                             False)
 
 #+END_SRC
+
 
 ***  Get all roles from the System
     This return the role_set maintained by the system.
@@ -489,6 +492,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Add a oc to the system
     This function adds an outreach centre to the oc-set maintained by the system.
 #+NAME: persistent_add_oc
@@ -515,6 +519,7 @@ class TestPersistentDelegate(TestCase):
          oc = self.persistent_delegate.add_oc(institute)
          self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 #+END_SRC
+
 
 ***  Add a nc to the system
     This function adds an outreach centre to the nc-set maintained by the system.
@@ -547,6 +552,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Get ocs from system
 
     This return the oc_set maintained by the system.
@@ -569,6 +575,7 @@ class TestPersistentDelegate(TestCase):
          self.assertEqual(len(self.persistent_delegate.get_ocs()), 1)
 
 #+END_SRC
+
 
 ***  Check if =nc= already exists
     This function checks if a nodal-centre is already in the nc-set of the =System=.
@@ -594,6 +601,7 @@ class TestPersistentDelegate(TestCase):
          nc = self.persistent_delegate.add_nc(institute, oc)
          self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 #+END_SRC
+
 
 ***  Get ncs from system
 
@@ -625,6 +633,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Get all active_users from system
     This function returns All the active users from the user_set.
 #+NAME: persistent_get_active_users
@@ -653,15 +662,25 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Check if =workshop= already exists
     This function checks if a workshop is already in the workshop-set of the =System=.
 #+NAME: persistent_workshop_exists
 #+BEGIN_SRC python
     def workshop_exists(self, workshop):
-        if workshop in Workshop.get_all():
-            return True
+        name = workshop.get("name")
+        institute = workshop.get("institute")
+        nc = workshop.get("nc")
+        date = workshop.get("date")
+        if name and institute and nc and date:
+            return workshop == self.get_workshop(name=name, 
+                                                 institute=institute,
+                                                 nc=nc,
+                                                 date=date)
         else:
             return False
+
+
 #+END_SRC
 
 **** Tests
@@ -685,6 +704,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Add a workshop to the system
     This function adds a workshop to the workshop-set maintained by the system.
 #+NAME: persistent_add_workshop
@@ -694,13 +714,13 @@ class TestPersistentDelegate(TestCase):
         new_workshop = Workshop(institute = institute,
                                 name = name,
                                 ws_target = ws_target,
-                                artefacts = artefacts,
+                                artefacts = [],
                                 status = status,
                                 nc = nc,
-                                a_date = None,
-                                a_participants = 0,
-                                a_experiments = 0,
-                                a_usage = 0)
+                                date = date,
+                                participants = 0,
+                                experiments = 0,
+                                usage = 0)
         new_workshop.save()
         return new_workshop
 
@@ -711,19 +731,26 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_add_workshop(self):
         print "test_add_workshop"
-        institute = Institute(name='IIIT',address='Hyderabad')
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        institute = Institute(name="IIIT", address="Hyderabad")
+        institute.save()
+        oc = OC(institute=institute, spokes=[], oc_targets=[])
+        nc = NC(institute=institute, hub=oc, nc_targets=[], workshops=[])
+        target_date = datetime.datetime.strptime("30-06-2016", \
+                                                 "%d-%m-%Y").date()
         oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
-        name = Name(name = "New Workshop")
-        status = Status(name = "pending")
-        artefacts = []
-
-        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
-        self.assertEqual(self.persistent_delegate.workshop_exists(workshop), True)
+        oc_target.save()
+        nc_target = NCTarget(usage = 200, date = target_date,
+                             oc_target = oc_target, ws_targets = [])
+        nc_target.save()
+        ws_target = WSTarget(usage = 4000, participants = 200,
+                             experiments = 20, date = target_date,
+                             nc_target = nc_target )
+        name = Name(name="New Workshop")
+        status = Status(name="pending")
+        workshop = self.persistent_delegate.add_workshop(institute, name,\
+                                                         ws_target, status, nc)
+        self.assertEqual(self.persistent_delegate.workshop_exists(workshop),
+                         True)
 #+END_SRC
 
 
@@ -757,6 +784,7 @@ class TestPersistentDelegate(TestCase):
 
         self.assertEqual(cancelled_workshop.get("status"), Status.cancelled)
 #+END_SRC
+
 
 ***  Reschedule Workshop
 #+NAME: persistent_reschedule_workshop
@@ -1080,6 +1108,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 	
+
 ***  Get Name 
 
     This function returns a Name object from the database based on the name
@@ -1104,6 +1133,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Get Email
     This function returns an Email object from the database based on the email
     string provided.
@@ -1124,6 +1154,7 @@ class TestPersistentDelegate(TestCase):
          self.assertEqual(email_obj.get("email"), Config.admin_email)
 
 #+END_SRC
+
 
 ***  Get User
     This function returns a user if present in the database.  If the user is
@@ -1146,6 +1177,7 @@ class TestPersistentDelegate(TestCase):
                               Config.admin_email)
 
 #+END_SRC
+
 
 ***  Get Institute
     This function returns an institute if present in the database.  If the institute is
@@ -1170,6 +1202,7 @@ class TestPersistentDelegate(TestCase):
                               institute.get("name"))
 
 #+END_SRC
+
 
 ***  Get OC
     This function returns an =OC= if present in the database.  If =OC= is
@@ -1198,6 +1231,7 @@ class TestPersistentDelegate(TestCase):
                               oc.get("institute").get("name"))
 
 #+END_SRC
+
 
 ***  Get NC
     This function returns an =NC= if present in the database.  If =NC= is
@@ -1230,6 +1264,7 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
+
 ***  Get Role
     This function returns either admin or user role from the roles in database
 #+NAME: persistent_get_role
@@ -1248,6 +1283,72 @@ class TestPersistentDelegate(TestCase):
          self.assertEqual(role_obj.get("name"), Config.admin_role)
 
 #+END_SRC
+
+
+***  Get Workshop
+    This function returns the workshop if present in the database.  If the workshop is
+    not present, =None= type is returned.
+#+NAME: persistent_get_workshop
+#+BEGIN_SRC python
+    def get_workshop(self, **kwargs):
+        return self.get_object(Workshop, **kwargs)
+
+#+END_SRC
+
+**** Tests
+#+NAME: test_persistent_get_workshop
+#+BEGIN_SRC python
+    def test_get_workshop(self):
+         print "test_get_workshop"
+
+         status = Status(name="pending")
+         status.save()
+         inst1 = Institute(name="NIT",address="Suratkal")
+         inst1.save()
+         inst2 = Institute(name="IIIT",address="Hyderabad")
+         inst2.save()
+         inst3 = Institute(name="HCU",address="Hyderabad")
+         inst3.save()
+        
+         oc = OC(institute=inst1, spokes=[], oc_targets=[])
+         oc.save()
+        
+         nc = NC(institute=inst2, hub=oc,
+                 nc_targets=[], workshops=[])
+         nc.save()
+
+         date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
+
+         oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+         oc_target.save()
+         nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                                oc_target=oc_target, ws_targets=[])
+         nc_target.save()
+         ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                  date=date, nc_target=nc_target)
+         ws_target.save()
+
+         workshop = Workshop(name="Test workshop",
+                                institute=inst3,
+                                status=status, 
+                                artefacts=[], 
+                                nc=nc,
+                                ws_target=ws_target,
+                                date=date,
+                                participants=0,
+                                experiments=0,
+                                usage=0)
+         workshop.save()
+
+         workshop_obj = self.persistent_delegate.get_workshop(name="Test"
+                                                              " workshop", 
+                                                              institute=inst3,
+                                                              nc=nc,
+                                                              date=date)
+         self.assertEqual(workshop_obj.get("name"), workshop.get("name"))
+
+#+END_SRC
+
 
 ***  Get user by Email
     This function returns the user by email from the database
@@ -1335,6 +1436,7 @@ if __name__ == '__main__':
 <<persistent_get_institute>>
 <<persistent_get_oc>>
 <<persistent_get_nc>>
+<<persistent_get_workshop>>
 <<persistent_update_user>>
 <<persistent_delete_user>>
 <<persistent_add_role_to_user>>
@@ -1386,6 +1488,7 @@ if __name__ == '__main__':
 <<test_persistent_get_institute>>
 <<test_persistent_get_oc>>
 <<test_persistent_get_nc>>
+<<test_persistent_get_workshop>>
 #<<test_persistent_update_user>>
 #<<test_persistent_delete_user>>
 <<test_persistent_add_role_to_user>>
