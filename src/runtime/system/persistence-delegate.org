@@ -13,7 +13,7 @@
   each environment, for example, be it either objects or persistence, the
   =system= for that particular environment is derived while not modifying the
   =system= class.
-
+  
 ** Initialize Persistence Delegate
    Provides all the delegates that operate on objects.
 
@@ -256,21 +256,21 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_add_role_to_user(self):
         name = Name(name="some user")
-        name.save()
         email = Email(email="tt@kk.com")
+        name.save()
         email.save()
         guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
         guest_role.save()
         reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
         reviewer_role.save()
 
-        user = User(name=name,
-                    email=email,
-                    roles=[guest_role])
+        user = User(name=name, email=email, roles=[guest_role])
         user.save()
+        
         user_with_new_role = self.persistent_delegate.add_role_to_user\
           (user, reviewer_role)
-        self.assertTrue(len(user_with_new_role.get('roles')) == 2)
+        self.assertTrue(len(user_with_new_role.get('roles'))==2)
+
 #+END_SRC
 
 ***  Get all Active users from the system
