@@ -275,6 +275,41 @@ class TestAddUser(TestCase):
 
         with self.assertRaises(TypeError):
             System.do("add_user", user=session, session=session)
+
+    def test_add_user_raises_state_error_with_no_session(self):
+        print "test_add_user_raises_state_error_with_no_session"
+
+        admin_user = User.get_by_id(1)
+        admin_role = Role.get_by_id(1)
+        admin_session = Session(user=admin_user, role=admin_role)
+
+        name = Name(name="nocuser")
+        email = Email(email="abc@gmail.com")
+        guest_role = Role.get_by_id(2)
+        user = User(name=name, email=email, roles=[guest_role])
+
+        with self.assertRaises(StateError):
+            System.do("add_user", user=user, session=admin_session)
+
+    def test_add_user_raises_state_error_with_existing_user(self):
+        print "test_add_user_raises_state_error_with_existing_user"
+
+        admin_user = User.get_by_id(1)
+
+        admin_role = Role.get_by_id(1)
+        admin_session = Session(user=admin_user, role=admin_role)
+        System.session_set.append(admin_session)
+
+        name = Name(name="nocuser")
+        name.save()
+        email = Email(email="abc@gmail.com")
+        email.save()
+        guest_role = Role.get_by_id(2)
+        user = User(name=name, email=email, roles=[guest_role])
+        user.save()
+
+        with self.assertRaises(StateError):
+            System.do("add_user", user=user, session=admin_session)
             
 #+END_SRC
 * Test DeleteUser
