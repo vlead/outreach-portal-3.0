@@ -688,19 +688,43 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_workshop_exists(self):
         print "test_workshop_exists"
-        institute = Institute(name='IIIT',address='Hyderabad')
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
-        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
-        name = Name(name = "New Workshop")
-        status = Status(name = "pending")
-        artefacts = []
 
-        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
-        self.assertEqual(self.persistent_delegate.workshop_exists(workshop), True)
+        status = Status(name="pending")
+        status.save()
+        inst1 = Institute(name="NIT", address="Suratkal")
+        inst1.save()
+        inst2 = Institute(name="IIIT", address="Hyderabad")
+        inst2.save()
+        inst3 = Institute(name="HCU", address="Hyderabad")
+        inst3.save()
+        
+        oc = OC(institute=inst1, spokes=[], oc_targets=[])
+        oc.save()
+        
+        nc = NC(institute=inst2, hub=oc,
+                    nc_targets=[], workshops=[])
+        nc.save()
+        
+        date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
+        
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        oc_target.save()
+        nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                                 oc_target=oc_target, ws_targets=[])
+        nc_target.save()
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+        ws_target.save()
+        
+        workshop = self.persistent_delegate.add_workshop(name="Test workshop",
+                                                             institute=inst3,
+                                                             status=status, 
+                                                             nc=nc,
+                                                             ws_target=\
+                                                             ws_target,
+                                                             date=date)
+        self.assertEqual(self.persistent_delegate.workshop_exists(workshop), 
+                             True)
 
 #+END_SRC
 
@@ -709,18 +733,18 @@ class TestPersistentDelegate(TestCase):
     This function adds a workshop to the workshop-set maintained by the system.
 #+NAME: persistent_add_workshop
 #+BEGIN_SRC python
-    def add_workshop(self, institute, name, ws_target, artefacts, status, nc
-):
-        new_workshop = Workshop(institute = institute,
-                                name = name,
-                                ws_target = ws_target,
-                                artefacts = [],
-                                status = status,
-                                nc = nc,
-                                date = date,
-                                participants = 0,
-                                experiments = 0,
-                                usage = 0)
+    def add_workshop(self, name, institute, ws_target, status, \
+                         nc, date):
+        new_workshop = Workshop(name=name,
+                                institute=institute,
+                                status=status, 
+                                artefacts=[], 
+                                nc=nc,
+                                ws_target=ws_target,
+                                date=date,
+                                participants=0,
+                                experiments=0,
+                                usage=0)
         new_workshop.save()
         return new_workshop
 
@@ -731,24 +755,41 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_add_workshop(self):
         print "test_add_workshop"
-        institute = Institute(name="IIIT", address="Hyderabad")
-        institute.save()
-        oc = OC(institute=institute, spokes=[], oc_targets=[])
-        nc = NC(institute=institute, hub=oc, nc_targets=[], workshops=[])
-        target_date = datetime.datetime.strptime("30-06-2016", \
-                                                 "%d-%m-%Y").date()
-        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        oc_target.save()
-        nc_target = NCTarget(usage = 200, date = target_date,
-                             oc_target = oc_target, ws_targets = [])
-        nc_target.save()
-        ws_target = WSTarget(usage = 4000, participants = 200,
-                             experiments = 20, date = target_date,
-                             nc_target = nc_target )
-        name = Name(name="New Workshop")
         status = Status(name="pending")
-        workshop = self.persistent_delegate.add_workshop(institute, name,\
-                                                         ws_target, status, nc)
+        status.save()
+        inst1 = Institute(name="NIT", address="Suratkal")
+        inst1.save()
+        inst2 = Institute(name="IIIT", address="Hyderabad")
+        inst2.save()
+        inst3 = Institute(name="HCU", address="Hyderabad")
+        inst3.save()
+        
+        oc = OC(institute=inst1, spokes=[], oc_targets=[])
+        oc.save()
+        
+        nc = NC(institute=inst2, hub=oc,
+                    nc_targets=[], workshops=[])
+        nc.save()
+        
+        date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
+        
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        oc_target.save()
+        nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                                 oc_target=oc_target, ws_targets=[])
+        nc_target.save()
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+        ws_target.save()
+        
+        workshop = self.persistent_delegate.add_workshop(name="Test workshop",
+                                                             institute=inst3,
+                                                             status=status, 
+                                                             nc=nc,
+                                                             ws_target=\
+                                                             ws_target,
+                                                             date=date)
+
         self.assertEqual(self.persistent_delegate.workshop_exists(workshop),
                          True)
 #+END_SRC
@@ -1303,11 +1344,11 @@ class TestPersistentDelegate(TestCase):
 
          status = Status(name="pending")
          status.save()
-         inst1 = Institute(name="NIT",address="Suratkal")
+         inst1 = Institute(name="NIT", address="Suratkal")
          inst1.save()
-         inst2 = Institute(name="IIIT",address="Hyderabad")
+         inst2 = Institute(name="IIIT", address="Hyderabad")
          inst2.save()
-         inst3 = Institute(name="HCU",address="Hyderabad")
+         inst3 = Institute(name="HCU", address="Hyderabad")
          inst3.save()
         
          oc = OC(institute=inst1, spokes=[], oc_targets=[])
@@ -1507,7 +1548,7 @@ if __name__ == '__main__':
 <<test_persistent_add_institute>>
 #<<test_persistent_update_institute>>
 #<<test_persistent_get_institutes>>
-#<<test_persistent_add_workshop>>
+<<test_persistent_add_workshop>>
 #<<test_persistent_workshop_exists>>
 #<<test_persistent_cancel_workshop>>
 #<<test_persistent_reschedule_workshop>>
