@@ -38,6 +38,7 @@ def populate_db():
     admin_user = User.get_by_id(1)
 
 #+END_SRC
+
 * Test Constructor
 #+NAME: test_persistent_system_constructor
 #+BEGIN_SRC python
@@ -148,6 +149,7 @@ class TestSystemConstructor(TestCase):
 
 #+END_SRC
 
+
 * Test Arity and Type Checks
 #+NAME: test_arity_and_types
 #+BEGIN_SRC python
@@ -179,6 +181,7 @@ class TestSystemArityAndType(TestCase):
             System.type_check(args, arg_types)
 
 #+END_SRC
+
 
 * Test AddUser
 #+NAME: test_add_user
@@ -277,6 +280,7 @@ class TestAddUser(TestCase):
             System.do("add_user", user=session, session=session)
             
 #+END_SRC
+
 * Test DeleteUser
 #+NAME: test_delete_user
 #+BEGIN_SRC python
@@ -431,6 +435,7 @@ class TestDeleteUser(TestCase):
         self.assertEqual(oc_user.get("user_status"),"inactive")
 
 #+END_SRC
+
 * Test UpdateUser
 #+NAME: test_update_user
 #+BEGIN_SRC python
@@ -578,6 +583,7 @@ class TestUpdateUser(TestCase):
 
 
 #+END_SRC
+
 * Test AddRole
 #+NAME: test_AddRole
 #+BEGIN_SRC python
@@ -621,6 +627,8 @@ def test_add_role(self):
         self.assertEqual(len(User.get_by_id(1).get('roles')), 2)
 
 #+END_SRC
+
+
 * Test login
 #+NAME: test_login
 #+BEGIN_SRC python
@@ -653,6 +661,7 @@ class Testlogin(TestCase):
 
 #+END_SRC
 
+
 * Test logout
 #+NAME: test_logout
 #+BEGIN_SRC python
@@ -682,6 +691,7 @@ class Testlogout(TestCase):
         System.do("logout",session=sess)
         self.assertEqual(System.session_set,[])
 #+END_SRC
+
 * Test create_institute
 #+NAME: test_CreateInstitute
 #+BEGIN_SRC python
@@ -714,6 +724,7 @@ class TestCreateInstitute(TestCase):
         self.assertEqual(Institute.get_by_id(1).get("name"), "IIIT")
 
 #+END_SRC
+
 * Test create_oc
 #+NAME: test_CreateOC
 #+BEGIN_SRC python
@@ -749,6 +760,7 @@ class TestCreateOC(TestCase):
         self.assertEqual(self.persistent_delegate.oc_exists(oc), True)
 
 #+END_SRC
+
 
 * Test CreateNC
 #+NAME: test_CreateNC
@@ -788,6 +800,7 @@ class TestCreateNC(TestCase):
                              nc.get("institute").get("name"))
         self.assertEqual(self.persistent_delegate.nc_exists(nc), True)
 #+END_SRC
+
 * Test update_institute
 #+NAME: test_UpdateInstitute
 #+BEGIN_SRC python
@@ -824,6 +837,7 @@ class TestUpdateInstitute(TestCase):
         self.assertEqual(institute.get("name"),"NITK")
 
 #+END_SRC
+
 
 * Test CreateWorkshop
 #+NAME: test_CreateWorkshop
@@ -908,6 +922,7 @@ class TestCreateWorkshop(TestCase):
         self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"),
                          workshop_institute.get("name"))
 #+END_SRC
+
 
 * Test CancelWorkshop
 #+NAME: test_CancelWorkshop
@@ -1000,6 +1015,7 @@ class TestCancelWorkshop(TestCase):
 #                         ws_status.cancelled.get("name"))
         
     #+END_SRC
+
 
 * Test RescheduleWorkshop
 #+NAME: test_RescheduleWorkshop
@@ -1099,6 +1115,7 @@ class TestRescheduleWorkshop(TestCase):
         
     #+END_SRC
 
+
 * Test ConductWorkshop
 #+NAME: test_ConductWorkshop
 #+BEGIN_SRC python
@@ -1189,6 +1206,7 @@ class TestConductWorkshop(TestCase):
 #        self.assertEqual(nc.get("workshops")[0].get("status").get("name"),
 #                         ws_status.completed.get("name"))
  #+END_SRC
+
 
 * Test UploadArtefact
 #+NAME: test_UploadArtefact
@@ -1284,6 +1302,7 @@ class TestUploadArtefact(TestCase):
         
 
     #+END_SRC
+
 
 * Test ApproveWorkshop
 #+NAME: test_ApproveWorkshop
@@ -1399,6 +1418,7 @@ class TestApproveWorkshop(TestCase):
 
     #+END_SRC
 
+
 * Test RejectWorkshop
 #+NAME: test_RejectWorkshop
 #+BEGIN_SRC python
@@ -1513,6 +1533,7 @@ class TestRejectWorkshop(TestCase):
                          Status.rejected.get("name"))
 
     #+END_SRC
+
 * Test DeleteArtefact
 #+NAME: test_DeleteArtefact
 #+BEGIN_SRC python
@@ -1613,6 +1634,7 @@ class TestDeleteArtefact(TestCase):
 
     #+END_SRC
 
+
 * ops_table
 #+NAME: ops_table
 #+BEGIN_SRC python
@@ -1636,6 +1658,7 @@ ops_table = {'add_user' : AddUser,
              'delete_artefact' : DeleteArtefact
 }
 #+END_SRC
+
 
 * Infra                                                         :boilerplate:
 
@@ -1669,6 +1692,7 @@ if __name__ == '__main__':
     unittest.main()
 
 #+END_SRC
+
 
 * Tangling                                                      :boilerplate:
 
