@@ -655,8 +655,6 @@ class CreateWorkshop():
        nc = args["nc"]
        if not (System.is_session_NCC(session)):
            raise AuthError("Role not Authorized to perform this action")
-       if nc != session.get("role").get("centre_nc"):
-           raise AuthError("Role not Authorized to perform this action")
        
    @staticmethod
    def state_check(args):
@@ -670,7 +668,11 @@ class CreateWorkshop():
        if not System.delegate.institute_exists(institute):
            raise StateError("institute %s not in System"
                                 % institute.get("name"))
-       if not System.delegate.nc_exists(nc):
+
+       if System.delegate.nc_exists(nc):
+           if nc != session.get("role").get("centre_nc"):
+               raise AuthError("Role not Authorized to perform this action")
+       else:
            raise StateError("nc %s not in System" % nc.get("name"))
        
    @staticmethod
