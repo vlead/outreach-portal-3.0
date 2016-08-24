@@ -179,9 +179,18 @@ class TestPersistentDelegate(TestCase):
         guest_role = Role.get_by_id(1)
         user = User(name=name, email=email,
                         roles=[guest_role])
-
+                        
+        name_1 = Name(name="dummy user")
+        email_1 = Email(email="dummy@kk.com")
+        role_1 = Role(name="guest", centre_nc=None, centre_oc=None)
+        role_1.save()
+        guest_role_1 = Role.get_by_id(1)
+        user_1 = User(name=name_1, email=email_1,
+                        roles=[guest_role_1])
+        
         user = self.persistent_delegate.add_user(user)
         self.assertEqual(self.persistent_delegate.user_exists(user), True)
+        self.assertEqual(self.persistent_delegate.user_exists(user_1), False)
     
 #+END_SRC
 
