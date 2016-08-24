@@ -760,6 +760,44 @@ class ConductWorkshop():
 
 #+end_src
 
+** =approve_workshop=
+#+NAME: class_ApproveWorkshop
+#+begin_src python
+class ApproveWorkshop():
+    arg_types = {"workshop":is_workshop_or_none, "session":is_session}
+    arity_and_type_checks_needed = True   
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        workshop = args['workshop']
+        role = session.get('role')
+        oc_centre = role.get('centre_oc')
+        
+        spokes  = oc_centre.get("spokes")
+        if System.is_session_OCC(session):
+            for nc in spokes:
+                if workshop in nc.get("workshops"):
+                    return True
+        else:
+            raise AuthError("Role not Authorized to perform this action")
+
+    @staticmethod
+    def state_check(args):
+        workshop = args["workshop"]
+        session = args["session"]
+        workshop_status = workshop.get("status")
+        if workshop_status == "pending for approval":
+            raise StateError("cannot approve workshop")
+        
+                    
+    @staticmethod
+    def action(args):
+        workshop = args["workshop"]
+        workshop = System.delegate.approve_workshop(workshop)     
+        return workshop
+        
+#+end_src
+
 ** =reschedule_workshop=
 #+NAME: class_RescheduleWorkshop
 #+begin_src python
@@ -843,44 +881,6 @@ class UploadArtefact():
         return workshop
 
         
-        
-#+end_src
-
-** =approve_workshop=
-#+NAME: class_ApproveWorkshop
-#+begin_src python
-class ApproveWorkshop():
-    arg_types = {"workshop":is_workshop_or_none, "session":is_session}
-    arity_and_type_checks_needed = True   
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        workshop = args['workshop']
-        role = session.get('role')
-        oc_centre = role.get('centre_oc')
-        
-        spokes  = oc_centre.get("spokes")
-        if System.is_session_OCC(session):
-            for nc in spokes:
-                if workshop in nc.get("workshops"):
-                    return True
-        else:
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        workshop = args["workshop"]
-        session = args["session"]
-        workshop_status = workshop.get("status")
-        if workshop_status == "pending for approval":
-            raise StateError("cannot approve workshop")
-        
-                    
-    @staticmethod
-    def action(args):
-        workshop = args["workshop"]
-        workshop = System.delegate.approve_workshop(workshop)     
-        return workshop
         
 #+end_src
 
