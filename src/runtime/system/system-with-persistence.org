@@ -247,51 +247,7 @@ class TestAddUser(TestCase):
 
         user = User.get_by_id(2)
         self.assertEqual(user.get("name").get("name"),"nocuser")
-
-    def test_add_user_by_noc(self):
-        print "test_add_user_by_noc"
-        admin_user=User.get_by_id(1)
-        session = Session(user=admin_user,role=Role.admin)
-        System.session_set.append(session)
-
-        name = Name(name="nocuser")
-        name.save()
-        email = Email(email="abc@gmail.com")
-        email.save()
-        guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
-                    roles= [guest_role])
-        noc_user= System.do("add_user", user=user, session=session)
-
-        session_noc = Session(user=noc_user,role=Role.get_by_id(4))
-        System.session_set.append(session_noc)
-        inst = Institute(name = "NITK", address = "Surathkal")
-        inst.save()
-        oc = System.do("add_oc", institute = inst,
-                        session = session)
-
-        name = Name(name="ocuser")
-        name.save()
-        email = Email(email="mary@gmail.com")
-        email.save()
-        guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(3), email= Email.get_by_id(3),
-                    roles= [guest_role])
-
-        oc_user= System.do("add_user", user=user, session=session_noc)
-
-        oc_role = filter(lambda x:x.get('name') == "OCC" and
-                         x.get('centre_oc').get("institute").get("name") ==
-                         inst.get("name"), Role.get_all())
-
-        System.do("add_role", user = oc_user,
-                    role = oc_role,
-                    session = session)
-
-        u=User.get_by_id(3)
-        self.assertEqual(u.get("name").get("name"),"ocuser")
-
-
+    
     def test_add_user_raises_arity_error(self):
         print "test_add_user_raises_arity_error"
 
