@@ -241,7 +241,7 @@ class TestAddUser(TestCase):
         noc_user = User(name=name, email=email, \
                         roles=[noc_role])
 
-        noc_user=System.do("add_user", user=user, session=session)
+        noc_user=System.do("add_user", user=noc_user, session=session)
         session_noc = Session(user=noc_user, role=noc_role)
         System.session_set.append(session_noc)
 
@@ -1254,6 +1254,7 @@ class TestCreateWorkshop(TestCase):
         
         self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"),
                          inst3.get("name"))
+
 #+END_SRC
 
 * Test CancelWorkshop
