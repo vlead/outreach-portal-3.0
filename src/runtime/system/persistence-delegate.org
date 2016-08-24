@@ -102,6 +102,7 @@ class TestPersistentDelegate(TestCase):
         
 #+END_SRC
 
+
 ***  Check if =name= already exists
     This function checks if a name is already in the database of the =System=.
 #+NAME: persistent_name_exists
@@ -727,6 +728,51 @@ class TestPersistentDelegate(TestCase):
                                                              date=date)
         self.assertEqual(self.persistent_delegate.workshop_exists(workshop), 
                              True)
+
+
+    def test_workshop_does_not_exists(self):
+        print "test_workshop_does_not_exists"
+
+        status = Status(name="pending")
+        status.save()
+        inst1 = Institute(name="NIT", address="Suratkal")
+        inst1.save()
+        inst2 = Institute(name="IIIT", address="Hyderabad")
+        inst2.save()
+        inst3 = Institute(name="HCU", address="Hyderabad")
+        inst3.save()
+        
+        oc = OC(institute=inst1, spokes=[], oc_targets=[])
+        oc.save()
+        
+        nc = NC(institute=inst2, hub=oc,
+                    nc_targets=[], workshops=[])
+        nc.save()
+        
+        date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
+        
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        oc_target.save()
+        nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                                 oc_target=oc_target, ws_targets=[])
+        nc_target.save()
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+        ws_target.save()
+
+        workshop = Workshop(name="Test workshop",
+                                institute=inst3,
+                                status=status, 
+                                artefacts=[], 
+                                nc=nc,
+                                ws_target=ws_target,
+                                date=date,
+                                participants=0,
+                                experiments=0,
+                                usage=0)
+        
+        self.assertEqual(self.persistent_delegate.workshop_exists(workshop), 
+                             False)
 
 #+END_SRC
 
