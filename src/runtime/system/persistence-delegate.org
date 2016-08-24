@@ -935,8 +935,8 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_approve_workshop(self):
         print "test_approve_workshop"
-        pending_status = Status(name="pending")
-        pending_status.save()
+        pending_for_approval = Status(name="pending for approval")
+        pending_for_approval.save()
         approved_status = Status(name="approved")
         approved_status.save()
         inst1 = Institute(name="NIT", address="Suratkal")
@@ -962,7 +962,7 @@ class TestPersistentDelegate(TestCase):
 
         workshop = Workshop(name="Test workshop",
                             institute=inst3,
-                            status=pending_status, 
+                            status=pending_for_approval, 
                             artefacts=[], 
                             nc=nc,
                             ws_target=ws_target,
