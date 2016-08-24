@@ -1510,8 +1510,66 @@ class TestCancelWorkshop(TestCase):
         self.assertEqual(nc.get("workshops")[0].get("status").get("name"),
                          cancelled_status.get("name"))
 
-    def test_create_workshop_raises_arity_error(self):
-        print "test_create_workshop_raises_arity_error"
+    def test_cancel_workshop_raises_type_error(self):
+        print "test_cancel_workshop_raises_type_error"
+        login_user = User.get_by_id(1)
+        login_role = Role.get_by_id(1)
+        session = System.do("login", user=login_user, role=login_role)
+        inst1 = Institute(name="NIT", address="Suratkal")
+        inst1.save()
+        inst2 = Institute(name="IIIT", address="Hyderabad")
+        inst2.save()
+        inst3 = Institute(name="HCU", address="Hyderabad")
+        inst3.save()
+        oc = System.do("add_oc", institute=inst1,
+                        session=session)
+        nc = System.do("add_nc", institute=inst2,
+                        hub=oc, session=session)
+
+        name=Name(name="ncuser")
+        email=Email(email="ncuser@gmail.com")
+        name.save()
+        email.save()
+        guest_role = Role.get_by_id(2)
+        user = User(name=Name.get_by_id(2), email=Email.get_by_id(2),
+                    roles=[guest_role])
+
+        nc_user = System.do("add_user", user=user, session=session)
+        ncc_role =  Role.get_by_id(6)
+        System.do("add_role", user=nc_user, role=ncc_role,                            
+                   session=session)                                                        
+
+        nc_session = Session(user=nc_user, role=ncc_role)
+        System.session_set.append(nc_session)
+        role_check = Role.get_by_id(6)
+
+        pending_status = Status.get_by_id(1)
+        
+        date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
+        
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        oc_target.save()
+        nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                                 oc_target=oc_target, ws_targets=[])
+        nc_target.save()
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+        ws_target.save()
+
+        new_workshop = System.do("create_workshop", 
+                                     name="Test workshop",
+                                     institute=inst3,
+                                     status=pending_status, 
+                                     nc=nc,
+                                     ws_target=ws_target,
+                                     date=date,
+                                     session=nc_session) 
+        with self.assertRaises(TypeError):
+            System.do("cancel_workshop", workshop=nc_session,
+                                         session=new_workshop)
+
+    def test_cancel_workshop_raises_arity_error(self):
+        print "test_cancel_workshop_raises_arity_error"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
@@ -1566,7 +1624,7 @@ class TestCancelWorkshop(TestCase):
                                      session=nc_session) 
 
         with self.assertRaises(ArityError):
-            System.do("cancel_workshop", workshop = new_workshop)
+            System.do("cancel_workshop", workshop=new_workshop)
         
     #+END_SRC
 
