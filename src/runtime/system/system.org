@@ -711,9 +711,8 @@ class CancelWorkshop():
     def state_check(args):
         workshop = args["workshop"]
         session = args["session"]
-        workshop_status = workshop.get("status")
-        print workshop_status
-        if workshop_status == "pending":
+        workshop_status = workshop.get("status").get("name")
+        if not workshop_status == "pending":
             raise StateError("cannot cancel workshop")
                     
     @staticmethod
