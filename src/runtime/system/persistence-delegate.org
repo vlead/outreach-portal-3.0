@@ -564,7 +564,6 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-
 ***  Get ocs from system
 
     This return the oc_set maintained by the system.
@@ -867,7 +866,6 @@ class TestPersistentDelegate(TestCase):
 
 #+END_SRC
 
-
 ***  Reschedule Workshop
 #+NAME: persistent_reschedule_workshop
 #+BEGIN_SRC python
@@ -907,7 +905,8 @@ class TestPersistentDelegate(TestCase):
 #+NAME: persistent_conduct_workshop
 #+BEGIN_SRC python
     def conduct_workshop(self, workshop):
-        workshop.set(status = Status.completed)
+        completed = self.get_status(name="completed")
+        workshop.set(status=completed)
         workshop.save()
         return workshop
 #+END_SRC
@@ -916,24 +915,48 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_conduct_workshop(self):
         print "test_conduct_workshop"
-        institute = Institute(name='IIIT',address='Hyderabad')
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
-        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
-        name = Name(name = "New Workshop")
-        status = Status(name = "pending")
-        artefacts = []
+        pending_status = Status(name="pending")
+        pending_status.save()
+        completed_status = Status(name="completed")
+        completed_status.save()
+        inst1 = Institute(name="NIT", address="Suratkal")
+        inst1.save()
+        inst2 = Institute(name="IIIT", address="Hyderabad")
+        inst2.save()
+        inst3 = Institute(name="HCU", address="Hyderabad")
+        inst3.save()
+        oc = OC(institute=inst1, spokes=[], oc_targets=[])
+        oc.save()
+        nc = NC(institute=inst2, hub=oc,
+                    nc_targets=[], workshops=[])
+        nc.save()
+        date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        oc_target.save()
+        nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                                 oc_target=oc_target, ws_targets=[])
+        nc_target.save()
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+        ws_target.save()
 
-        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        workshop = Workshop(name="Test workshop",
+                            institute=inst3,
+                            status=pending_status, 
+                            artefacts=[], 
+                            nc=nc,
+                            ws_target=ws_target,
+                            date=date,
+                            participants=0,
+                            experiments=0,
+                            usage=0)
+        workshop.save()
 
         conducted_workshop = self.persistent_delegate.conduct_workshop(workshop)
+        self.assertEqual(conducted_workshop.get("status").get("name"), 
+                             completed_status.get("name"))
 
-        self.assertEqual(conducted_workshop.get("status"), Status.completed)
 #+END_SRC
-
 
 ***  Upload Artefact
 #+NAME: persistent_upload_artefact
@@ -1621,7 +1644,7 @@ if __name__ == '__main__':
 <<test_persistent_workshop_exists>>
 <<test_persistent_cancel_workshop>>
 #<<test_persistent_reschedule_workshop>>
-#<<test_persistent_conduct_workshop>>
+<<test_persistent_conduct_workshop>>
 #<<test_persistent_upload_artefact>>
 #<<test_persistent_approve_workshop>>
 #<<test_persistent_reject_workshop>>

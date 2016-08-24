@@ -725,6 +725,41 @@ class CancelWorkshop():
         
 #+end_src
 
+** =conduct_workshop=
+#+NAME: class_ConductWorkshop
+#+begin_src python
+class ConductWorkshop():
+    arg_types = {"workshop":is_workshop_or_none, "session":is_session}
+    arity_and_type_checks_needed = True   
+    @staticmethod
+    def auth_check(args):
+        session = args['session']
+        workshop = args['workshop']
+        
+        if System.is_session_NCC(session):
+            role = session.get('role')
+            nc_centre = role.get('centre_nc')
+            if workshop in nc_centre.get('workshops'):
+                return True
+        else:
+            raise AuthError("Role not Authorized to perform this action")
+
+    @staticmethod
+    def state_check(args):
+        workshop = args["workshop"]
+        session = args["session"]
+        workshop_status = workshop.get("status").get("name")
+        if not workshop_status == "pending":
+            raise StateError("cannot conduct workshop")
+                    
+    @staticmethod
+    def action(args):
+        workshop = args["workshop"]
+        workshop = System.delegate.conduct_workshop(workshop)     
+        return workshop
+
+#+end_src
+
 ** =reschedule_workshop=
 #+NAME: class_RescheduleWorkshop
 #+begin_src python
@@ -763,47 +798,6 @@ class RescheduleWorkshop():
         wstarget = args['wstarget']
         workshop = System.delegate.reschedule_workshop(workshop, wstarget)     
         return workshop
-        
-#+end_src
-
-** =conduct_workshop=
-#+NAME: class_ConductWorkshop
-#+begin_src python
-class ConductWorkshop():
-    arg_types = {"workshop":is_workshop_or_none, "session":is_session}
-    arity_and_type_checks_needed = True   
-    @staticmethod
-    def auth_check(args):
-        session = args['session']
-        workshop = args['workshop']
-        
-        
-        if System.is_session_NCC(session):
-            role = session.get('role')
-            nc_centre = role.get('centre_nc')
-            if workshop in nc_centre.get('workshops'):
-                return True
-            
-        else:
-            raise AuthError("Role not Authorized to perform this action")
-
-    @staticmethod
-    def state_check(args):
-        workshop = args["workshop"]
-        session = args["session"]
-        workshop_status = workshop.get("status")
-        if workshop_status == "pending":
-            raise StateError("cannot conduct workshop")
-        
-                    
-    @staticmethod
-    def action(args):
-        workshop = args["workshop"]
-        workshop = System.delegate.conduct_workshop(workshop)     
-        return workshop
-
-
-        
         
 #+end_src
 
