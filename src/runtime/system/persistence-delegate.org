@@ -900,7 +900,6 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(rescheduled_workshop.get("ws_target").get("usage"), 5000)
 #+END_SRC
 
-
 ***  Conduct Workshop
 #+NAME: persistent_conduct_workshop
 #+BEGIN_SRC python
