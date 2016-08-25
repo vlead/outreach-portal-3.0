@@ -2870,9 +2870,9 @@ if __name__ == '__main__':
 <<test_login>>
 <<test_logout>>
 #<<test_updateuser>>
-<<test_CreateInstitute>>
-<<test_CreateOC>>
-<<test_CreateNC>>
+<<test_AddInstitute>>
+<<test_AddOC>>
+<<test_AddNC>>
 <<test_AddRole>>
 #<<test_UpdateInstitute>>
 <<test_CreateWorkshop>>
