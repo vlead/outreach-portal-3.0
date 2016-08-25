@@ -1044,10 +1044,40 @@ class TestPersistentDelegate(TestCase):
 
         rescheduled_workshop = self.persistent_delegate.reschedule_workshop\
           (workshop, new_wstarget)
-        self.assertEqual(rescheduled_workshop.get("status").get("name"),
-                             pending_status.get("name"))
+        self.assertEqual(rescheduled_workshop.get("status").get("name"), pending_status.get("name"))
         self.assertEqual(rescheduled_workshop.get("ws_target").get("usage"),
                              3000)
+#+END_SRC
+***  Reject Workshop
+#+NAME: persistent_reject_workshop
+#+BEGIN_SRC python
+    def reject_workshop(self, workshop):
+        pending = self.get_status(name="pending")
+        workshop.set(status = Status.rejected)
+        workshop.save()
+        return workshop
+#+END_SRC
+**** Tests
+#+NAME: test_persistent_reject_workshop
+#+BEGIN_SRC python
+    def test_reject_workshop(self):
+        print "test_reject_workshop"
+        institute = Institute(name='IIIT',address='Hyderabad')
+        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
+        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
+        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
+        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
+        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
+        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
+        name = Name(name = "New Workshop")
+        status = Status(name = "pending")
+        artefacts = []
+
+        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+
+        rejected_workshop = self.persistent_delegate.reject_workshop(workshop)
+
+        self.assertEqual(rejected_workshop.get("status"), Status.rejected)
 #+END_SRC
 ***  Upload Artefact
 #+NAME: persistent_upload_artefact
@@ -1111,37 +1141,6 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(len(self.persistent_delegate.get_artefacts()), 1)
 
 #+END_SRC
-***  Reject Workshop
-#+NAME: persistent_reject_workshop
-#+BEGIN_SRC python
-    def reject_workshop(self, workshop):
-        workshop.set(status = Status.rejected)
-        workshop.save()
-        return workshop
-#+END_SRC
-**** Tests
-#+NAME: test_persistent_reject_workshop
-#+BEGIN_SRC python
-    def test_reject_workshop(self):
-        print "test_reject_workshop"
-        institute = Institute(name='IIIT',address='Hyderabad')
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
-        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
-        name = Name(name = "New Workshop")
-        status = Status(name = "pending")
-        artefacts = []
-
-        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
-
-        rejected_workshop = self.persistent_delegate.reject_workshop(workshop)
-
-        self.assertEqual(rejected_workshop.get("status"), Status.rejected)
-#+END_SRC
-
 ***  Delete Artefact
 #+NAME: persistent_delete_artefact
 #+BEGIN_SRC python
@@ -1182,7 +1181,6 @@ class TestPersistentDelegate(TestCase):
         self.assertEqual(len(self.persistent_delegate.get_artefacts_of_a_workshop(artefact_delete_workshop)), 0)
 
 #+END_SRC
-
 
 ***  Get all workshops from the system
 

@@ -766,6 +766,7 @@ class ConductWorkshop():
 class ApproveWorkshop():
     arg_types = {"workshop":is_workshop_or_none, "session":is_session}
     arity_and_type_checks_needed = True   
+
     @staticmethod
     def auth_check(args):
         session = args['session']
@@ -785,10 +786,9 @@ class ApproveWorkshop():
     def state_check(args):
         workshop = args["workshop"]
         session = args["session"]
-        workshop_status = workshop.get("status")
-        if workshop_status == "pending for approval":
+        workshop_status = workshop.get("status").get("name")
+        if not workshop_status == "pending for approval":
             raise StateError("cannot approve workshop")
-        
                     
     @staticmethod
     def action(args):
@@ -805,6 +805,7 @@ class RescheduleWorkshop():
     arg_types = {"workshop":is_workshop_or_none, "session":is_session,
                  "wstarget" : is_ws_target}
     arity_and_type_checks_needed = True   
+
     @staticmethod
     def auth_check(args):
         session = args['session']
@@ -827,7 +828,6 @@ class RescheduleWorkshop():
         workshop_status = workshop.get("status")
         if workshop_status == "cancelled":
             raise StateError("cannot reschedule workshop")
-        
                     
     @staticmethod
     def action(args):
