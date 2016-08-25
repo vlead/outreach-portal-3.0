@@ -45,6 +45,7 @@ def populate_db():
 
 #+END_SRC
 
+
 * Test Constructor
 #+NAME: test_persistent_system_constructor
 #+BEGIN_SRC python
@@ -322,6 +323,7 @@ class TestAddUser(TestCase):
             
 #+END_SRC
 
+
 * Test DeleteUser
 #+NAME: test_delete_user
 #+BEGIN_SRC python
@@ -476,6 +478,7 @@ class TestDeleteUser(TestCase):
 
 #+END_SRC
 
+
 * Test UpdateUser
 #+NAME: test_update_user
 #+BEGIN_SRC python
@@ -624,6 +627,7 @@ class TestUpdateUser(TestCase):
 
 #+END_SRC
 
+
 * Test AddRole
 #+NAME: test_AddRole
 #+BEGIN_SRC python
@@ -733,6 +737,7 @@ class Testlogout(TestCase):
         self.assertEqual(System.session_set, [])
 #+END_SRC
 
+
 * Test add_institute
 #+NAME: test_AddInstitute
 #+BEGIN_SRC python
@@ -838,6 +843,7 @@ class TestAddInstitute(TestCase):
             System.do("add_institute", institute=institute, session=session)
 
 #+END_SRC
+
 
 * Test add_oc
 #+NAME: test_AddOC
@@ -987,6 +993,7 @@ class TestAddOC(TestCase):
             System.do("add_oc", institute=institute, session=session)
 
 #+END_SRC
+
 
 * Test AddNC
 #+NAME: test_AddNC
@@ -1150,6 +1157,7 @@ class TestAddNC(TestCase):
             System.do("add_nc", institute=institute, hub=oc,
                           session=session)
 #+END_SRC
+
 
 * Test update_institute
 #+NAME: test_UpdateInstitute
@@ -1660,6 +1668,7 @@ class TestCreateWorkshop(TestCase):
                           )
 
 #+END_SRC
+
 
 * Test CancelWorkshop
 #+NAME: test_CancelWorkshop
@@ -2326,6 +2335,7 @@ class TestConductWorkshop(TestCase):
 
  #+END_SRC
 
+
 * Test RescheduleWorkshop
 #+NAME: test_RescheduleWorkshop
 #+BEGIN_SRC python
@@ -2448,13 +2458,17 @@ class TestUploadArtefact(TestCase):
         print "test_upload_artefact"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
+
         session = System.do("login", user=login_user, role=login_role)
         inst1 = Institute(name="NIT", address="Suratkal")
         inst1.save()
+
         inst2 = Institute(name="IIIT", address="Hyderabad")
         inst2.save()
+
         inst3 = Institute(name="HCU", address="Hyderabad")
         inst3.save()
+
         oc = System.do("add_oc", institute=inst1,
                         session=session)
         nc = System.do("add_nc", institute=inst2,
@@ -2464,14 +2478,14 @@ class TestUploadArtefact(TestCase):
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
+
         guest_role = Role.get_by_id(2)
         user = User(name=Name.get_by_id(2), email=Email.get_by_id(2),
                     roles=[guest_role])
 
         nc_user = System.do("add_user", user=user, session=session)
         ncc_role =  Role.get_by_id(6)
-        System.do("add_role", user=nc_user, role=ncc_role,                            
-                   session=session)                                                        
+        System.do("add_role", user=nc_user, role=ncc_role, session=session)
 
         nc_session = Session(user=nc_user, role=ncc_role)
         System.session_set.append(nc_session)
@@ -2483,11 +2497,13 @@ class TestUploadArtefact(TestCase):
         
         oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
         oc_target.save()
+
         nc_target = NCTarget(usage=400, date=date, nc=nc, 
-                                 oc_target=oc_target, ws_targets=[])
+                             oc_target=oc_target, ws_targets=[])
         nc_target.save()
+
         ws_target = WSTarget(usage=4000, participants=200, experiments=20,
-                                 date=date, nc_target=nc_target)
+                             date=date, nc_target=nc_target)
         ws_target.save()
 
         pending_approval = Status.get_by_id(4)
@@ -2516,6 +2532,7 @@ class TestUploadArtefact(TestCase):
         
         self.assertEqual(workshop.get("artefacts")[0].get("name"),
                          new_artefact.get("name"))
+
         self.assertEqual(workshop.get("status").get("name") ,
                          pending_approval.get("name"))
         
@@ -2524,13 +2541,17 @@ class TestUploadArtefact(TestCase):
         print "test_upload_artefact_raises_arity_error"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
+
         session = System.do("login", user=login_user, role=login_role)
         inst1 = Institute(name="NIT", address="Suratkal")
         inst1.save()
+
         inst2 = Institute(name="IIIT", address="Hyderabad")
         inst2.save()
+
         inst3 = Institute(name="HCU", address="Hyderabad")
         inst3.save()
+
         oc = System.do("add_oc", institute=inst1,
                         session=session)
         nc = System.do("add_nc", institute=inst2,
@@ -2540,14 +2561,14 @@ class TestUploadArtefact(TestCase):
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
+
         guest_role = Role.get_by_id(2)
         user = User(name=Name.get_by_id(2), email=Email.get_by_id(2),
                     roles=[guest_role])
 
         nc_user = System.do("add_user", user=user, session=session)
         ncc_role =  Role.get_by_id(6)
-        System.do("add_role", user=nc_user, role=ncc_role,                            
-                   session=session)                                                        
+        System.do("add_role", user=nc_user, role=ncc_role, session=session)  
 
         nc_session = Session(user=nc_user, role=ncc_role)
         System.session_set.append(nc_session)
@@ -2560,10 +2581,10 @@ class TestUploadArtefact(TestCase):
         oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
         oc_target.save()
         nc_target = NCTarget(usage=400, date=date, nc=nc, 
-                                 oc_target=oc_target, ws_targets=[])
+                             oc_target=oc_target, ws_targets=[])
         nc_target.save()
         ws_target = WSTarget(usage=4000, participants=200, experiments=20,
-                                 date=date, nc_target=nc_target)
+                             date=date, nc_target=nc_target)
         ws_target.save()
 
         new_workshop = System.do("create_workshop", 
@@ -2584,13 +2605,17 @@ class TestUploadArtefact(TestCase):
         print "test_upload_artefact_type_error"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
+
         session = System.do("login", user=login_user, role=login_role)
         inst1 = Institute(name="NIT", address="Suratkal")
         inst1.save()
+
         inst2 = Institute(name="IIIT", address="Hyderabad")
         inst2.save()
+
         inst3 = Institute(name="HCU", address="Hyderabad")
         inst3.save()
+
         oc = System.do("add_oc", institute=inst1,
                         session=session)
         nc = System.do("add_nc", institute=inst2,
@@ -2600,14 +2625,14 @@ class TestUploadArtefact(TestCase):
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
+
         guest_role = Role.get_by_id(2)
         user = User(name=Name.get_by_id(2), email=Email.get_by_id(2),
                     roles=[guest_role])
 
         nc_user = System.do("add_user", user=user, session=session)
         ncc_role =  Role.get_by_id(6)
-        System.do("add_role", user=nc_user, role=ncc_role,                            
-                   session=session)                                                        
+        System.do("add_role", user=nc_user, role=ncc_role, session=session)
 
         nc_session = Session(user=nc_user, role=ncc_role)
         System.session_set.append(nc_session)
@@ -2619,11 +2644,13 @@ class TestUploadArtefact(TestCase):
         
         oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
         oc_target.save()
+
         nc_target = NCTarget(usage=400, date=date, nc=nc, 
-                                 oc_target=oc_target, ws_targets=[])
+                             oc_target=oc_target, ws_targets=[])
         nc_target.save()
+
         ws_target = WSTarget(usage=4000, participants=200, experiments=20,
-                                 date=date, nc_target=nc_target)
+                             date=date, nc_target=nc_target)
         ws_target.save()
 
         new_workshop = Workshop(name="Test workshop",
@@ -2637,6 +2664,7 @@ class TestUploadArtefact(TestCase):
                             experiments=0,
                             usage=0)
         new_workshop.save()
+
         file_type = FileType(name="photo")
         file_type.save()
 
@@ -2645,7 +2673,8 @@ class TestUploadArtefact(TestCase):
         new_artefact.save()
 
         with self.assertRaises(TypeError):
-            System.do("upload_artefact", workshop=new_artefact, artefact=new_workshop, session=nc_session)
+            System.do("upload_artefact", workshop=new_artefact, 
+                       artefact=new_workshop, session=nc_session)
 
 
     def test_upload_artefact_raises_auth_error(self):
@@ -2674,8 +2703,7 @@ class TestUploadArtefact(TestCase):
 
         nc_user = System.do("add_user", user=user, session=session)
         ncc_role =  Role.get_by_id(6)
-        System.do("add_role", user=nc_user, role=ncc_role,                            
-                   session=session)                                                        
+        System.do("add_role", user=nc_user, role=ncc_role, session=session)
 
         nc_session = Session(user=nc_user, role=ncc_role)
         System.session_set.append(nc_session)
@@ -2723,10 +2751,13 @@ class TestUploadArtefact(TestCase):
         session = System.do("login", user=login_user, role=login_role)
         inst1 = Institute(name="NIT", address="Suratkal")
         inst1.save()
+
         inst2 = Institute(name="IIIT", address="Hyderabad")
         inst2.save()
+
         inst3 = Institute(name="HCU", address="Hyderabad")
         inst3.save()
+
         oc = System.do("add_oc", institute=inst1,
                         session=session)
         nc = System.do("add_nc", institute=inst2,
@@ -2736,6 +2767,7 @@ class TestUploadArtefact(TestCase):
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
+
         guest_role = Role.get_by_id(2)
         user = User(name=Name.get_by_id(2), email=Email.get_by_id(2),
                     roles=[guest_role])
@@ -2748,18 +2780,18 @@ class TestUploadArtefact(TestCase):
         nc_session = Session(user=nc_user, role=ncc_role)
         System.session_set.append(nc_session)
         role_check = Role.get_by_id(6)
-
         pending_status = Status.get_by_id(2)
-        
         date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
-        
+
         oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
         oc_target.save()
+
         nc_target = NCTarget(usage=400, date=date, nc=nc,
-                                 oc_target=oc_target, ws_targets=[])
+                             oc_target=oc_target, ws_targets=[])
         nc_target.save()
+
         ws_target = WSTarget(usage=4000, participants=200, experiments=20,
-                                 date=date, nc_target=nc_target)
+                             date=date, nc_target=nc_target)
         ws_target.save()
 
         new_workshop = System.do("create_workshop", 
@@ -2772,6 +2804,7 @@ class TestUploadArtefact(TestCase):
                                      session=nc_session) 
                                      
         new_workshop.save()
+
         file_type = FileType(name="photo")
         file_type.save()
 
@@ -2780,8 +2813,8 @@ class TestUploadArtefact(TestCase):
         new_artefact.save()
 
         with self.assertRaises(StateError):
-            System.do("upload_artefact", workshop=new_workshop, artefact=new_artefact, 
-                          session=nc_session)
+            System.do("upload_artefact", workshop=new_workshop, 
+                       artefact=new_artefact, session=nc_session)
 
 #+END_SRC
 
@@ -3015,6 +3048,7 @@ class TestRejectWorkshop(TestCase):
                          Status.rejected.get("name"))
 
     #+END_SRC
+
 
 * Test DeleteArtefact
 #+NAME: test_DeleteArtefact
