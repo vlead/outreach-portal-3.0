@@ -1019,7 +1019,8 @@ class TestPersistentDelegate(TestCase):
         artefacts = workshop.get("artefacts")
         artefacts.append(new_artefact)
         workshop.set(artefacts = artefacts)
-        workshop.set(status = Status.pending_approval)
+        pending_approval = self.get_status(name="pending for approval")
+        workshop.set(status = pending_approval)
         workshop.save()
         return workshop
 #+END_SRC
@@ -1028,24 +1029,54 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_upload_artefact(self):
         print "test_upload_artefact"
-        institute = Institute(name='IIIT',address='Hyderabad')
-        oc = OC(institute=Institute(name="IIITH",address="Hyderabad"), spokes=[], oc_target = None)
-        nc = NC(institute=Institute(name="IIITH",address="Hyderabad"), hub=oc, nc_target = None, workshops=None)
-        target_date = datetime.datetime.strptime("30-06-2016", '%d-%m-%Y').date()
-        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date, oc_target = oc_target, wstargets = [])
-        ws_target = WSTarget(usage = 4000, participants = 200, experiments = 20, date = target_date, nc_target = nc_target )
-        name = Name(name = "New Workshop")
-        status = Status(name = "pending")
-        artefacts = []
+        pending_status = Status(name="pending")
+        pending_status.save()
+        pending_approval = Status(name="pending for approval")
+        pending_approval.save()
+        inst1 = Institute(name="NIT", address="Suratkal")
+        inst1.save()
+        inst2 = Institute(name="IIIT", address="Hyderabad")
+        inst2.save()
+        inst3 = Institute(name="HCU", address="Hyderabad")
+        inst3.save()
+       
+        oc = OC(institute=inst1, spokes=[], oc_targets=[])
+        oc.save()
+        nc = NC(institute=inst2, hub=oc,
+                    nc_targets=[], workshops=[])
+        nc.save()
+        date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        oc_target.save()
+        nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                                 oc_target=oc_target, ws_targets=[])
+        nc_target.save()
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+        ws_target.save()
 
-        workshop = self.persistent_delegate.add_workshop(institute, name, ws_target, artefacts, status, nc)
+        workshop = Workshop(name="Test workshop",
+                            institute=inst3,
+                            status=pending_status, 
+                            artefacts=[], 
+                            nc=nc,
+                            ws_target=ws_target,
+                            date=date,
+                            participants=0,
+                            experiments=0,
+                            usage=0)
+        workshop.save()
+
+        file_type = FileType(name="photo")
+        file_type.save()
+
         new_artefact = Artefact(name = "Photo", path = "/main/photos",
-                                a_type = Type.photo)
+                                file_type = file_type, workshop = workshop)
+        new_artefact.save()
 
         workshop = self.persistent_delegate.upload_artefact(workshop, new_artefact)
 
-        self.assertEqual(workshop.get("status"), Status.pending_approval)
+        self.assertEqual(workshop.get("status").get("name"), pending_approval.get("name"))
         self.assertEqual(len(self.persistent_delegate.get_artefacts_of_a_workshop(workshop)), 1)
         self.assertEqual(len(self.persistent_delegate.get_artefacts()), 1)
 
@@ -1664,7 +1695,7 @@ if __name__ == '__main__':
 <<test_persistent_cancel_workshop>>
 #<<test_persistent_reschedule_workshop>>
 <<test_persistent_conduct_workshop>>
-#<<test_persistent_upload_artefact>>
+<<test_persistent_upload_artefact>>
 <<test_persistent_approve_workshop>>
 #<<test_persistent_reject_workshop>>
 #<<test_persistent_delete_artefact>>
