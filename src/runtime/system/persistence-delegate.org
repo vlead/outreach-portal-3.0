@@ -1014,14 +1014,10 @@ class TestPersistentDelegate(TestCase):
 #+END_SRC
 ***  Upload Artefact
 #+NAME: persistent_upload_artefact
-#+BEGIN_SRC python
+#+BEGIN_SRC python  
     def upload_artefact(self, workshop, new_artefact):
         artefacts = workshop.get("artefacts")
         artefacts.append(new_artefact)
-        workshop.set(artefacts = artefacts)
-        pending_approval = self.get_status(name="pending for approval")
-        workshop.set(status = pending_approval)
-        workshop.save()
         return workshop
 #+END_SRC
 **** Tests
@@ -1029,8 +1025,6 @@ class TestPersistentDelegate(TestCase):
 #+BEGIN_SRC python
     def test_upload_artefact(self):
         print "test_upload_artefact"
-        pending_status = Status(name="pending")
-        pending_status.save()
         pending_approval = Status(name="pending for approval")
         pending_approval.save()
         inst1 = Institute(name="NIT", address="Suratkal")
@@ -1057,7 +1051,7 @@ class TestPersistentDelegate(TestCase):
 
         workshop = Workshop(name="Test workshop",
                             institute=inst3,
-                            status=pending_status, 
+                            status=pending_approval, 
                             artefacts=[], 
                             nc=nc,
                             ws_target=ws_target,
@@ -1070,13 +1064,12 @@ class TestPersistentDelegate(TestCase):
         file_type = FileType(name="photo")
         file_type.save()
 
-        new_artefact = Artefact(name = "Photo", path = "/main/photos",
+        new_artefact1 = Artefact(name = "Photo", path = "/main/photos/name.jpg",
                                 file_type = file_type, workshop = workshop)
-        new_artefact.save()
+        new_artefact1.save()
 
-        workshop = self.persistent_delegate.upload_artefact(workshop, new_artefact)
+        workshop = self.persistent_delegate.upload_artefact(workshop, new_artefact1)
 
-        self.assertEqual(workshop.get("status").get("name"), pending_approval.get("name"))
         self.assertEqual(len(self.persistent_delegate.get_artefacts_of_a_workshop(workshop)), 1)
         self.assertEqual(len(self.persistent_delegate.get_artefacts()), 1)
 

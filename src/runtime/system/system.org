@@ -865,8 +865,8 @@ class UploadArtefact():
     def state_check(args):
         workshop = args["workshop"]
         session = args["session"]
-        workshop_status = workshop.get("status")
-        if (workshop_status == "completed" or
+        workshop_status = workshop.get("status").get("name")
+        if not (workshop_status == "completed" or
             workshop_status == "pending for approval" or
             workshop_status == "rejected" or
             workshop_status == "approved"):
@@ -1014,7 +1014,7 @@ from runtime.objects.entities import is_user, is_session, is_role, is_email, \
     is_oc, is_nc_target, are_workshops_or_empty_list, is_ws_target,\
     are_artefacts_or_empty_list,  is_workshop_or_none, is_ws_target, \
     is_artefact, are_oc_targets_or_empty_list, is_date, \
-    are_nc_targets_or_empty_list, Session
+    are_nc_targets_or_empty_list, are_artefacts_or_empty_list, Session
 
 
 #+end_src
