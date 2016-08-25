@@ -1044,8 +1044,7 @@ class TestPersistentDelegate(TestCase):
 
         rescheduled_workshop = self.persistent_delegate.reschedule_workshop\
           (workshop, new_wstarget)
-        self.assertEqual(rescheduled_workshop.get("status").get("name"),
-                             pending_status.get("name"))
+        self.assertEqual(rescheduled_workshop.get("status").get("name"), pending_status.get("name"))
         self.assertEqual(rescheduled_workshop.get("ws_target").get("usage"),
                              3000)
 #+END_SRC
