@@ -824,7 +824,7 @@ class RescheduleWorkshop():
         workshop = args["workshop"]
         session = args["session"]
         wstarget = args['wstarget']
-        workshop_status = workshop.get("status")
+        workshop_status = workshop.get("status").get("name")
         if workshop_status == "cancelled":
             raise StateError("cannot reschedule workshop")
         
