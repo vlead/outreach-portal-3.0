@@ -267,13 +267,15 @@ class TestPersistentDelegate(TestCase):
 #+NAME: test_persistent_add_role_to_user
 #+BEGIN_SRC python
     def test_add_role_to_user(self):
-        print "test add role to user"
+        print "test_add_role_to_user"
         name = Name(name="some user")
         email = Email(email="tt@kk.com")
         name.save()
         email.save()
+
         guest_role = Role(name="guest", centre_oc=None, centre_nc=None)
         guest_role.save()
+
         reviewer_role = Role(name="reviewer", centre_oc=None, centre_nc=None)
         reviewer_role.save()
 
@@ -281,8 +283,8 @@ class TestPersistentDelegate(TestCase):
         user.save()
         
         user_with_new_role = self.persistent_delegate.add_role_to_user\
-          (user, reviewer_role)
-        self.assertTrue(len(user_with_new_role.get('roles'))==2)
+                             (user, reviewer_role)
+        self.assertTrue(len(user_with_new_role.get('roles')) == 2)
 
 #+END_SRC
 

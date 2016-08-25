@@ -44,6 +44,7 @@ def populate_db():
     approved.save()
 
 #+END_SRC
+
 * Test Constructor
 #+NAME: test_persistent_system_constructor
 #+BEGIN_SRC python
@@ -154,6 +155,7 @@ class TestSystemConstructor(TestCase):
 
 #+END_SRC
 
+
 * Test Arity and Type Checks
 #+NAME: test_arity_and_types
 #+BEGIN_SRC python
@@ -185,6 +187,7 @@ class TestSystemArityAndType(TestCase):
             System.type_check(args, arg_types)
 
 #+END_SRC
+
 
 * Test AddUser
 #+NAME: test_add_user
@@ -318,6 +321,7 @@ class TestAddUser(TestCase):
             System.do("add_user", user=user, session=admin_session)
             
 #+END_SRC
+
 * Test DeleteUser
 #+NAME: test_delete_user
 #+BEGIN_SRC python
@@ -471,6 +475,7 @@ class TestDeleteUser(TestCase):
         self.assertEqual(oc_user.get("user_status"),"inactive")
 
 #+END_SRC
+
 * Test UpdateUser
 #+NAME: test_update_user
 #+BEGIN_SRC python
@@ -618,6 +623,7 @@ class TestUpdateUser(TestCase):
 
 
 #+END_SRC
+
 * Test AddRole
 #+NAME: test_AddRole
 #+BEGIN_SRC python
@@ -661,6 +667,8 @@ def test_add_role(self):
         self.assertEqual(len(User.get_by_id(1).get('roles')), 2)
 
 #+END_SRC
+
+
 * Test login
 #+NAME: test_login
 #+BEGIN_SRC python
@@ -694,6 +702,7 @@ class Testlogin(TestCase):
 
 #+END_SRC
 
+
 * Test logout
 #+NAME: test_logout
 #+BEGIN_SRC python
@@ -723,6 +732,7 @@ class Testlogout(TestCase):
         System.do("logout",session=session)
         self.assertEqual(System.session_set, [])
 #+END_SRC
+
 * Test add_institute
 #+NAME: test_AddInstitute
 #+BEGIN_SRC python
@@ -828,6 +838,7 @@ class TestAddInstitute(TestCase):
             System.do("add_institute", institute=institute, session=session)
 
 #+END_SRC
+
 * Test add_oc
 #+NAME: test_AddOC
 #+BEGIN_SRC python
@@ -1139,6 +1150,7 @@ class TestAddNC(TestCase):
             System.do("add_nc", institute=institute, hub=oc,
                           session=session)
 #+END_SRC
+
 * Test update_institute
 #+NAME: test_UpdateInstitute
 #+BEGIN_SRC python
@@ -1175,6 +1187,7 @@ class TestUpdateInstitute(TestCase):
         self.assertEqual(institute.get("name"),"NITK")
 
 #+END_SRC
+
 
 * Test CreateWorkshop
 #+NAME: test_CreateWorkshop
@@ -1254,61 +1267,7 @@ class TestCreateWorkshop(TestCase):
         self.assertEqual(Workshop.get_by_id(1).get("institute").get("name"),
                          inst3.get("name"))
 
-    def test_create_workshop_raises_arity_error(self):
-        print "test_create_workshop_raises_arity_error"
 
-        login_user = User.get_by_id(1)
-        login_role = Role.get_by_id(1)
-        session = System.do("login", user=login_user, role=login_role)
-        inst1 = Institute(name="NIT", address="Suratkal")
-        inst1.save()
-        inst2 = Institute(name="IIIT", address="Hyderabad")
-        inst2.save()
-        inst3 = Institute(name="HCU", address="Hyderabad")
-        inst3.save()
-        oc = System.do("add_oc", institute=inst1,
-                        session=session)
-        nc = System.do("add_nc", institute=inst2,
-                        hub=oc, session=session)
-
-        name=Name(name="ncuser")
-        email=Email(email="ncuser@gmail.com")
-        name.save()
-        email.save()
-        guest_role = Role.get_by_id(2)
-        user = User(name=Name.get_by_id(2), email=Email.get_by_id(2),
-                    roles=[guest_role])
-
-        nc_user = System.do("add_user", user=user, session=session)
-        ncc_role =  Role.get_by_id(6)
-        System.do("add_role", user=nc_user, role=ncc_role,                            
-                   session=session)                                                        
-
-        nc_session = Session(user=nc_user, role=ncc_role)
-        System.session_set.append(nc_session)
-
-        pending_status = Status.get_by_id(1)
-        
-        date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
-        
-        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
-        oc_target.save()
-        nc_target = NCTarget(usage=400, date=date, nc=nc, 
-                                 oc_target=oc_target, ws_targets=[])
-        nc_target.save()
-        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
-                                 date=date, nc_target=nc_target)
-        ws_target.save()
-
-        with self.assertRaises(ArityError):
-            System.do("create_workshop",
-                          name="Test workshop",
-                          institute=inst3,
-                          status=pending_status, 
-                          nc=nc,
-                          ws_target=ws_target,
-                          date=date
-                          )
 
     def test_create_workshop_raises_type_check_error(self):
         print "test_create_workshop_raises_type_check_error"
@@ -1980,6 +1939,7 @@ class TestCancelWorkshop(TestCase):
 
  #+END_SRC
 
+
 * Test ConductWorkshop
 #+NAME: test_ConductWorkshop
 #+BEGIN_SRC python
@@ -2408,6 +2368,7 @@ class TestRescheduleWorkshop(TestCase):
         
     #+END_SRC
 
+
 * Test UploadArtefact
 #+NAME: test_UploadArtefact
 #+BEGIN_SRC python
@@ -2502,6 +2463,7 @@ class TestUploadArtefact(TestCase):
         
 
     #+END_SRC
+
 
 * Test ApproveWorkshop
 #+NAME: test_ApproveWorkshop
@@ -2617,6 +2579,7 @@ class TestApproveWorkshop(TestCase):
 
     #+END_SRC
 
+
 * Test RejectWorkshop
 #+NAME: test_RejectWorkshop
 #+BEGIN_SRC python
@@ -2731,6 +2694,7 @@ class TestRejectWorkshop(TestCase):
                          Status.rejected.get("name"))
 
     #+END_SRC
+
 * Test DeleteArtefact
 #+NAME: test_DeleteArtefact
 #+BEGIN_SRC python
@@ -2831,6 +2795,7 @@ class TestDeleteArtefact(TestCase):
 
     #+END_SRC
 
+
 * ops_table
 #+NAME: ops_table
 #+BEGIN_SRC python
@@ -2854,6 +2819,7 @@ ops_table = {'add_user' : AddUser,
              'delete_artefact' : DeleteArtefact
 }
 #+END_SRC
+
 
 * Infra                                                         :boilerplate:
 
@@ -2886,6 +2852,7 @@ if __name__ == '__main__':
     unittest.main()
 
 #+END_SRC
+
 
 * Tangling                                                      :boilerplate:
 
