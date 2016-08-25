@@ -2717,7 +2717,7 @@ class TestUploadArtefact(TestCase):
                        artefact=new_artefact, session=login_user)
 
     def test_upload_artefact_raises_state_error_with_wrong_status(self):
-        print "test_upload__raises_state_error_with_wrong_status"
+        print "test_upload_artefact_raises_state_error_with_wrong_status"
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
