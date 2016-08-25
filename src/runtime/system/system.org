@@ -816,7 +816,6 @@ class RescheduleWorkshop():
             nc_centre = role.get('centre_nc')
             if workshop in nc_centre.get('workshops'):
                 return True
-            
         else:
             raise AuthError("Role not Authorized to perform this action")
 

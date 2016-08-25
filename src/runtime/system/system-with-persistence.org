@@ -155,7 +155,6 @@ class TestSystemConstructor(TestCase):
 
 #+END_SRC
 
-
 * Test Arity and Type Checks
 #+NAME: test_arity_and_types
 #+BEGIN_SRC python
@@ -187,7 +186,6 @@ class TestSystemArityAndType(TestCase):
             System.type_check(args, arg_types)
 
 #+END_SRC
-
 
 * Test AddUser
 #+NAME: test_add_user
@@ -668,7 +666,6 @@ def test_add_role(self):
 
 #+END_SRC
 
-
 * Test login
 #+NAME: test_login
 #+BEGIN_SRC python
@@ -701,7 +698,6 @@ class Testlogin(TestCase):
                          "admin")
 
 #+END_SRC
-
 
 * Test logout
 #+NAME: test_logout
@@ -1187,7 +1183,6 @@ class TestUpdateInstitute(TestCase):
         self.assertEqual(institute.get("name"),"NITK")
 
 #+END_SRC
-
 
 * Test CreateWorkshop
 #+NAME: test_CreateWorkshop
@@ -1937,7 +1932,6 @@ class TestCancelWorkshop(TestCase):
 
  #+END_SRC
 
-
 * Test ConductWorkshop
 #+NAME: test_ConductWorkshop
 #+BEGIN_SRC python
@@ -2293,62 +2287,62 @@ class TestRescheduleWorkshop(TestCase):
 
     def test_reschedule_workshop(self):
         print "test_reschedule_workshop"
-        admin_user=User.get_by_id(1)
-        session = Session(user=admin_user,role=Role.admin)
-        System.session_set.append(session)
-        inst = Institute(name="IIIT",address="Hyderabad")
-        institute = System.do("add_institute",institute = inst,session=session)
-        inst = Institute(name="NITK",address="Surathkal")
-        workshop_institute = System.do("add_institute", institute = inst, 
-                                        session = session)
-        oc = System.do("add_oc",institute=institute,spokes=[],
-                        session=session, oc_target = None)
 
-        nc = System.do("add_nc",institute=institute,hub=oc,session=session,
-                        nc_target = None, workshops = [])
-
-        target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        nc_target = NCTarget(usage = 200, date = target_date,
-                             oc_target = oc_target, wstargets = [])
-        
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
-                            date = target_date, nc_target = nc_target)
-
-        oc_target.save()
-        nc_target.save()
-        wstarget.save()
-        
-        ws_status = Status(name = "pending")
-        ws_status.save()
+        login_user = User.get_by_id(1)
+        login_role = Role.get_by_id(1)
+        session = System.do("login", user=login_user, role=login_role)
+        inst1 = Institute(name="NIT", address="Suratkal")
+        inst1.save()
+        inst2 = Institute(name="IIIT", address="Hyderabad")
+        inst2.save()
+        inst3 = Institute(name="HCU", address="Hyderabad")
+        inst3.save()
+        oc = System.do("add_oc", institute=inst1,
+                        session=session)
+        nc = System.do("add_nc", institute=inst2,
+                        hub=oc, session=session)
 
         name=Name(name="ncuser")
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
-        guest_role = Role.query.filter_by(name='guest').first()
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
-                    roles= [guest_role],
-                    user_status="active")
-        nc_user = System.do("add_user",user = user, session = session)
+        guest_role = Role.get_by_id(2)
+        user = User(name=Name.get_by_id(2), email=Email.get_by_id(2),
+                    roles=[guest_role])
 
-        ncc_role =  Role.get_by_id(6)
-        if ncc_role:
-            nc_user.append_role(ncc_role)
+        nc_user = System.do("add_user", user=user, session=session)
+        ncc_role = Role.get_by_id(6)
+        System.do("add_role", user=nc_user, role=ncc_role,
+                   session=session)
 
-        nc_session = Session(user = nc_user, role = ncc_role)
+        nc_session = Session(user=nc_user, role=ncc_role)
         System.session_set.append(nc_session)
+        role_check = Role.get_by_id(6)
 
-        name1 = Name(name = "Lab Workshop")
-        name1.save()
-        new_workshop = System.do("create_workshop",
-                                 institute = Institute.get_by_id(2),
-                                 name  = name1, ws_target = wstarget,
-                                 status = ws_status, artefacts = [],
-                                 nc = nc, session = nc_session) 
+        pending_status = Status.get_by_id(2)
+        completed_status = Status.get_by_id(3)
+        
+        date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
+        
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        oc_target.save()
+        nc_target = NCTarget(usage=400, date=date, nc=nc,
+                                 oc_target=oc_target, ws_targets=[])
+        nc_target.save()
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+        ws_target.save()
 
-        System.do("cancel_workshop", workshop = new_workshop,
-                   session = nc_session)
+        new_workshop = System.do("create_workshop", 
+                                     name="Test workshop",
+                                     institute=inst3,
+                                     status=completed_status, 
+                                     nc=nc,
+                                     ws_target=ws_target,
+                                     date=date,
+                                     session=nc_session) 
+                                     
+        new_workshop.save()
         
         new_target_date = datetime.datetime.strptime("05-07-2016", "%d-%m-%Y").date()
         new_wstarget = WSTarget(usage = 3000, participants = 200, experiments = 20,
@@ -2360,12 +2354,82 @@ class TestRescheduleWorkshop(TestCase):
                    session = nc_session, wstarget = new_wstarget)
 
         self.assertEqual(new_workshop.get("status").get("name"),
-                         ws_status.pending.get("name"))
+                         pending_status.pending.get("name"))
         self.assertEqual(new_workshop.get("ws_target").get("date"),
                          new_target_date)
-        
-    #+END_SRC
 
+    def test_reschedule_workshop_raises_arity_error(self):
+        print "test_reschedule_workshop_raises_arity_error"
+
+        login_user = User.get_by_id(1)
+        login_role = Role.get_by_id(1)
+        session = System.do("login", user=login_user, role=login_role)
+        inst1 = Institute(name="NIT", address="Suratkal")
+        inst1.save()
+        inst2 = Institute(name="IIIT", address="Hyderabad")
+        inst2.save()
+        inst3 = Institute(name="HCU", address="Hyderabad")
+        inst3.save()
+        oc = System.do("add_oc", institute=inst1,
+                        session=session)
+        nc = System.do("add_nc", institute=inst2,
+                        hub=oc, session=session)
+
+        name=Name(name="ncuser")
+        email=Email(email="ncuser@gmail.com")
+        name.save()
+        email.save()
+        guest_role = Role.get_by_id(2)
+        user = User(name=Name.get_by_id(2), email=Email.get_by_id(2),
+                    roles=[guest_role])
+
+        nc_user = System.do("add_user", user=user, session=session)
+        ncc_role = Role.get_by_id(6)
+        System.do("add_role", user=nc_user, role=ncc_role,
+                   session=session)
+
+        nc_session = Session(user=nc_user, role=ncc_role)
+        System.session_set.append(nc_session)
+        role_check = Role.get_by_id(6)
+
+        pending_status = Status.get_by_id(2)
+        completed_status = Status.get_by_id(3)
+        
+        date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
+        
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        oc_target.save()
+        nc_target = NCTarget(usage=400, date=date, nc=nc,
+                                 oc_target=oc_target, ws_targets=[])
+        nc_target.save()
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+        ws_target.save()
+
+        new_workshop = System.do("create_workshop", 
+                                     name="Test workshop",
+                                     institute=inst3,
+                                     status=completed_status, 
+                                     nc=nc,
+                                     ws_target=ws_target,
+                                     date=date,
+                                     session=nc_session) 
+                                     
+        new_workshop.save()
+        
+        new_target_date = datetime.datetime.strptime("05-07-2016", "%d-%m-%Y").date()
+
+
+        new_wstarget = WSTarget(usage = 3000, participants = 200, experiments = 20,
+                                date = new_target_date, nc_target = nc_target)
+
+        new_wstarget.save()
+
+        with self.assertRaises(ArityError):
+            System.do("reschedule_workshop", workshop = new_workshop,
+                        session = nc_session)
+
+ #+END_SRC
 
 * Test UploadArtefact
 #+NAME: test_UploadArtefact
@@ -2465,7 +2529,6 @@ class TestUploadArtefact(TestCase):
         
 
     #+END_SRC
-
 
 * Test ApproveWorkshop
 #+NAME: test_ApproveWorkshop
@@ -2580,7 +2643,6 @@ class TestApproveWorkshop(TestCase):
                          Status.approved.get("name"))
 
     #+END_SRC
-
 
 * Test RejectWorkshop
 #+NAME: test_RejectWorkshop
@@ -2797,7 +2859,6 @@ class TestDeleteArtefact(TestCase):
 
     #+END_SRC
 
-
 * ops_table
 #+NAME: ops_table
 #+BEGIN_SRC python
@@ -2821,7 +2882,6 @@ ops_table = {'add_user' : AddUser,
              'delete_artefact' : DeleteArtefact
 }
 #+END_SRC
-
 
 * Infra                                                         :boilerplate:
 
@@ -2855,7 +2915,6 @@ if __name__ == '__main__':
 
 #+END_SRC
 
-
 * Tangling                                                      :boilerplate:
 
 ** source
@@ -2881,7 +2940,7 @@ if __name__ == '__main__':
 #<<test_UpdateInstitute>>
 <<test_CreateWorkshop>>
 <<test_CancelWorkshop>>
-#<<test_RescheduleWorkshop>>
+<<test_RescheduleWorkshop>>
 <<test_ConductWorkshop>>
 <<test_UploadArtefact>>
 #<<test_ApproveWorkshop>>
