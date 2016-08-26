@@ -2656,8 +2656,7 @@ class TestRejectWorkshop(TestCase):
 
     def test_reject_workshop(self):
         print "test_reject_workshop"
-    def test_approve_workshop(self):
-        print "test_approve_workshop"
+
         login_user = User.get_by_id(1)
         login_role = Role.get_by_id(1)
         session = System.do("login", user=login_user, role=login_role)
@@ -2689,7 +2688,7 @@ class TestRejectWorkshop(TestCase):
         System.session_set.append(nc_session)
 
         pending_for_approval_status = Status.get_by_id(4)
-        approved_status = Status.get_by_id(6)
+        rejected_status = Status.get_by_id(5)
         date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
         
         oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
@@ -2733,7 +2732,7 @@ class TestRejectWorkshop(TestCase):
                    session=oc_session)
 
         self.assertEqual(workshop.get("status").get("name"),
-                         approved_status.get("name"))
+                         rejected_status.get("name"))
 
     #+END_SRC
 
@@ -2922,7 +2921,7 @@ if __name__ == '__main__':
 <<test_ConductWorkshop>>
 <<test_UploadArtefact>>
 <<test_ApproveWorkshop>>
-#<<test_RejectWorkshop>>
+<<test_RejectWorkshop>>
 #<<test_DeleteArtefact>>
 <<run_test_cases>>
 #+end_src
