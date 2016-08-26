@@ -2656,93 +2656,84 @@ class TestRejectWorkshop(TestCase):
 
     def test_reject_workshop(self):
         print "test_reject_workshop"
-
-        admin_user=User.get_by_id(1)
-        session = Session(user=admin_user,role=Role.admin)
-        System.session_set.append(session)
-        inst = Institute(name = "IIIT", address = "Hyderabad")
-        institute = System.do("add_institute", institute = inst, session=session)
-        inst = Institute(name = "NITK", address = "Surathkal")
-        workshop_institute = System.do("add_institute", institute = inst,
-                                        session = session)
-        oc = System.do("add_oc",institute=institute,spokes=[],
-                        session=session, oc_target = None)
-
-        nc = System.do("add_nc",institute=institute,hub=oc,session=session,
-                        nc_target = None, workshops = [])
-
-        target_date = datetime.datetime.strptime("30-06-2016", "%d-%m-%Y").date()
-        oc_target = OCTarget(usage = 400, date = target_date, nctargets = [])
-        oc_target.save()
-        nc_target = NCTarget(usage = 200, date = target_date,
-                             oc_target = oc_target, wstargets = [])
-        nc_target.save()
-        wstarget = WSTarget(usage = 4000, participants = 200, experiments = 20,
-                            date = target_date, nc_target = nc_target)
-
-        wstarget.save()
-
-        ws_status = Status(name = "pending")
-        ws_status.save()
+    def test_approve_workshop(self):
+        print "test_approve_workshop"
+        login_user = User.get_by_id(1)
+        login_role = Role.get_by_id(1)
+        session = System.do("login", user=login_user, role=login_role)
+        inst1 = Institute(name="NIT", address="Suratkal")
+        inst1.save()
+        inst2 = Institute(name="IIIT", address="Hyderabad")
+        inst2.save()
+        inst3 = Institute(name="HCU", address="Hyderabad")
+        inst3.save()
+        oc = System.do("add_oc", institute=inst1,
+                        session=session)
+        nc = System.do("add_nc", institute=inst2,
+                        hub=oc, session=session)
 
         name=Name(name="ncuser")
         email=Email(email="ncuser@gmail.com")
         name.save()
         email.save()
         guest_role = Role.get_by_id(2)
-        user = User(name=Name.get_by_id(2), email= Email.get_by_id(2),
-                    roles= [guest_role])
-        nc_user = System.do("add_user",user = user, session = session)
+        user = User(name=Name.get_by_id(2), email=Email.get_by_id(2),
+                    roles=[guest_role])
 
+        nc_user = System.do("add_user", user=user, session=session)
         ncc_role =  Role.get_by_id(6)
-        if ncc_role:
-            nc_user.append_role(ncc_role)
+        System.do("add_role", user=nc_user, role=ncc_role,                            
+                   session=session)                                                        
 
-        nc_session = Session(user = nc_user, role = ncc_role)
+        nc_session = Session(user=nc_user, role=ncc_role)
         System.session_set.append(nc_session)
 
-        workshop_name = Name(name = "Lab Workshop")
-        workshop_name.save()
+        pending_for_approval_status = Status.get_by_id(4)
+        approved_status = Status.get_by_id(6)
+        date = datetime.datetime.strptime("2016-12-23", "%Y-%m-%d").date()
+        
+        oc_target = OCTarget(usage=400, date=date, oc=oc, nc_targets=[])
+        oc_target.save()
+        nc_target = NCTarget(usage=400, date=date, nc=nc, 
+                                 oc_target=oc_target, ws_targets=[])
+        nc_target.save()
+        ws_target = WSTarget(usage=4000, participants=200, experiments=20,
+                                 date=date, nc_target=nc_target)
+        ws_target.save()
 
         name1=Name(name="ocuser")
         name1.save()
 
         email1=Email(email="ocuser@gmail.com")
         email1.save()
-        guest_role = Role.query.filter_by(name='guest').first()
+        guest_role = Role.get_by_id(2)
         user = User(name=Name.get_by_id(3), email= Email.get_by_id(3),
                     roles= [guest_role])
         oc_user = System.do("add_user",user = user, session = session)
         occ_role =  Role.get_by_id(5)
-        if occ_role:
-            oc_user.append_role(occ_role)
+        System.do("add_role", user=oc_user, role=occ_role,                            
+                   session=session)                                                        
 
-        oc_session = Session(user = nc_user, role = occ_role)
+        oc_session = Session(user = oc_user, role = occ_role)
         System.session_set.append(oc_session)
 
-        new_workshop = System.do("create_workshop",
-                                 institute = Institute.get_by_id(2),
-                                 name  = workshop_name, ws_target = wstarget,
-                                 status = ws_status, artefacts = [],
-                                 nc = nc, session = nc_session)
+        workshop = Workshop(name="Test workshop",
+                            institute=inst3,
+                            status=pending_for_approval_status, 
+                            artefacts=[], 
+                            ws_target=ws_target,
+                            nc=nc,
+                            date=date,
+                            participants=0,
+                            experiments=0,
+                            usage=0)
+        workshop.save()
 
+        System.do("reject_workshop", workshop=workshop,
+                   session=oc_session)
 
-        System.do("conduct_workshop", workshop = new_workshop,
-                  session = nc_session)
-
-        new_artefact = Artefact(name = "Photo",
-                                path = "/main/photos",
-                                a_type = Type.photo)
-
-        new_artefact.save()
-
-        System.do("upload_artefact", workshop = new_workshop,
-                  session = nc_session, artefact = Artefact.get_by_id(1))
-
-        System.do("reject_workshop", workshop = new_workshop,
-                   session = oc_session)
-        self.assertEqual(new_workshop.get("status").get("name"),
-                         Status.rejected.get("name"))
+        self.assertEqual(workshop.get("status").get("name"),
+                         approved_status.get("name"))
 
     #+END_SRC
 
