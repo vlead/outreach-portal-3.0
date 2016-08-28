@@ -1103,6 +1103,7 @@ class TestPersistentDelegate(TestCase):
 
         self.assertEqual(rejected_workshop.get("status").get("name"), reject_status.get("name"))
 #+END_SRC
+
 ***  Upload Artefact
 #+NAME: persistent_upload_artefact
 #+BEGIN_SRC python  
