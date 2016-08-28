@@ -908,10 +908,9 @@ class RejectWorkshop():
     def state_check(args):
         workshop = args["workshop"]
         session = args["session"]
-        workshop_status = workshop.get("status")
-        if workshop_status == "pending for approval":
+        workshop_status = workshop.get("status").get("name")
+        if not workshop_status == "pending for approval":
             raise StateError("cannot reject workshop")
-        
                     
     @staticmethod
     def action(args):
