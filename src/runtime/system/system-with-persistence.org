@@ -2533,7 +2533,6 @@ class TestUploadArtefact(TestCase):
 
         self.assertEqual(workshop.get("status").get("name") ,
                          pending_approval.get("name"))
-        
 
     def test_upload_artefact_raises_arity_error(self):
         print "test_upload_artefact_raises_arity_error"
@@ -2673,7 +2672,6 @@ class TestUploadArtefact(TestCase):
         with self.assertRaises(TypeError):
             System.do("upload_artefact", workshop=new_artefact, 
                        artefact=new_workshop, session=nc_session)
-
 
     def test_upload_artefact_raises_auth_error(self):
         print "test_upload_artefact_auth_error"
@@ -2836,7 +2834,6 @@ class TestApproveWorkshop(TestCase):
         System.session_set = []
         db.session.remove()
         db.drop_all()
-
 
     def test_approve_workshop(self):
         print "test_approve_workshop"
